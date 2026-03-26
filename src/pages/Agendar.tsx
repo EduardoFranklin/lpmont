@@ -5,6 +5,7 @@ import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import useTrackingScripts from "@/hooks/useTrackingScripts";
 
 const UFS = [
   "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
@@ -71,6 +72,7 @@ const benefits = [
 ];
 
 const Agendar = () => {
+  useTrackingScripts();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     treatment: "Dr.",
