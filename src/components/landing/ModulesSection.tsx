@@ -47,6 +47,50 @@ const phaseColors: Record<string, string> = {
   Cume: "text-primary",
 };
 
+const coverSlides = [
+  "/images/capa1.webp",
+  "/images/capa2.webp",
+  "/images/capa3.webp",
+  "/images/capa4.webp",
+  "/images/capa5.webp",
+  "/images/capa6.webp",
+  "/images/capa7.webp",
+];
+
+const CampsCarousel = () => {
+  const [emblaRef] = useEmblaCarousel(
+    { loop: true, align: "start", dragFree: true },
+    [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
+  );
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      className="mb-16 -mx-4 sm:mx-0"
+    >
+      <div ref={emblaRef} className="overflow-hidden cursor-grab active:cursor-grabbing">
+        <div className="flex gap-4 pl-4 sm:pl-0">
+          {coverSlides.map((src, i) => (
+            <div
+              key={i}
+              className="flex-shrink-0 w-[200px] sm:w-[220px] rounded-xl overflow-hidden border border-foreground/[0.06]"
+            >
+              <img
+                src={src}
+                alt={`Acampamento ${i + 1}`}
+                className="w-full h-auto object-cover"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const [openHandsOn, setOpenHandsOn] = useState<number | null>(0);
