@@ -3,12 +3,12 @@ import { motion } from "framer-motion";
 import { BookOpen, Wrench, ChevronLeft, ChevronRight } from "lucide-react";
 
 const handsOnImages = [
-  { src: "/images/handson-1.png", caption: "Inserção de resina com espátula" },
-  { src: "/images/handson-2.png", caption: "Anatomização do modelo" },
-  { src: "/images/handson-3.png", caption: "Escultura e detalhamento" },
-  { src: "/images/handson-4.png", caption: "Verificação de contatos proximais" },
-  { src: "/images/handson-5.png", caption: "Ajuste fino da restauração" },
-  { src: "/images/handson-6.png", caption: "Aplicação do adesivo" },
+  { src: "/images/thumbs/handson-1-thumb.webp", caption: "Inserção de resina com espátula" },
+  { src: "/images/thumbs/handson-2-thumb.webp", caption: "Anatomização do modelo" },
+  { src: "/images/thumbs/handson-3-thumb.webp", caption: "Escultura e detalhamento" },
+  { src: "/images/thumbs/handson-4-thumb.webp", caption: "Verificação de contatos proximais" },
+  { src: "/images/thumbs/handson-5-thumb.webp", caption: "Ajuste fino da restauração" },
+  { src: "/images/thumbs/handson-6-thumb.webp", caption: "Aplicação do adesivo" },
 ];
 
 const MethodSection = () => {

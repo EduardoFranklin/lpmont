@@ -18,7 +18,7 @@ const HeroSection = () => {
       {/* Background mountain image with parallax */}
       <div className="absolute inset-0">
         <img
-          src="/images/bg-montanha.jpg"
+          src="/images/thumbs/bg-montanha-thumb.webp"
           alt=""
           className="w-full h-full object-cover will-change-transform"
           decoding="async"
@@ -123,7 +123,7 @@ const HeroSection = () => {
                     >
                       <div className="absolute inset-0">
                         <img
-                          src="/images/hero-mountain.jpg"
+                          src="/images/thumbs/hero-mountain-thumb.webp"
                           alt=""
                           className="w-full h-full object-cover opacity-40"
                           loading="lazy"
