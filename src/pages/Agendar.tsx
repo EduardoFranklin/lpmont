@@ -232,6 +232,7 @@ const Agendar = () => {
 
   const goToStep3 = async () => {
     if (!selectedSlot) return;
+    setCalendarCreating(true);
     try {
       await supabase.from("leads").insert({
         treatment: form.treatment,
@@ -251,7 +252,7 @@ const Agendar = () => {
         utm_content: utmParams.utm_content || null,
       } as any);
 
-      // Send welcome email with calendar info (fire-and-forget)
+      // Send welcome email (fire-and-forget)
       supabase.functions.invoke("send-welcome-email", {
         body: {
           recipientEmail: form.email,
@@ -262,9 +263,31 @@ const Agendar = () => {
           scheduledTime: selectedSlot.time,
         },
       }).catch((err) => console.error("Welcome email error:", err));
+
+      // Create Google Calendar event with Meet link
+      try {
+        const { data: calData } = await supabase.functions.invoke("create-calendar-event", {
+          body: {
+            title: `Reunião Método Mont' - ${form.treatment} ${form.name}`,
+            description: `Reunião online de 30 min com a equipe do Método Mont'.\n\nParticipantes:\n- ${form.treatment} ${form.name} (${form.email})\n- Equipe Método Mont' (${ADMIN_EMAIL})`,
+            dateStr: selectedSlot.date,
+            timeSlot: selectedSlot.time,
+            guestEmail: form.email,
+            guestName: form.name,
+            treatment: form.treatment,
+          },
+        });
+        if (calData?.meetLink) {
+          setMeetLink(calData.meetLink);
+          setCalendarCreated(true);
+        }
+      } catch (calErr) {
+        console.error("Calendar event error:", calErr);
+      }
     } catch (err) {
       console.error("Erro ao salvar lead:", err);
     }
+    setCalendarCreating(false);
     setStep(3);
   };
 
