@@ -178,6 +178,79 @@ const ModulesSection = () => {
           </div>
         </div>
 
+        {/* Situações Clínicas Slider */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-3xl mx-auto mt-14"
+        >
+          <div className="gradient-card">
+            <div className="gradient-card-inner overflow-hidden">
+              <div
+                className="relative aspect-video bg-background overflow-hidden cursor-pointer"
+                onMouseEnter={() => setClinicalAutoPlay(false)}
+                onMouseLeave={() => setClinicalAutoPlay(true)}
+              >
+                {clinicalImages.map((img, i) => (
+                  <div
+                    key={i}
+                    className="absolute inset-0 transition-opacity duration-700"
+                    style={{ opacity: i === clinicalCurrent ? 1 : 0 }}
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.caption}
+                      className="w-full h-full object-cover"
+                      loading={i === 0 ? "eager" : "lazy"}
+                    />
+                    <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
+                  </div>
+                ))}
+
+                <div className="absolute bottom-0 left-0 right-0 px-6 pb-5 flex items-end justify-between z-10">
+                  <div>
+                    <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block mb-1">
+                      Situações Clínicas · {String(clinicalCurrent + 1).padStart(2, "0")}/{String(clinicalImages.length).padStart(2, "0")}
+                    </span>
+                    <p className="text-foreground/80 text-sm font-medium">{clinicalImages[clinicalCurrent].caption}</p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={clinicalPrev}
+                      className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={clinicalNext}
+                      className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="absolute bottom-0 left-0 right-0 flex gap-1 px-6 pb-1.5 z-10">
+                  {clinicalImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setClinicalCurrent(i)}
+                      className="flex-1 h-[2px] rounded-full transition-all duration-500"
+                      style={{
+                        background: i === clinicalCurrent
+                          ? "linear-gradient(90deg, hsl(38 100% 55%), hsl(30 80% 45%))"
+                          : "rgba(255,255,255,0.1)",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Hands-On */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
