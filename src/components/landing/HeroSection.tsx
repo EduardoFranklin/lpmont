@@ -7,8 +7,13 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      {/* Deep dark bg with subtle radial glow */}
-      <div className="absolute inset-0 bg-background" />
+      {/* Background mountain image */}
+      <div className="absolute inset-0">
+        <img src="/images/bg-montanha.jpg" alt="" className="w-full h-full object-cover" />
+      </div>
+      {/* Dark overlay to keep text readable */}
+      <div className="absolute inset-0 bg-background/70" />
+      {/* Existing glows on top */}
       <div className="glow-gold" style={{ width: 800, height: 800, top: "-20%", left: "50%", transform: "translateX(-50%)" }} />
       <div className="glow-gold" style={{ width: 500, height: 500, bottom: "0", right: "-10%", opacity: 0.5 }} />
 
