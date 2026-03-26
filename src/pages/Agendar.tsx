@@ -72,6 +72,7 @@ const benefits = [
 ];
 
 const Agendar = () => {
+  useTrackingScripts();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     treatment: "Dr.",
