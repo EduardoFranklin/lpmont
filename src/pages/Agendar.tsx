@@ -181,7 +181,7 @@ const Agendar = () => {
         </div>
       </div>
 
-      <div className="flex-1 section-container py-5 pb-8 max-w-lg mx-auto w-full">
+      <div className="flex-1 section-container py-5 pb-4 max-w-lg mx-auto w-full">
         {/* Progress */}
         <div className="mb-4">
           <Progress value={progress} className="h-1.5 bg-foreground/[0.06]" />
@@ -351,7 +351,7 @@ const Agendar = () => {
               </button>
 
               {/* Spacer for floating button on mobile */}
-              <div className="h-20 sm:hidden" />
+              <div className="h-16 sm:hidden" />
             </motion.div>
           )}
 
