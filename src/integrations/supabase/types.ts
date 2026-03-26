@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      lead_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          lead_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          lead_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          lead_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_notes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           career: string
@@ -27,6 +59,7 @@ export type Database = {
           scheduled_day: string | null
           scheduled_time: string | null
           status: Database["public"]["Enums"]["lead_status"]
+          temperature: Database["public"]["Enums"]["lead_temperature"] | null
           treatment: string
           uf: string
           updated_at: string
@@ -43,6 +76,7 @@ export type Database = {
           scheduled_day?: string | null
           scheduled_time?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          temperature?: Database["public"]["Enums"]["lead_temperature"] | null
           treatment?: string
           uf: string
           updated_at?: string
@@ -59,8 +93,42 @@ export type Database = {
           scheduled_day?: string | null
           scheduled_time?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          temperature?: Database["public"]["Enums"]["lead_temperature"] | null
           treatment?: string
           uf?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      messaging_templates: {
+        Row: {
+          active: boolean
+          body: string
+          channel: Database["public"]["Enums"]["message_channel"]
+          created_at: string
+          id: string
+          subject: string | null
+          trigger: Database["public"]["Enums"]["funnel_trigger"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          body: string
+          channel: Database["public"]["Enums"]["message_channel"]
+          created_at?: string
+          id?: string
+          subject?: string | null
+          trigger: Database["public"]["Enums"]["funnel_trigger"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          channel?: Database["public"]["Enums"]["message_channel"]
+          created_at?: string
+          id?: string
+          subject?: string | null
+          trigger?: Database["public"]["Enums"]["funnel_trigger"]
           updated_at?: string
         }
         Relationships: []
@@ -70,9 +138,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      auto_move_stale_leads: { Args: never; Returns: undefined }
     }
     Enums: {
+      funnel_trigger:
+        | "novo"
+        | "agendado"
+        | "compareceu"
+        | "nao_compareceu"
+        | "convertido"
+        | "perdido"
       lead_status:
         | "novo"
         | "agendado"
@@ -80,6 +155,8 @@ export type Database = {
         | "nao_compareceu"
         | "convertido"
         | "perdido"
+      lead_temperature: "frio" | "morno" | "quente"
+      message_channel: "email" | "whatsapp"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -207,6 +284,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      funnel_trigger: [
+        "novo",
+        "agendado",
+        "compareceu",
+        "nao_compareceu",
+        "convertido",
+        "perdido",
+      ],
       lead_status: [
         "novo",
         "agendado",
@@ -215,6 +300,8 @@ export const Constants = {
         "convertido",
         "perdido",
       ],
+      lead_temperature: ["frio", "morno", "quente"],
+      message_channel: ["email", "whatsapp"],
     },
   },
 } as const
