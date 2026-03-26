@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2, MessageCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -43,6 +43,44 @@ const Agendar = () => {
     career: "",
   });
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; time: string } | null>(null);
+  const [cities, setCities] = useState<string[]>([]);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [citySearch, setCitySearch] = useState("");
+  const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
+  const cityRef = useRef<HTMLDivElement>(null);
+
+  // Fetch cities from IBGE API when UF changes
+  useEffect(() => {
+    if (!form.uf) {
+      setCities([]);
+      return;
+    }
+    setLoadingCities(true);
+    handleChange("city", "");
+    setCitySearch("");
+    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.uf}/municipios?orderBy=nome`)
+      .then((res) => res.json())
+      .then((data: { nome: string }[]) => {
+        setCities(data.map((c) => c.nome));
+      })
+      .catch(() => setCities([]))
+      .finally(() => setLoadingCities(false));
+  }, [form.uf]);
+
+  // Close city dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (cityRef.current && !cityRef.current.contains(e.target as Node)) {
+        setCityDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filteredCities = citySearch
+    ? cities.filter((c) => c.toLowerCase().includes(citySearch.toLowerCase()))
+    : cities;
 
   const progress = step === 1 ? 50 : step === 2 ? 90 : 100;
 
@@ -184,14 +222,38 @@ const Agendar = () => {
                       ))}
                     </select>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 relative" ref={cityRef}>
                     <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Cidade <span className="text-primary">*</span></Label>
                     <Input
-                      value={form.city}
-                      onChange={(e) => handleChange("city", e.target.value)}
-                      placeholder="Sua cidade"
+                      value={form.city || citySearch}
+                      onChange={(e) => {
+                        setCitySearch(e.target.value);
+                        setCityDropdownOpen(true);
+                        if (form.city) handleChange("city", "");
+                      }}
+                      onFocus={() => setCityDropdownOpen(true)}
+                      placeholder={loadingCities ? "Carregando..." : form.uf ? "Digite para buscar" : "Selecione o UF"}
+                      disabled={!form.uf || loadingCities}
                       className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25"
                     />
+                    {cityDropdownOpen && filteredCities.length > 0 && (
+                      <div className="absolute z-50 top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-lg border border-foreground/15 bg-card shadow-xl">
+                        {filteredCities.slice(0, 50).map((city) => (
+                          <button
+                            key={city}
+                            type="button"
+                            onClick={() => {
+                              handleChange("city", city);
+                              setCitySearch("");
+                              setCityDropdownOpen(false);
+                            }}
+                            className="w-full text-left px-3 py-2 text-sm text-foreground/70 hover:bg-foreground/[0.06] transition-colors"
+                          >
+                            {city}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
