@@ -107,8 +107,7 @@ const HeroSection = () => {
             className="text-base sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-5 sm:mb-10"
           >
             Reputação vira indicação. Indicação vira agenda cheia.
-            Agenda cheia vira clínica. Clínica vira instituto.
-            Tudo vem do método.
+            Agenda cheia vira clínica e Instituto. Tudo vem do método.
           </motion.p>
 
           {/* Author badge */}
