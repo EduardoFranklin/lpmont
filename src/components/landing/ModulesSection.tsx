@@ -364,24 +364,32 @@ const ModulesSection = () => {
         >
           <div className="gradient-card">
             <div className="gradient-card-inner p-6 sm:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
-                  <Printer className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block">Incluso no curso</span>
-                  <h3 className="text-foreground/90 font-medium text-base">Arquivo para Impressão 3D do Modelo</h3>
-                </div>
-              </div>
-              <p className="text-foreground/30 text-sm leading-relaxed mb-6 sm:ml-[52px]">
-                Você receberá o arquivo digital para imprimir o mesmo modelo utilizado nas aulas práticas (Hands-On). Treine no seu próprio ritmo, com o mesmo modelo usado pelo Prof. Breno Mont'Alverne.
-              </p>
-              <div className="grid grid-cols-3 gap-3 sm:ml-[52px]">
-                {["/images/modelo-handson-1.webp", "/images/modelo-handson-2.webp", "/images/modelo-handson-3.webp"].map((src, i) => (
-                  <div key={i} className="rounded-xl overflow-hidden border border-foreground/[0.06] aspect-[4/3]">
-                    <img src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                      <Printer className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block">Incluso no curso</span>
+                      <h3 className="text-foreground/90 font-medium text-base">Arquivo para Impressão 3D do Modelo</h3>
+                    </div>
                   </div>
-                ))}
+                  <p className="text-foreground/30 text-sm leading-relaxed sm:ml-[52px]">
+                    Você receberá o arquivo digital para imprimir o mesmo modelo utilizado nas aulas práticas (Hands-On). Treine no seu próprio ritmo, com o mesmo modelo usado pelo Prof. Breno Mont'Alverne.
+                  </p>
+                </div>
+                <div className="w-full sm:w-36 h-28 rounded-xl overflow-hidden border border-foreground/[0.06] flex-shrink-0 relative">
+                  <motion.div
+                    className="flex h-full"
+                    animate={{ x: ["0%", "-66.66%", "-33.33%", "0%"] }}
+                    transition={{ duration: 8, ease: "easeInOut", repeat: Infinity, repeatType: "loop", times: [0, 0.33, 0.66, 1] }}
+                  >
+                    {["/images/modelo-handson-1.webp", "/images/modelo-handson-2.webp", "/images/modelo-handson-3.webp"].map((src, i) => (
+                      <img key={i} src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover flex-shrink-0" loading="lazy" />
+                    ))}
+                  </motion.div>
+                </div>
               </div>
             </div>
           </div>
