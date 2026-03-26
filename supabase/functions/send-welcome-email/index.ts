@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { recipientEmail, recipientName, treatment, scheduledDay, scheduledDate, scheduledTime } = await req.json();
+    const { recipientEmail, recipientName, treatment, scheduledDay, scheduledDate, scheduledTime, meetLink } = await req.json();
 
     if (!recipientEmail) {
       return new Response(JSON.stringify({ error: "recipientEmail is required" }), {
