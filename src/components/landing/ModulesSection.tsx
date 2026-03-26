@@ -47,10 +47,9 @@ const ModulesSection = () => {
         ([entry]) => {
           if (entry.isIntersecting) {
             setOpenIdx(i);
-            obs.disconnect();
           }
         },
-        { threshold: 0.6 }
+        { threshold: 0.5 }
       );
       obs.observe(el);
       observers.push(obs);
