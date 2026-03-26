@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2, MessageCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
@@ -157,8 +158,25 @@ const Agendar = () => {
     }
   };
 
-  const goToStep3 = () => {
-    if (selectedSlot) setStep(3);
+  const goToStep3 = async () => {
+    if (!selectedSlot) return;
+    try {
+      await supabase.from("leads").insert({
+        treatment: form.treatment,
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        uf: form.uf,
+        city: form.city,
+        career: form.career,
+        scheduled_day: selectedSlot.day,
+        scheduled_time: selectedSlot.time,
+        status: "agendado",
+      });
+    } catch (err) {
+      console.error("Erro ao salvar lead:", err);
+    }
+    setStep(3);
   };
 
   const stepVariants = {
