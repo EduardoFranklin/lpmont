@@ -427,7 +427,7 @@ const Agendar = () => {
                 <CheckCircle2 className="w-10 h-10 text-primary" />
               </motion.div>
 
-              <h2 className="text-xl font-bold text-foreground/90 mb-2">
+              <h2 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-2">
                 Agendamento <span className="summit-text">confirmado!</span>
               </h2>
               <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
