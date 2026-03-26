@@ -47,7 +47,7 @@ const HeroSection = () => {
         </svg>
       </div>
 
-      <div className="section-container relative z-10 pt-32 pb-20 lg:pt-40 lg:pb-24">
+      <div className="section-container relative z-10 pt-24 pb-20 lg:pt-40 lg:pb-24">
         <div className="max-w-4xl mx-auto text-center">
 
 
@@ -56,14 +56,14 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center justify-center gap-2 sm:gap-3 mb-6"
+            className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6"
           >
             {toggles.map((t, i) => {
               const Icon = t.icon;
               return (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 sm:py-2 rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium text-foreground/30 bg-foreground/[0.04] border border-foreground/[0.06] min-h-[48px] sm:min-h-0 justify-center"
+                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 px-4 sm:px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium text-foreground/30 bg-foreground/[0.04] border border-foreground/[0.06] min-h-[48px] sm:min-h-0 justify-center"
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
                   <span className="text-center leading-tight whitespace-nowrap">{t.label}</span>
@@ -77,7 +77,7 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="flex items-center justify-center gap-3 mb-10"
+            className="flex items-center justify-center gap-3 mb-5 sm:mb-10"
           >
             <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-foreground/40">
@@ -91,10 +91,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-4xl sm:text-5xl lg:text-[4.25rem] font-semibold leading-[1.15] text-foreground/95 text-balance mb-6"
+            className="text-3xl sm:text-5xl lg:text-[4.25rem] font-bold sm:font-semibold leading-[1.15] text-foreground/95 text-balance mb-4 sm:mb-6"
           >
             Dentista, construa a reputação que{" "}
-            <span className="summit-text font-medium">
+            <span className="summit-text font-bold sm:font-medium">
               lota sua agenda e faz sua clínica crescer.
             </span>
           </motion.h1>
@@ -104,7 +104,7 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="text-lg sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-10"
+            className="text-base sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-5 sm:mb-10"
           >
             Reputação vira indicação. Indicação vira agenda cheia.
             Agenda cheia vira clínica. Clínica vira instituto.
@@ -116,7 +116,7 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.55 }}
-            className="flex items-center justify-center gap-3 mb-10"
+            className="flex items-center justify-center gap-3 mb-5 sm:mb-10"
           >
             <img
               src="/images/thumbs/breno-avatar.webp"
@@ -135,9 +135,9 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 sm:mb-12"
           >
-            <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" className="btn-gradient">
+            <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" className="btn-gradient w-full sm:w-auto">
               <div className="btn-gradient-wrapper">
                 <div className="btn-gradient-inner">
                   <div className="btn-gradient-bg" />
@@ -147,7 +147,7 @@ const HeroSection = () => {
                 </div>
               </div>
             </a>
-            <a href="#modulos" className="btn-secondary">
+            <a href="#modulos" className="btn-secondary hidden sm:inline-flex">
               Ver a trilha completa
             </a>
           </motion.div>
