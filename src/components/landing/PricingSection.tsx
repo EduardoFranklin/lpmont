@@ -103,7 +103,7 @@ const PricingSection = () => {
                 </div>
 
                 <a
-                  href="https://metodomont.com.br"
+                  href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-summit w-full justify-center text-base"
