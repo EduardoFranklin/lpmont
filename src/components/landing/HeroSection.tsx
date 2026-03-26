@@ -201,6 +201,7 @@ const HeroSection = () => {
                       style={{ border: "none" }}
                       allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
                       allowFullScreen
+                      // @ts-ignore
                       fetchpriority="high"
                     />
                   )}
