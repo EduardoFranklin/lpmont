@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { ChevronDown, ChevronLeft, ChevronRight, Printer } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Printer, BookOpen } from "lucide-react";
+import SynopsisModal from "./SynopsisModal";
 
 const clinicalImages = [
   { src: "/images/thumbs/clinicas-1-thumb.webp", caption: "Classe I — Visão oclusal isolada" },
@@ -63,10 +64,10 @@ const coverSlides = [
   "/images/capa13.webp",
 ];
 
-const CampsCarousel = () => {
+const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => void }) => {
   const doubled = [...coverSlides, ...coverSlides];
-  const itemWidth = 200; // sm:w-[200px]
-  const gapWidth = 16; // gap-4 = 16px
+  const itemWidth = 200;
+  const gapWidth = 16;
   const totalWidth = coverSlides.length * (itemWidth + gapWidth);
 
   return (
@@ -96,19 +97,23 @@ const CampsCarousel = () => {
           dragElastic={0.1}
           style={{ willChange: "transform" }}
         >
-          {doubled.map((src, i) => (
-            <div
-              key={i}
-              className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-colors duration-300"
-            >
-              <img
-                src={src}
-                alt={`Acampamento ${(i % coverSlides.length) + 1}`}
-                className="w-full h-auto object-cover"
-                loading="lazy"
-              />
-            </div>
-          ))}
+          {doubled.map((src, i) => {
+            const moduleNum = (i % coverSlides.length) + 1;
+            return (
+              <div
+                key={i}
+                className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-colors duration-300 cursor-pointer"
+                onClick={() => onCoverClick(moduleNum)}
+              >
+                <img
+                  src={src}
+                  alt={`Acampamento ${moduleNum}`}
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
+            );
+          })}
         </motion.div>
       </div>
     </motion.div>
