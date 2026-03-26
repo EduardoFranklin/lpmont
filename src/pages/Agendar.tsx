@@ -308,7 +308,7 @@ const Agendar = () => {
                 <ArrowLeft className="w-3.5 h-3.5" /> Voltar
               </button>
 
-              <h2 className="text-lg font-bold text-foreground/90 leading-snug mb-1">
+              <h2 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-1">
                 Escolha o melhor <span className="summit-text">horário</span>
               </h2>
               <p className="text-[13px] text-foreground/35 mb-5">
