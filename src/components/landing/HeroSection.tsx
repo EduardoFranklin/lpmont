@@ -119,7 +119,7 @@ const HeroSection = () => {
             className="flex items-center justify-center gap-3 mb-10"
           >
             <img
-              src="/images/thumbs/breno-thumb.webp"
+              src="/images/thumbs/breno-avatar.webp"
               alt="Dr. Breno Mont'Alverne"
               className="w-10 h-10 rounded-full object-cover border border-foreground/[0.08]"
               decoding="async"
