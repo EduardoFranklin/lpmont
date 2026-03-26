@@ -95,7 +95,7 @@ const PricingSection = () => {
                     <Gift className="w-3.5 h-3.5" /> Bônus da expedição
                   </p>
 
-                  <div className="rounded-xl border border-primary/10 bg-primary/[0.03] p-5">
+                  <div className="rounded-xl border border-primary/10 bg-primary/[0.03] p-5 mb-3">
                     <div>
                       <p className="text-[13px] font-medium text-foreground/60 mb-1">
                         Seja membro fundador da comunidade:
@@ -106,6 +106,21 @@ const PricingSection = () => {
                       <p className="text-foreground/30 text-[12px] mt-2">
                         Grupo exclusivo no WhatsApp com acesso direto à equipe e outros expedicionários.
                       </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <div className="rounded-xl border border-primary/10 bg-primary/[0.03] px-5 py-4 flex items-center gap-3">
+                      <Gift className="w-4 h-4 text-primary/50 flex-shrink-0" />
+                      <p className="text-[13px] font-medium text-foreground/55">Curso de Clareamento — Rayssa Cavaleiro</p>
+                    </div>
+                    <div className="rounded-xl border border-primary/10 bg-primary/[0.03] px-5 py-4 flex items-center gap-3">
+                      <Gift className="w-4 h-4 text-primary/50 flex-shrink-0" />
+                      <p className="text-[13px] font-medium text-foreground/55">Curso de Fotografia — Caio Calixto</p>
+                    </div>
+                    <div className="rounded-xl border border-primary/10 bg-primary/[0.03] px-5 py-4 flex items-center gap-3">
+                      <Gift className="w-4 h-4 text-primary/50 flex-shrink-0" />
+                      <p className="text-[13px] font-medium text-foreground/55">Curso de I.A. para Dentistas</p>
                     </div>
                   </div>
                 </div>
