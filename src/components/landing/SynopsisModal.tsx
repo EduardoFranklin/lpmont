@@ -18,7 +18,7 @@ const SynopsisModal = ({ moduleNum, open, onOpenChange }: SynopsisModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl p-0 gap-0 border-foreground/[0.06] bg-background/95 backdrop-blur-xl overflow-hidden rounded-2xl max-h-[90vh] [&>button]:z-30 [&>button]:bg-background/60 [&>button]:backdrop-blur-sm [&>button]:rounded-full [&>button]:w-8 [&>button]:h-8 [&>button]:border [&>button]:border-foreground/10 [&>button]:opacity-100 [&>button]:hover:opacity-100 [&>button]:right-3 [&>button]:top-3">
+      <DialogContent className="max-w-2xl p-0 gap-0 border-foreground/[0.06] bg-background/95 backdrop-blur-xl overflow-hidden rounded-2xl max-h-[90vh] [&>button]:z-30 [&>button]:bg-background/60 [&>button]:backdrop-blur-sm [&>button]:rounded-full [&>button]:w-8 [&>button]:h-8 [&>button]:border [&>button]:border-foreground/10 [&>button]:opacity-100 [&>button]:hover:opacity-100 [&>button]:right-3 [&>button]:top-3 [&>button]:flex [&>button]:items-center [&>button]:justify-center">
         <DialogTitle className="sr-only">{data.title}</DialogTitle>
 
         <SynopsisContent data={data} coverSrc={coverSrc} moduleNum={moduleNum} />
