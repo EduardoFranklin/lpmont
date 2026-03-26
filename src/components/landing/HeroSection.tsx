@@ -21,6 +21,8 @@ const HeroSection = () => {
           src="/images/bg-montanha.jpg"
           alt=""
           className="w-full h-full object-cover will-change-transform"
+          decoding="async"
+          fetchPriority="high"
           style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.1)` }}
         />
       </div>
@@ -124,6 +126,8 @@ const HeroSection = () => {
                           src="/images/hero-mountain.jpg"
                           alt=""
                           className="w-full h-full object-cover opacity-40"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
                       </div>
