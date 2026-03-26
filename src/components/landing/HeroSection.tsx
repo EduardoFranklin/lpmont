@@ -62,9 +62,9 @@ const HeroSection = () => {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="text-4xl sm:text-5xl lg:text-[4.25rem] font-normal leading-[1.15] text-foreground/95 text-balance mb-6"
           >
-            Domine cada restauração.{" "}
+            Domine a trilha. Construa sua reputação.{" "}
             <span className="summit-text font-medium">
-              Chegue ao topo da odontologia.
+              Chegue à sua própria clínica.
             </span>
           </motion.h1>
 
