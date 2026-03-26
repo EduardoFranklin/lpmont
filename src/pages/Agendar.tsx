@@ -580,16 +580,15 @@ const Agendar = () => {
                     <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
                   </div>
 
-                  {meetLink && (
-                    <a
-                      href={meetLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-summit w-full justify-center text-sm py-3.5 gap-2 mb-3"
-                    >
-                      <Video className="w-5 h-5" /> Entrar no Google Meet
-                    </a>
-                  )}
+                  <a
+                    href={`https://wa.me/5598991426777?text=${encodeURIComponent("Acabei de agendar uma reunião, tenho interesse em saber mais sobre o Método Mont.")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-summit w-full justify-center text-sm py-3.5 gap-2 mb-3"
+                    style={{ background: "#1DA851" }}
+                  >
+                    <MessageCircle className="w-5 h-5" /> Falar no WhatsApp
+                  </a>
 
                   <p className="text-[13px] text-foreground/35 max-w-xs mb-2">
                     O evento foi adicionado ao seu calendário e o link da reunião foi enviado para <span className="text-foreground/50 font-medium">{form.email}</span>
