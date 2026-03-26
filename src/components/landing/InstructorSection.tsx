@@ -68,7 +68,7 @@ const InstructorSection = () => {
               {stats.map((s) => (
                 <div key={s.label} className="gradient-card">
                   <div className="gradient-card-inner p-5 text-center">
-                    <span className="text-lg mb-1 block">{s.icon}</span>
+                    <s.icon className="w-5 h-5 text-primary mx-auto mb-1" />
                     <p className="text-lg font-medium summit-text">{s.value}</p>
                     <p className="text-[11px] text-foreground/30 mt-1">{s.label}</p>
                   </div>
