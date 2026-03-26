@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Trash2, Edit2, RefreshCw, MessageCircle, Plus, CalendarCheck } from "lucide-react";
+import { Search, Trash2, Edit2, RefreshCw, MessageCircle, Plus, CalendarCheck, Snowflake, Flame, Zap } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -114,13 +114,14 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
     if (!editLead || !newNote.trim()) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+    const statusLabel = STATUS_OPTIONS.find(s => s.value === editStatus)?.label || editStatus;
+    const contentWithStage = `[${statusLabel}] ${newNote.trim()}`;
     await supabase.from("lead_notes").insert({
       lead_id: editLead.id,
       user_id: user.id,
-      content: newNote.trim(),
+      content: contentWithStage,
     } as any);
     setNewNote("");
-    // Refresh notes
     const { data } = await supabase.from("lead_notes").select("*").eq("lead_id", editLead.id).order("created_at", { ascending: false });
     setLeadNotes((data as any[]) || []);
   };
@@ -270,47 +271,48 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
       <Dialog open={!!editLead} onOpenChange={() => setEditLead(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Editar Lead: {editLead?.treatment} {editLead?.name}</DialogTitle>
+            <DialogTitle>{editLead?.treatment} {editLead?.name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Status</label>
-                <select
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  {STATUS_OPTIONS.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1.5 block">Temperatura</label>
-                <select
-                  value={editTemp}
-                  onChange={(e) => setEditTemp(e.target.value)}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  {TEMP_OPTIONS.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            {/* Status full width */}
             <div>
-              <label className="text-sm font-medium text-foreground mb-1.5 block">Observação rápida</label>
-              <textarea
-                value={editNotes}
-                onChange={(e) => setEditNotes(e.target.value)}
-                rows={2}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="Observação geral do lead..."
-              />
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Status</label>
+              <select
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {STATUS_OPTIONS.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
             </div>
 
-            {/* Multi-notes section */}
+            {/* Temperature as icon buttons */}
+            <div>
+              <label className="text-sm font-medium text-foreground mb-1.5 block">Temperatura</label>
+              <div className="flex gap-2">
+                {([
+                  { value: "frio", label: "Frio", icon: Snowflake, activeClass: "bg-blue-500/20 text-blue-400 border-blue-500/50" },
+                  { value: "morno", label: "Morno", icon: Flame, activeClass: "bg-amber-500/20 text-amber-400 border-amber-500/50" },
+                  { value: "quente", label: "Quente", icon: Zap, activeClass: "bg-red-500/20 text-red-400 border-red-500/50" },
+                ] as const).map((t) => (
+                  <Button
+                    key={t.value}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={`flex-1 gap-1.5 ${editTemp === t.value ? t.activeClass : "text-muted-foreground"}`}
+                    onClick={() => setEditTemp(t.value)}
+                  >
+                    <t.icon className="w-3.5 h-3.5" />
+                    {t.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Notes section only */}
             <div>
               <label className="text-sm font-medium text-foreground mb-1.5 block">Notas ({leadNotes.length})</label>
               <div className="flex gap-2 mb-2">
@@ -326,14 +328,24 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
                 </Button>
               </div>
               <div className="max-h-40 overflow-y-auto space-y-2">
-                {leadNotes.map((note) => (
-                  <div key={note.id} className="rounded bg-muted/50 p-2 text-xs">
-                    <p className="text-foreground">{note.content}</p>
-                    <p className="text-muted-foreground mt-1">
-                      {format(new Date(note.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                    </p>
-                  </div>
-                ))}
+                {leadNotes.map((note) => {
+                  const stageMatch = note.content.match(/^\[(.+?)\]\s?/);
+                  const stageName = stageMatch?.[1];
+                  const noteText = stageMatch ? note.content.replace(stageMatch[0], "") : note.content;
+                  return (
+                    <div key={note.id} className="rounded bg-muted/50 p-2 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        {stageName && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">{stageName}</Badge>
+                        )}
+                        <span className="text-muted-foreground">
+                          {format(new Date(note.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                        </span>
+                      </div>
+                      <p className="text-foreground mt-1">{noteText}</p>
+                    </div>
+                  );
+                })}
                 {leadNotes.length === 0 && (
                   <p className="text-xs text-muted-foreground">Nenhuma nota registrada.</p>
                 )}

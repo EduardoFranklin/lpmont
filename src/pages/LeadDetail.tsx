@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
-  Plus, Save, Thermometer, User, FileText, Globe, CalendarCheck, Timer
+  Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap, Pencil, X
 } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -46,11 +46,15 @@ const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
   { value: "perdido", label: "Perdido", color: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
 ];
 
-const TEMP_OPTIONS: { value: LeadTemperature; label: string; color: string }[] = [
-  { value: "frio", label: "Frio", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-  { value: "morno", label: "Morno", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
-  { value: "quente", label: "Quente", color: "bg-red-500/20 text-red-400 border-red-500/30" },
+const TEMP_BUTTONS = [
+  { value: "frio" as LeadTemperature, label: "Frio", icon: Snowflake, activeClass: "bg-blue-500/20 text-blue-400 border-blue-500/50" },
+  { value: "morno" as LeadTemperature, label: "Morno", icon: Flame, activeClass: "bg-amber-500/20 text-amber-400 border-amber-500/50" },
+  { value: "quente" as LeadTemperature, label: "Quente", icon: Zap, activeClass: "bg-red-500/20 text-red-400 border-red-500/50" },
 ];
+
+const TREATMENT_OPTIONS = ["Dr.", "Dra.", "Sr.", "Sra."];
+const UF_OPTIONS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
+const CAREER_OPTIONS = ["medico","dentista","fisioterapeuta","nutricionista","psicologo","enfermeiro","veterinario","farmaceutico","outro"];
 
 const LeadDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,8 +65,14 @@ const LeadDetail = () => {
   const [newNote, setNewNote] = useState("");
   const [editStatus, setEditStatus] = useState<LeadStatus>("novo");
   const [editTemp, setEditTemp] = useState<LeadTemperature>("frio");
-  const [editObs, setEditObs] = useState("");
   const [saving, setSaving] = useState(false);
+
+  // Editable fields
+  const [editing, setEditing] = useState(false);
+  const [editFields, setEditFields] = useState({
+    treatment: "", name: "", phone: "", email: "", city: "", uf: "", career: "",
+    scheduled_day: "", scheduled_time: "", notes: "",
+  });
 
   const fetchLead = async () => {
     if (!id) return;
@@ -71,7 +81,18 @@ const LeadDetail = () => {
       setLead(data);
       setEditStatus(data.status);
       setEditTemp(data.temperature || "frio");
-      setEditObs(data.notes || "");
+      setEditFields({
+        treatment: data.treatment || "Dr.",
+        name: data.name,
+        phone: data.phone,
+        email: data.email,
+        city: data.city,
+        uf: data.uf,
+        career: data.career,
+        scheduled_day: data.scheduled_day || "",
+        scheduled_time: data.scheduled_time || "",
+        notes: data.notes || "",
+      });
     }
     setLoading(false);
   };
@@ -102,20 +123,31 @@ const LeadDetail = () => {
     await supabase.from("leads").update({
       status: editStatus,
       temperature: editTemp,
-      notes: editObs,
+      treatment: editFields.treatment,
+      name: editFields.name,
+      phone: editFields.phone,
+      email: editFields.email,
+      city: editFields.city,
+      uf: editFields.uf,
+      career: editFields.career,
+      scheduled_day: editFields.scheduled_day || null,
+      scheduled_time: editFields.scheduled_time || null,
+      notes: editFields.notes || null,
     }).eq("id", lead.id);
     await fetchLead();
     setSaving(false);
+    setEditing(false);
   };
 
   const handleAddNote = async () => {
     if (!lead || !newNote.trim()) return;
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
+    const statusLabel = STATUS_OPTIONS.find(s => s.value === editStatus)?.label || editStatus;
     await supabase.from("lead_notes").insert({
       lead_id: lead.id,
       user_id: user.id,
-      content: newNote.trim(),
+      content: `[${statusLabel}] ${newNote.trim()}`,
     } as any);
     setNewNote("");
     fetchNotes();
@@ -131,7 +163,7 @@ const LeadDetail = () => {
   if (!lead) return <div className="min-h-screen bg-background flex items-center justify-center text-muted-foreground">Lead não encontrado.</div>;
 
   const statusOpt = STATUS_OPTIONS.find(s => s.value === lead.status);
-  const tempOpt = TEMP_OPTIONS.find(t => t.value === (lead.temperature || "frio"));
+  const tempBtn = TEMP_BUTTONS.find(t => t.value === (lead.temperature || "frio"));
 
   return (
     <div className="min-h-screen bg-background">
@@ -145,7 +177,11 @@ const LeadDetail = () => {
               {lead.treatment} {lead.name}
             </span>
             <Badge variant="outline" className={statusOpt?.color}>{statusOpt?.label}</Badge>
-            <Badge variant="outline" className={tempOpt?.color}>{tempOpt?.label}</Badge>
+            {tempBtn && (
+              <Badge variant="outline" className={tempBtn.activeClass}>
+                <tempBtn.icon className="w-3 h-3 mr-1" />{tempBtn.label}
+              </Badge>
+            )}
             {lead.scheduled_day && lead.scheduled_time && (
               <CalendarCheck className="w-4 h-4 text-amber-400 flex-shrink-0" />
             )}
@@ -153,6 +189,9 @@ const LeadDetail = () => {
               <Timer className="w-3 h-3" /> há {formatElapsed(lead.updated_at)}
             </span>
           </div>
+          <Button variant="ghost" size="icon" onClick={() => setEditing(!editing)}>
+            {editing ? <X className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
+          </Button>
           <Button variant="ghost" size="icon" className="text-emerald-400" onClick={() => openWhatsApp(lead.phone)}>
             <MessageCircle className="w-4 h-4" />
           </Button>
@@ -167,26 +206,35 @@ const LeadDetail = () => {
               <CardTitle className="text-sm flex items-center gap-2"><User className="w-4 h-4" /> Dados pessoais</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <User className="w-3.5 h-3.5" />
-                <span>{lead.treatment} {lead.name}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="w-3.5 h-3.5" />
-                <span>{lead.phone}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="w-3.5 h-3.5" />
-                <span>{lead.email}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-3.5 h-3.5" />
-                <span>{lead.city} - {lead.uf}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Briefcase className="w-3.5 h-3.5" />
-                <span className="capitalize">{lead.career?.replace("_", " ")}</span>
-              </div>
+              {editing ? (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <select value={editFields.treatment} onChange={e => setEditFields(f => ({...f, treatment: e.target.value}))} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                      {TREATMENT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    <Input value={editFields.name} onChange={e => setEditFields(f => ({...f, name: e.target.value}))} placeholder="Nome" className="flex-1 h-9" />
+                  </div>
+                  <Input value={editFields.phone} onChange={e => setEditFields(f => ({...f, phone: e.target.value}))} placeholder="Telefone" className="h-9" />
+                  <Input value={editFields.email} onChange={e => setEditFields(f => ({...f, email: e.target.value}))} placeholder="Email" className="h-9" />
+                  <div className="flex gap-2">
+                    <Input value={editFields.city} onChange={e => setEditFields(f => ({...f, city: e.target.value}))} placeholder="Cidade" className="flex-1 h-9" />
+                    <select value={editFields.uf} onChange={e => setEditFields(f => ({...f, uf: e.target.value}))} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                      {UF_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
+                    </select>
+                  </div>
+                  <select value={editFields.career} onChange={e => setEditFields(f => ({...f, career: e.target.value}))} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
+                    {CAREER_OPTIONS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1).replace("_"," ")}</option>)}
+                  </select>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-muted-foreground"><User className="w-3.5 h-3.5" /><span>{lead.treatment} {lead.name}</span></div>
+                  <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-3.5 h-3.5" /><span>{lead.phone}</span></div>
+                  <div className="flex items-center gap-2 text-muted-foreground"><Mail className="w-3.5 h-3.5" /><span>{lead.email}</span></div>
+                  <div className="flex items-center gap-2 text-muted-foreground"><MapPin className="w-3.5 h-3.5" /><span>{lead.city} - {lead.uf}</span></div>
+                  <div className="flex items-center gap-2 text-muted-foreground"><Briefcase className="w-3.5 h-3.5" /><span className="capitalize">{lead.career?.replace("_", " ")}</span></div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -215,11 +263,18 @@ const LeadDetail = () => {
               <CardTitle className="text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> Agendamento & Datas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {lead.scheduled_day && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span>{lead.scheduled_day} — {lead.scheduled_time}</span>
+              {editing ? (
+                <div className="flex gap-2">
+                  <Input value={editFields.scheduled_day} onChange={e => setEditFields(f => ({...f, scheduled_day: e.target.value}))} placeholder="Dia (ex: segunda)" className="flex-1 h-9" />
+                  <Input value={editFields.scheduled_time} onChange={e => setEditFields(f => ({...f, scheduled_time: e.target.value}))} placeholder="Horário" className="w-28 h-9" />
                 </div>
+              ) : (
+                lead.scheduled_day && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{lead.scheduled_day} — {lead.scheduled_time}</span>
+                  </div>
+                )
               )}
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Clock className="w-3.5 h-3.5" />
@@ -233,48 +288,54 @@ const LeadDetail = () => {
           </Card>
         </div>
 
-        {/* Edit section */}
+        {/* Manage section */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2"><FileText className="w-4 h-4" /> Gerenciar Lead</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Status</label>
-                <select
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  {STATUS_OPTIONS.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Temperatura</label>
-                <select
-                  value={editTemp}
-                  onChange={(e) => setEditTemp(e.target.value as LeadTemperature)}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  {TEMP_OPTIONS.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Status</label>
+              <select
+                value={editStatus}
+                onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {STATUS_OPTIONS.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Observação</label>
-              <textarea
-                value={editObs}
-                onChange={(e) => setEditObs(e.target.value)}
-                rows={2}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="Observação geral do lead..."
-              />
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Temperatura</label>
+              <div className="flex gap-2">
+                {TEMP_BUTTONS.map((t) => (
+                  <Button
+                    key={t.value}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={`flex-1 gap-1.5 ${editTemp === t.value ? t.activeClass : "text-muted-foreground"}`}
+                    onClick={() => setEditTemp(t.value)}
+                  >
+                    <t.icon className="w-3.5 h-3.5" />
+                    {t.label}
+                  </Button>
+                ))}
+              </div>
             </div>
+            {editing && (
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Observação</label>
+                <textarea
+                  value={editFields.notes}
+                  onChange={(e) => setEditFields(f => ({...f, notes: e.target.value}))}
+                  rows={2}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  placeholder="Observação geral do lead..."
+                />
+              </div>
+            )}
             <div className="flex justify-end">
               <Button onClick={handleSave} disabled={saving} size="sm">
                 <Save className="w-3.5 h-3.5 mr-1.5" /> {saving ? "Salvando..." : "Salvar alterações"}
@@ -287,7 +348,7 @@ const LeadDetail = () => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
-              <FileText className="w-4 h-4" /> Anotações ({notes.length})
+              <FileText className="w-4 h-4" /> Notas ({notes.length})
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -295,7 +356,7 @@ const LeadDetail = () => {
               <Input
                 value={newNote}
                 onChange={(e) => setNewNote(e.target.value)}
-                placeholder="Adicionar nova anotação..."
+                placeholder="Adicionar nova nota..."
                 className="flex-1"
                 onKeyDown={(e) => e.key === "Enter" && handleAddNote()}
               />
@@ -305,16 +366,26 @@ const LeadDetail = () => {
             </div>
             <Separator />
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
-              {notes.map((note) => (
-                <div key={note.id} className="rounded-lg bg-muted/30 border border-border p-3">
-                  <p className="text-sm text-foreground">{note.content}</p>
-                  <p className="text-xs text-muted-foreground mt-1.5">
-                    {format(new Date(note.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                  </p>
-                </div>
-              ))}
+              {notes.map((note) => {
+                const stageMatch = note.content.match(/^\[(.+?)\]\s?/);
+                const stageName = stageMatch?.[1];
+                const noteText = stageMatch ? note.content.replace(stageMatch[0], "") : note.content;
+                return (
+                  <div key={note.id} className="rounded-lg bg-muted/30 border border-border p-3">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      {stageName && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{stageName}</Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {format(new Date(note.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                      </span>
+                    </div>
+                    <p className="text-sm text-foreground">{noteText}</p>
+                  </div>
+                );
+              })}
               {notes.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-4">Nenhuma anotação registrada.</p>
+                <p className="text-sm text-muted-foreground text-center py-4">Nenhuma nota registrada.</p>
               )}
             </div>
           </CardContent>
