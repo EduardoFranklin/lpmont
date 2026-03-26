@@ -213,6 +213,17 @@ const Agendar = () => {
           treatment: form.treatment,
         },
       }).catch((err) => console.error("Welcome email error:", err));
+
+      // Create Google Calendar event + Meet (fire-and-forget)
+      supabase.functions.invoke("google-calendar-create", {
+        body: {
+          leadEmail: form.email,
+          leadName: form.name,
+          treatment: form.treatment,
+          scheduledDay: selectedSlot.day,
+          scheduledTime: selectedSlot.time,
+        },
+      }).catch((err) => console.error("Calendar event error:", err));
     } catch (err) {
       console.error("Erro ao salvar lead:", err);
     }

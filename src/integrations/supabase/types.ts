@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      google_oauth_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          email: string | null
+          id: string
+          refresh_token: string
+          token_expiry: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          refresh_token: string
+          token_expiry: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          refresh_token?: string
+          token_expiry?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       lead_notes: {
         Row: {
           content: string
