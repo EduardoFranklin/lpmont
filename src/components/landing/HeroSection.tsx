@@ -52,6 +52,43 @@ const HeroSection = () => {
         <div className="max-w-4xl mx-auto text-center">
 
 
+          {/* Toggle pills */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center justify-center gap-1 mb-6"
+          >
+            <div className="relative flex items-center bg-foreground/[0.04] border border-foreground/[0.06] rounded-full p-1">
+              {toggles.map((t) => {
+                const Icon = t.icon;
+                const isActive = activeToggle === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setActiveToggle(t.id)}
+                    className={`relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-[11px] sm:text-[12px] tracking-wide uppercase font-medium transition-colors duration-300 ${
+                      isActive ? "text-background" : "text-foreground/30 hover:text-foreground/50"
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{t.label}</span>
+                  </button>
+                );
+              })}
+              {/* Animated background pill */}
+              <motion.div
+                className="absolute top-1 bottom-1 rounded-full"
+                style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold)), hsl(var(--brand-gold) / 0.8))" }}
+                animate={{
+                  left: `${4 + activeToggle * (100 / 3)}%`,
+                  width: `${100 / 3 - 2}%`,
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            </div>
+          </motion.div>
+
           {/* Caption line + tag */}
           <motion.div
             initial={{ opacity: 0 }}
