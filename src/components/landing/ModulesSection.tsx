@@ -1,6 +1,17 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+
+const clinicalImages = [
+  { src: "/images/clinicas-1.png", caption: "Classe I — Visão oclusal isolada" },
+  { src: "/images/clinicas-2.png", caption: "Classe I e II — Comparativo clínico" },
+  { src: "/images/clinicas-3.png", caption: "Classe II — Identificação de margens" },
+  { src: "/images/clinicas-4.png", caption: "Classe I e II — Diagnóstico de lesões" },
+  { src: "/images/clinicas-5.png", caption: "Reconstrução Coronária — Planejamento" },
+  { src: "/images/clinicas-6.png", caption: "Reconstrução Coronária — Visão aproximada" },
+  { src: "/images/clinicas-7.png", caption: "Reconstrução Coronária — Análise de estrutura" },
+  { src: "/images/clinicas-8.png", caption: "Reconstrução Coronária — Caso clínico complexo" },
+];
 
 const camps = [
   { num: "01", altitude: "1.200m", title: "Início da Expedição", desc: "Boas-vindas e mapeamento da jornada. Entenda cada etapa que vai te levar do chão ao cume da odontologia restauradora.", phase: "Base", img: "/images/freepik_1.jpg" },
