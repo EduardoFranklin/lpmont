@@ -122,7 +122,7 @@ const HeroSection = () => {
             <img
               src="/images/foto-breno.png"
               alt="Dr. Breno Mont'Alverne"
-              className="w-10 h-10 rounded-full object-cover border border-foreground/[0.08]"
+              className="w-12 h-12 sm:w-10 sm:h-10 rounded-full object-cover border border-foreground/[0.08]"
               decoding="async"
             />
             <div className="text-left">
