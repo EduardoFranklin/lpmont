@@ -211,49 +211,49 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
               <TableHead className="hidden sm:table-cell">Telefone</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Temp.</TableHead>
-              <TableHead className="hidden lg:table-cell">Observação</TableHead>
-              <TableHead className="hidden lg:table-cell">Data</TableHead>
+              <TableHead className="hidden lg:table-cell">No estágio</TableHead>
+              <TableHead className="hidden lg:table-cell">Criado</TableHead>
               <TableHead className="w-[120px]">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filtered.map((lead, idx) => (
-              <TableRow key={lead.id} className="cursor-pointer hover:bg-muted/30" onClick={() => navigate(`/dash/lead/${lead.id}`)}>
-                <TableCell className="text-muted-foreground text-xs">{idx + 1}</TableCell>
-                <TableCell className="font-medium">{lead.treatment} {lead.name}</TableCell>
-                <TableCell className="hidden md:table-cell text-muted-foreground">{lead.email}</TableCell>
-                <TableCell className="hidden sm:table-cell text-muted-foreground">{lead.phone}</TableCell>
-                <TableCell>{getStatusBadge(lead.status)}</TableCell>
-                <TableCell>{getTempBadge((lead as any).temperature)}</TableCell>
-                <TableCell className="hidden lg:table-cell">
-                  <Input
-                    defaultValue={lead.notes || ""}
-                    className="h-7 text-xs bg-transparent border-border/50"
-                    placeholder="—"
-                    onBlur={(e) => {
-                      if (e.target.value !== (lead.notes || "")) {
-                        handleInlineObsChange(lead.id, e.target.value);
-                      }
-                    }}
-                  />
-                </TableCell>
-                <TableCell className="hidden lg:table-cell text-muted-foreground text-xs whitespace-nowrap">
-                  {format(new Date(lead.created_at), "dd/MM/yyyy 'às' HH'h'mm", { locale: ptBR })}
-                </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
-                      <MessageCircle className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(lead)}>
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(lead.id)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+            {filtered.map((lead, idx) => {
+              const hasSchedule = lead.scheduled_day && lead.scheduled_time;
+              return (
+                <TableRow key={lead.id} className="cursor-pointer hover:bg-muted/30" onClick={() => navigate(`/dash/lead/${lead.id}`)}>
+                  <TableCell className="text-muted-foreground text-xs">{idx + 1}</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-1.5">
+                      {lead.treatment} {lead.name}
+                      {hasSchedule && (
+                        <CalendarCheck className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" title={`Agendado: ${lead.scheduled_day} ${lead.scheduled_time}`} />
+                      )}
+                    </span>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground">{lead.email}</TableCell>
+                  <TableCell className="hidden sm:table-cell text-muted-foreground">{lead.phone}</TableCell>
+                  <TableCell>{getStatusBadge(lead.status)}</TableCell>
+                  <TableCell>{getTempBadge((lead as any).temperature)}</TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground text-xs whitespace-nowrap">
+                    há {formatElapsed(lead.updated_at)}
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell text-muted-foreground text-xs whitespace-nowrap">
+                    {format(new Date(lead.created_at), "dd/MM/yy HH'h'mm", { locale: ptBR })}
+                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
+                        <MessageCircle className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEdit(lead)}>
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(lead.id)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
               );
             })}
             {filtered.length === 0 && (
