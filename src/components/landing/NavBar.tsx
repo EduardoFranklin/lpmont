@@ -25,7 +25,7 @@ const NavBar = () => {
 
   const links = [
     { label: "A Trilha", href: "#modulos" },
-    { label: "O Guia", href: "#professor" },
+    { label: "O Guia", href: "#guia" },
     { label: "Investimento", href: "#preco" },
   ];
 
