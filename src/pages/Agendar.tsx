@@ -550,47 +550,92 @@ const Agendar = () => {
 
           {/* ===== STEP 3: SUCCESS ===== */}
           {step === 3 && (
-            <motion.div key="step3" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }} className="flex flex-col items-center justify-center text-center pt-10">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                className="w-20 h-20 rounded-full flex items-center justify-center mb-6 animate-pulse"
-                style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))", border: "1px solid hsl(var(--brand-gold) / 0.2)" }}
-              >
-                <CalendarCheck className="w-10 h-10 text-primary" />
-              </motion.div>
+             <motion.div key="step3" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }} className="flex flex-col items-center justify-center text-center pt-10">
+              
+              {calendarCreated ? (
+                <>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+                    className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
+                    style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))", border: "1px solid hsl(var(--brand-gold) / 0.2)" }}
+                  >
+                    <CheckCircle2 className="w-10 h-10 text-primary" />
+                  </motion.div>
 
-              <h2 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-2">
-                Adicione ao Google Calendar <span className="summit-text">para confirmar.</span>
-              </h2>
-              <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
-                {form.treatment} {form.name}, sua reunião está marcada para:
-              </p>
-              <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-6 py-4 mb-4">
-                <p className="text-base font-semibold text-foreground/70">
-                  {selectedSlot?.day} · {selectedSlot?.date} · {selectedSlot?.time}
-                </p>
-                <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
-              </div>
+                  <h2 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-2">
+                    Agendamento <span className="summit-text">confirmado!</span>
+                  </h2>
+                  <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
+                    {form.treatment} {form.name}, sua reunião está marcada para:
+                  </p>
+                  <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-6 py-4 mb-4">
+                    <p className="text-base font-semibold text-foreground/70">
+                      {selectedSlot?.day} · {selectedSlot?.date} · {selectedSlot?.time}
+                    </p>
+                    <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
+                  </div>
 
-              {/* Google Calendar button - opens in modal popup */}
-              {selectedSlot && (
-                <button
-                  onClick={() => {
-                    const url = buildGoogleCalendarUrl(
-                      `Reunião Método Mont' - ${form.treatment} ${form.name}`,
-                      `Reunião online de 30 min com a equipe do Método Mont'.\n\nParticipantes:\n- ${form.treatment} ${form.name} (${form.email})\n- Equipe Método Mont' (${ADMIN_EMAIL})`,
-                      selectedSlot.date,
-                      selectedSlot.time,
-                      form.email
-                    );
-                    window.open(url, "gcal_popup", "width=700,height=600,scrollbars=yes,resizable=yes");
-                  }}
-                  className="btn-summit w-full justify-center text-sm py-3.5 gap-2"
-                >
-                  <Calendar className="w-5 h-5" /> Adicionar ao Google Calendar
-                </button>
+                  {meetLink && (
+                    <a
+                      href={meetLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-summit w-full justify-center text-sm py-3.5 gap-2 mb-3"
+                    >
+                      <Video className="w-5 h-5" /> Entrar no Google Meet
+                    </a>
+                  )}
+
+                  <p className="text-[13px] text-foreground/35 max-w-xs mb-2">
+                    O evento foi adicionado ao seu calendário e o link da reunião foi enviado para <span className="text-foreground/50 font-medium">{form.email}</span>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
+                    className="w-20 h-20 rounded-full flex items-center justify-center mb-6 animate-pulse"
+                    style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))", border: "1px solid hsl(var(--brand-gold) / 0.2)" }}
+                  >
+                    <CalendarCheck className="w-10 h-10 text-primary" />
+                  </motion.div>
+
+                  <h2 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-2">
+                    Adicione ao Google Calendar <span className="summit-text">para confirmar.</span>
+                  </h2>
+                  <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
+                    {form.treatment} {form.name}, sua reunião está marcada para:
+                  </p>
+                  <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-6 py-4 mb-4">
+                    <p className="text-base font-semibold text-foreground/70">
+                      {selectedSlot?.day} · {selectedSlot?.date} · {selectedSlot?.time}
+                    </p>
+                    <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
+                  </div>
+
+                  {/* Fallback: Google Calendar URL popup */}
+                  {selectedSlot && (
+                    <button
+                      onClick={() => {
+                        const url = buildGoogleCalendarUrl(
+                          `Reunião Método Mont' - ${form.treatment} ${form.name}`,
+                          `Reunião online de 30 min com a equipe do Método Mont'.\n\nParticipantes:\n- ${form.treatment} ${form.name} (${form.email})\n- Equipe Método Mont' (${ADMIN_EMAIL})`,
+                          selectedSlot.date,
+                          selectedSlot.time,
+                          form.email
+                        );
+                        window.open(url, "gcal_popup", "width=700,height=600,scrollbars=yes,resizable=yes");
+                      }}
+                      className="btn-summit w-full justify-center text-sm py-3.5 gap-2"
+                    >
+                      <Calendar className="w-5 h-5" /> Adicionar ao Google Calendar
+                    </button>
+                  )}
+                </>
               )}
 
               <a href="/" className="text-[13px] text-foreground/30 hover:text-foreground/50 transition-colors mt-4">
