@@ -1,7 +1,12 @@
+import { useState } from "react";
 import type { Lead } from "@/pages/Dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CalendarCheck, UserCheck, TrendingUp, Globe, Megaphone, Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Users, CalendarCheck, UserCheck, TrendingUp, Globe, Megaphone, Target,
+  Snowflake, Flame, Zap, X
+} from "lucide-react";
 
 const statusLabels: Record<string, string> = {
   novo: "Novos",
@@ -12,11 +17,47 @@ const statusLabels: Record<string, string> = {
   perdido: "Perdidos",
 };
 
+type Filter = {
+  type: "status" | "temperature" | "source" | "campaign" | "medium" | "career" | "uf";
+  value: string;
+  label: string;
+};
+
 const DashReports = ({ leads }: { leads: Lead[] }) => {
-  const total = leads.length;
-  const agendados = leads.filter((l) => l.status !== "novo").length;
-  const compareceram = leads.filter((l) => ["compareceu", "convertido"].includes(l.status)).length;
-  const convertidos = leads.filter((l) => l.status === "convertido").length;
+  const [filters, setFilters] = useState<Filter[]>([]);
+
+  const toggleFilter = (f: Filter) => {
+    setFilters((prev) => {
+      const exists = prev.find((p) => p.type === f.type && p.value === f.value);
+      if (exists) return prev.filter((p) => !(p.type === f.type && p.value === f.value));
+      // Replace same type filter (single select per dimension)
+      return [...prev.filter((p) => p.type !== f.type), f];
+    });
+  };
+
+  const isActive = (type: string, value: string) =>
+    filters.some((f) => f.type === type && f.value === value);
+
+  // Apply filters
+  const filtered = leads.filter((l) => {
+    return filters.every((f) => {
+      switch (f.type) {
+        case "status": return l.status === f.value;
+        case "temperature": return (l as any).temperature === f.value;
+        case "source": return ((l as any).utm_source || "Orgânico / Direto") === f.value;
+        case "campaign": return (l as any).utm_campaign === f.value;
+        case "medium": return (l as any).utm_medium === f.value;
+        case "career": return l.career === f.value;
+        case "uf": return l.uf === f.value;
+        default: return true;
+      }
+    });
+  });
+
+  const total = filtered.length;
+  const agendados = filtered.filter((l) => l.status !== "novo").length;
+  const compareceram = filtered.filter((l) => ["compareceu", "convertido"].includes(l.status)).length;
+  const convertidos = filtered.filter((l) => l.status === "convertido").length;
 
   const taxaAgendamento = total > 0 ? ((agendados / total) * 100).toFixed(1) : "0";
   const taxaComparecimento = agendados > 0 ? ((compareceram / agendados) * 100).toFixed(1) : "0";
@@ -29,28 +70,32 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
     { label: "Conversões", value: `${convertidos} (${taxaConversao}%)`, icon: TrendingUp, color: "text-primary" },
   ];
 
+  // Temperature rank
+  const tempData = [
+    { value: "quente", label: "Quente", icon: Zap, color: "bg-red-500/20 text-red-400 border-red-500/30", count: filtered.filter((l) => (l as any).temperature === "quente").length },
+    { value: "morno", label: "Morno", icon: Flame, color: "bg-amber-500/20 text-amber-400 border-amber-500/30", count: filtered.filter((l) => (l as any).temperature === "morno").length },
+    { value: "frio", label: "Frio", icon: Snowflake, color: "bg-blue-500/20 text-blue-400 border-blue-500/30", count: filtered.filter((l) => (l as any).temperature === "frio" || !(l as any).temperature).length },
+  ];
+
   const byStatus = Object.entries(statusLabels).map(([key, label]) => ({
+    key,
     label,
-    count: leads.filter((l) => l.status === key).length,
+    count: filtered.filter((l) => l.status === key).length,
   }));
 
   const byCareer: Record<string, number> = {};
-  leads.forEach((l) => {
-    byCareer[l.career] = (byCareer[l.career] || 0) + 1;
-  });
+  filtered.forEach((l) => { byCareer[l.career] = (byCareer[l.career] || 0) + 1; });
+  const sortedCareers = Object.entries(byCareer).sort((a, b) => b[1] - a[1]);
 
   const byUf: Record<string, number> = {};
-  leads.forEach((l) => {
-    byUf[l.uf] = (byUf[l.uf] || 0) + 1;
-  });
+  filtered.forEach((l) => { byUf[l.uf] = (byUf[l.uf] || 0) + 1; });
   const topUfs = Object.entries(byUf).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
-  // UTM origin reports
   const bySource: Record<string, { total: number; convertidos: number }> = {};
   const byCampaign: Record<string, { total: number; convertidos: number }> = {};
   const byMedium: Record<string, { total: number; convertidos: number }> = {};
 
-  leads.forEach((l) => {
+  filtered.forEach((l) => {
     const src = (l as any).utm_source || "Orgânico / Direto";
     const camp = (l as any).utm_campaign;
     const med = (l as any).utm_medium;
@@ -77,8 +122,32 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
   const sortedCampaigns = Object.entries(byCampaign).sort((a, b) => b[1].total - a[1].total);
   const sortedMediums = Object.entries(byMedium).sort((a, b) => b[1].total - a[1].total);
 
+  const clickable = "cursor-pointer hover:bg-muted/50 rounded-md px-1.5 py-0.5 -mx-1.5 transition-colors";
+  const activeRow = "bg-primary/10 rounded-md px-1.5 py-0.5 -mx-1.5 ring-1 ring-primary/20";
+
   return (
     <div className="space-y-6">
+      {/* Active filters bar */}
+      {filters.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-muted-foreground">Filtros:</span>
+          {filters.map((f) => (
+            <Badge
+              key={`${f.type}-${f.value}`}
+              variant="outline"
+              className="gap-1 cursor-pointer bg-primary/10 border-primary/30 text-primary"
+              onClick={() => toggleFilter(f)}
+            >
+              {f.label}
+              <X className="w-3 h-3" />
+            </Badge>
+          ))}
+          <Button variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground" onClick={() => setFilters([])}>
+            Limpar todos
+          </Button>
+        </div>
+      )}
+
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m) => {
@@ -99,19 +168,57 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
         })}
       </div>
 
+      {/* Temperature rank */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm">Ranking de Temperatura</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            {tempData.map((t) => {
+              const Icon = t.icon;
+              const active = isActive("temperature", t.value);
+              return (
+                <button
+                  key={t.value}
+                  onClick={() => toggleFilter({ type: "temperature", value: t.value, label: `Temp: ${t.label}` })}
+                  className={`flex flex-col items-center gap-2 rounded-lg border p-4 transition-all ${
+                    active ? "ring-2 ring-primary/40 " + t.color : "border-border hover:border-muted-foreground/30"
+                  }`}
+                >
+                  <Icon className={`w-6 h-6 ${active ? "" : "text-muted-foreground"}`} />
+                  <span className="text-xs font-medium text-muted-foreground">{t.label}</span>
+                  <span className="text-2xl font-bold">{t.count}</span>
+                  {total > 0 && (
+                    <span className="text-[10px] text-muted-foreground">
+                      {((t.count / total) * 100).toFixed(0)}%
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Origin reports */}
       <div className="grid md:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Globe className="w-4 h-4 text-blue-400" /> Por Origem (Source)
+              <Globe className="w-4 h-4 text-blue-400" /> Por Origem
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {sortedSources.map(([src, data]) => {
               const rate = data.total > 0 ? ((data.convertidos / data.total) * 100).toFixed(0) : "0";
+              const active = isActive("source", src);
               return (
-                <div key={src} className="flex items-center justify-between text-sm">
+                <div
+                  key={src}
+                  className={`flex items-center justify-between text-sm ${active ? activeRow : clickable}`}
+                  onClick={() => toggleFilter({ type: "source", value: src, label: `Origem: ${src}` })}
+                >
                   <span className="text-muted-foreground truncate max-w-[140px]">{src}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{data.total}</span>
@@ -135,8 +242,13 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
           <CardContent className="space-y-2">
             {sortedCampaigns.map(([camp, data]) => {
               const rate = data.total > 0 ? ((data.convertidos / data.total) * 100).toFixed(0) : "0";
+              const active = isActive("campaign", camp);
               return (
-                <div key={camp} className="flex items-center justify-between text-sm">
+                <div
+                  key={camp}
+                  className={`flex items-center justify-between text-sm ${active ? activeRow : clickable}`}
+                  onClick={() => toggleFilter({ type: "campaign", value: camp, label: `Campanha: ${camp}` })}
+                >
                   <span className="text-muted-foreground truncate max-w-[140px]">{camp}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{data.total}</span>
@@ -154,14 +266,19 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Target className="w-4 h-4 text-primary" /> Por Mídia (Medium)
+              <Target className="w-4 h-4 text-primary" /> Por Mídia
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {sortedMediums.map(([med, data]) => {
               const rate = data.total > 0 ? ((data.convertidos / data.total) * 100).toFixed(0) : "0";
+              const active = isActive("medium", med);
               return (
-                <div key={med} className="flex items-center justify-between text-sm">
+                <div
+                  key={med}
+                  className={`flex items-center justify-between text-sm ${active ? activeRow : clickable}`}
+                  onClick={() => toggleFilter({ type: "medium", value: med, label: `Mídia: ${med}` })}
+                >
                   <span className="text-muted-foreground truncate max-w-[140px]">{med}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{data.total}</span>
@@ -177,41 +294,62 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
         </Card>
       </div>
 
-      {/* Existing reports */}
+      {/* Status, Career, UF */}
       <div className="grid md:grid-cols-3 gap-4">
         <Card>
           <CardHeader><CardTitle className="text-sm">Por Status</CardTitle></CardHeader>
           <CardContent className="space-y-2">
-            {byStatus.map((s) => (
-              <div key={s.label} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{s.label}</span>
-                <span className="font-medium">{s.count}</span>
-              </div>
-            ))}
+            {byStatus.map((s) => {
+              const active = isActive("status", s.key);
+              return (
+                <div
+                  key={s.key}
+                  className={`flex justify-between text-sm ${active ? activeRow : clickable}`}
+                  onClick={() => toggleFilter({ type: "status", value: s.key, label: `Status: ${s.label}` })}
+                >
+                  <span className="text-muted-foreground">{s.label}</span>
+                  <span className="font-medium">{s.count}</span>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader><CardTitle className="text-sm">Por Carreira</CardTitle></CardHeader>
           <CardContent className="space-y-2">
-            {Object.entries(byCareer).map(([k, v]) => (
-              <div key={k} className="flex justify-between text-sm">
-                <span className="text-muted-foreground capitalize">{k.replace("_", " ")}</span>
-                <span className="font-medium">{v}</span>
-              </div>
-            ))}
+            {sortedCareers.map(([k, v]) => {
+              const active = isActive("career", k);
+              return (
+                <div
+                  key={k}
+                  className={`flex justify-between text-sm ${active ? activeRow : clickable}`}
+                  onClick={() => toggleFilter({ type: "career", value: k, label: `Carreira: ${k}` })}
+                >
+                  <span className="text-muted-foreground capitalize">{k.replace("_", " ")}</span>
+                  <span className="font-medium">{v}</span>
+                </div>
+              );
+            })}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader><CardTitle className="text-sm">Top UFs</CardTitle></CardHeader>
           <CardContent className="space-y-2">
-            {topUfs.map(([uf, count]) => (
-              <div key={uf} className="flex justify-between text-sm">
-                <span className="text-muted-foreground">{uf}</span>
-                <span className="font-medium">{count}</span>
-              </div>
-            ))}
+            {topUfs.map(([uf, count]) => {
+              const active = isActive("uf", uf);
+              return (
+                <div
+                  key={uf}
+                  className={`flex justify-between text-sm ${active ? activeRow : clickable}`}
+                  onClick={() => toggleFilter({ type: "uf", value: uf, label: `UF: ${uf}` })}
+                >
+                  <span className="text-muted-foreground">{uf}</span>
+                  <span className="font-medium">{count}</span>
+                </div>
+              );
+            })}
             {topUfs.length === 0 && <p className="text-sm text-muted-foreground">Sem dados</p>}
           </CardContent>
         </Card>
