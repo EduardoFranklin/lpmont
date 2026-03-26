@@ -11,9 +11,11 @@ import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FooterSection from "@/components/landing/FooterSection";
 import WhatsAppButton from "@/components/landing/WhatsAppButton";
 import useTrackingScripts from "@/hooks/useTrackingScripts";
+import useUtmCapture from "@/hooks/useUtmCapture";
 
 const Index = () => {
   useTrackingScripts();
+  useUtmCapture();
   return (
     <div className="min-h-screen bg-background">
       <NavBar />

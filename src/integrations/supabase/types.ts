@@ -63,6 +63,11 @@ export type Database = {
           treatment: string
           uf: string
           updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
         }
         Insert: {
           career: string
@@ -80,6 +85,11 @@ export type Database = {
           treatment?: string
           uf: string
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Update: {
           career?: string
@@ -97,6 +107,11 @@ export type Database = {
           treatment?: string
           uf?: string
           updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Relationships: []
       }
