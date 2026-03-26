@@ -11,10 +11,6 @@ import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
   Plus, Save, Thermometer, User, FileText, Globe
 } from "lucide-react";
-import {
-  ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
-  Plus, Save, Thermometer, User, FileText
-} from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Database } from "@/integrations/supabase/types";
