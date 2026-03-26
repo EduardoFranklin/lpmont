@@ -10,7 +10,7 @@ const HeroSection = () => {
   const toggles = [
     { label: "Comunidade", icon: Users },
     { label: "Cursos", icon: BookOpen },
-    { label: "Mentoria ao Vivo", icon: Radio },
+    { label: "+Aulas ao Vivo", icon: Radio },
   ];
 
   useEffect(() => {
@@ -108,7 +108,7 @@ const HeroSection = () => {
           >
             Reputação vira indicação. Indicação vira agenda cheia.
             Agenda cheia vira clínica. Clínica vira instituto.
-            Tudo começa com o método.
+            Tudo vem do método.
           </motion.p>
 
           {/* Author badge */}
