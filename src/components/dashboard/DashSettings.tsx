@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Save, Code2, AlertTriangle } from "lucide-react";
+import { Save, Code2, AlertTriangle, CalendarCheck, CheckCircle2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
 interface SettingField {
@@ -62,9 +62,13 @@ const DashSettings = () => {
   const [values, setValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState<string | null>(null);
+  const [connectingGoogle, setConnectingGoogle] = useState(false);
 
   useEffect(() => {
     fetchSettings();
+    checkGoogleConnection();
   }, []);
 
   const fetchSettings = async () => {
@@ -75,6 +79,66 @@ const DashSettings = () => {
     });
     setValues(map);
     setLoading(false);
+  };
+
+  const checkGoogleConnection = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data } = await supabase
+      .from("google_oauth_tokens")
+      .select("email")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (data) {
+      setGoogleConnected(true);
+      setGoogleEmail(data.email || null);
+    }
+  };
+
+  const handleConnectGoogle = async () => {
+    setConnectingGoogle(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Não autenticado");
+
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const redirectUri = `https://${projectId}.supabase.co/functions/v1/google-auth-callback`;
+
+      const { data, error } = await supabase.functions.invoke("google-auth-callback", {
+        body: { redirectUri },
+      });
+
+      if (error) throw error;
+      if (!data?.authUrl) throw new Error("URL de autorização não retornada");
+
+      // Listen for success message from popup
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data?.type === "google-auth-success") {
+          window.removeEventListener("message", handleMessage);
+          setGoogleConnected(true);
+          checkGoogleConnection();
+          toast.success("Google Calendar conectado com sucesso!");
+          setConnectingGoogle(false);
+        }
+      };
+      window.addEventListener("message", handleMessage);
+
+      window.open(
+        data.authUrl,
+        "google_auth",
+        "width=500,height=700,scrollbars=yes,resizable=yes"
+      );
+
+      // Timeout after 2 minutes
+      setTimeout(() => {
+        window.removeEventListener("message", handleMessage);
+        setConnectingGoogle(false);
+      }, 120000);
+    } catch (err) {
+      console.error("Google auth error:", err);
+      toast.error("Erro ao conectar Google Calendar");
+      setConnectingGoogle(false);
+    }
   };
 
   const handleSaveAll = async () => {
@@ -94,6 +158,41 @@ const DashSettings = () => {
 
   return (
     <div className="space-y-6">
+      {/* Google Calendar integration */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <CalendarCheck className="w-4 h-4" /> Google Calendar + Meet
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Conecte sua conta do Google para criar eventos com Google Meet automaticamente quando um lead agenda uma reunião.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {googleConnected ? (
+            <div className="flex items-center gap-2 text-sm">
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+              <span className="text-foreground/70">
+                Conectado{googleEmail ? ` como ${googleEmail}` : ""}
+              </span>
+              <Button variant="outline" size="sm" className="ml-auto text-xs" onClick={handleConnectGoogle}>
+                Reconectar
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleConnectGoogle}
+              disabled={connectingGoogle}
+              variant="outline"
+              className="gap-2"
+            >
+              <ExternalLink className="w-4 h-4" />
+              {connectingGoogle ? "Aguardando autorização..." : "Conectar Google Calendar"}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
         <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
         <p className="text-xs text-muted-foreground leading-relaxed">
