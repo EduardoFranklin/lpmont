@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { Lead } from "@/pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +24,7 @@ const TEMP_COLORS: Record<string, string> = {
 };
 
 const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void }) => {
+  const navigate = useNavigate();
   const handleDrop = async (e: React.DragEvent, newStatus: LeadStatus) => {
     e.preventDefault();
     const leadId = e.dataTransfer.getData("leadId");
@@ -64,6 +66,7 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
                     key={lead.id}
                     draggable
                     onDragStart={(e) => handleDragStart(e, lead.id)}
+                    onClick={() => navigate(`/dash/lead/${lead.id}`)}
                     className="cursor-grab active:cursor-grabbing hover:border-primary/30 transition-colors"
                   >
                     <CardContent className="p-3 space-y-1.5">
