@@ -99,7 +99,22 @@ const Agendar = () => {
   };
 
   const goToStep2 = () => {
-    if (isStep1Valid) setStep(2);
+    if (isStep1Valid) {
+      setStep(2);
+      setDynamicUnavailable(null);
+      // After 3s, mark a random available slot as unavailable
+      setTimeout(() => {
+        const available: { day: string; time: string }[] = [];
+        TIME_SLOTS.forEach((d) => {
+          d.slots.forEach((t) => {
+            if (!d.unavailable?.includes(t)) available.push({ day: d.day, time: t });
+          });
+        });
+        if (available.length > 0) {
+          setDynamicUnavailable(available[Math.floor(Math.random() * available.length)]);
+        }
+      }, 3000);
+    }
   };
 
   const goToStep3 = () => {
