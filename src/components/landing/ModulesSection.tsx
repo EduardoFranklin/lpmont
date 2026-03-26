@@ -380,15 +380,45 @@ const ModulesSection = () => {
                   </p>
                 </div>
                 <div className="w-full sm:w-36 h-28 rounded-xl overflow-hidden border border-foreground/[0.06] flex-shrink-0 relative">
-                  <motion.div
-                    className="flex h-full"
-                    animate={{ x: ["0%", "0%", "-100%", "-100%", "-200%", "-200%", "0%"] }}
-                    transition={{ duration: 15, ease: "easeInOut", repeat: Infinity, times: [0, 0.15, 0.3, 0.48, 0.63, 0.85, 1] }}
+                  <div
+                    className="flex h-full cursor-grab active:cursor-grabbing touch-pan-x"
+                    style={{ transition: "transform 0.4s ease" }}
+                    onPointerDown={(e) => {
+                      const container = e.currentTarget;
+                      const startX = e.clientX;
+                      const currentTransform = container.style.transform;
+                      const match = currentTransform.match(/translateX\((-?\d+(?:\.\d+)?)%\)/);
+                      const startOffset = match ? parseFloat(match[1]) : 0;
+                      const totalSlides = 3;
+                      container.style.transition = "none";
+                      container.setPointerCapture(e.pointerId);
+
+                      const onMove = (ev: PointerEvent) => {
+                        const dx = ev.clientX - startX;
+                        const pct = (dx / container.parentElement!.clientWidth) * 100;
+                        container.style.transform = `translateX(${startOffset + pct}%)`;
+                      };
+
+                      const onUp = (ev: PointerEvent) => {
+                        container.releasePointerCapture(ev.pointerId);
+                        container.removeEventListener("pointermove", onMove);
+                        container.removeEventListener("pointerup", onUp);
+                        const dx = ev.clientX - startX;
+                        const pct = (dx / container.parentElement!.clientWidth) * 100;
+                        let newSlide = Math.round(-(startOffset + pct) / 100);
+                        newSlide = Math.max(0, Math.min(totalSlides - 1, newSlide));
+                        container.style.transition = "transform 0.4s ease";
+                        container.style.transform = `translateX(${-newSlide * 100}%)`;
+                      };
+
+                      container.addEventListener("pointermove", onMove);
+                      container.addEventListener("pointerup", onUp);
+                    }}
                   >
                     {["/images/modelo-handson-1.webp", "/images/modelo-handson-2.webp", "/images/modelo-handson-3.webp"].map((src, i) => (
-                      <img key={i} src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover flex-shrink-0" loading="lazy" />
+                      <img key={i} src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover flex-shrink-0 pointer-events-none" loading="lazy" />
                     ))}
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             </div>
