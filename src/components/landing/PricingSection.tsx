@@ -1,16 +1,14 @@
 import { motion } from "framer-motion";
-import { Check, Shield, ArrowRight, Gift } from "lucide-react";
+import { Check, Shield, ArrowRight, Gift, Users, Video, RefreshCw, Clock } from "lucide-react";
 
 const includes = [
   "13 módulos — do vale ao cume",
   "5 Hands-On com casos reais do Instituto",
   "Aulas objetivas e materiais exclusivos",
   "Suporte próximo da equipe",
-  "Atualizações contínuas incluídas",
-];
-
-const bonuses = [
-  { text: "Comunidade Exclusiva de expedicionários", image: null },
+  "12 encontros ao vivo com Breno Mont'Alverne no ano",
+  "Atualização permanente de conteúdos",
+  "Acesso disponível por 12 meses",
 ];
 
 const PricingSection = () => {
@@ -80,24 +78,17 @@ const PricingSection = () => {
                     <Gift className="w-3.5 h-3.5" /> Bônus da expedição
                   </p>
 
-                  {/* Bonus cards with covers */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    {bonuses.filter(b => b.image).map((bonus) => (
-                      <div key={bonus.text} className="group relative rounded-xl overflow-hidden border border-foreground/[0.06] bg-secondary/30">
-                        <img src={bonus.image!} alt={bonus.text} className="w-full aspect-[3/4] object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-                        <p className="absolute bottom-0 left-0 right-0 p-3 text-[11px] leading-tight font-medium text-foreground/70">{bonus.text}</p>
-                      </div>
-                    ))}
+                  <div className="rounded-xl border border-primary/10 bg-primary/[0.03] p-5">
+                    <p className="text-[13px] font-medium text-foreground/60 mb-1">
+                      Seja membro fundador da comunidade:
+                    </p>
+                    <p className="text-base font-semibold summit-text flex items-center gap-2">
+                      <Users className="w-4 h-4" /> Mont'Alverne Experience
+                    </p>
+                    <p className="text-foreground/30 text-[12px] mt-2">
+                      Grupo exclusivo no WhatsApp com acesso direto à equipe e outros expedicionários.
+                    </p>
                   </div>
-
-                  {/* Text-only bonus */}
-                  {bonuses.filter(b => !b.image).map((bonus) => (
-                    <div key={bonus.text} className="flex items-start gap-3">
-                      <span className="caption-dot-green mt-1.5 flex-shrink-0" />
-                      <span className="text-foreground/50 text-[14px]">{bonus.text}</span>
-                    </div>
-                  ))}
                 </div>
 
                 <a
