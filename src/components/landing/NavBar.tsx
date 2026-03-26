@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
 
-const GradientButton = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => (
-  <a href={href} className={`btn-gradient ${className}`}>
+const GradientButton = ({ href, children, className = "", ...rest }: { href: string; children: React.ReactNode; className?: string; [key: string]: any }) => (
+  <a href={href} {...rest} className={`btn-gradient ${className}`}>
     <div className="btn-gradient-wrapper">
       <div className="btn-gradient-inner">
         <div className="btn-gradient-bg" />
