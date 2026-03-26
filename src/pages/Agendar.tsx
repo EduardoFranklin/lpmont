@@ -252,19 +252,8 @@ const Agendar = () => {
         utm_content: utmParams.utm_content || null,
       } as any);
 
-      // Send welcome email (fire-and-forget)
-      supabase.functions.invoke("send-welcome-email", {
-        body: {
-          recipientEmail: form.email,
-          recipientName: form.name,
-          treatment: form.treatment,
-          scheduledDay: selectedSlot.day,
-          scheduledDate: selectedSlot.date,
-          scheduledTime: selectedSlot.time,
-        },
-      }).catch((err) => console.error("Welcome email error:", err));
-
-      // Create Google Calendar event with Meet link
+      // Create Google Calendar event with Meet link FIRST
+      let calMeetLink: string | null = null;
       try {
         const { data: calData } = await supabase.functions.invoke("create-calendar-event", {
           body: {
@@ -278,12 +267,26 @@ const Agendar = () => {
           },
         });
         if (calData?.meetLink) {
+          calMeetLink = calData.meetLink;
           setMeetLink(calData.meetLink);
           setCalendarCreated(true);
         }
       } catch (calErr) {
         console.error("Calendar event error:", calErr);
       }
+
+      // Send welcome email WITH the Meet link
+      supabase.functions.invoke("send-welcome-email", {
+        body: {
+          recipientEmail: form.email,
+          recipientName: form.name,
+          treatment: form.treatment,
+          scheduledDay: selectedSlot.day,
+          scheduledDate: selectedSlot.date,
+          scheduledTime: selectedSlot.time,
+          meetLink: calMeetLink,
+        },
+      }).catch((err) => console.error("Welcome email error:", err));
     } catch (err) {
       console.error("Erro ao salvar lead:", err);
     }

@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { recipientEmail, recipientName, treatment, scheduledDay, scheduledDate, scheduledTime } = await req.json();
+    const { recipientEmail, recipientName, treatment, scheduledDay, scheduledDate, scheduledTime, meetLink } = await req.json();
 
     if (!recipientEmail) {
       return new Response(JSON.stringify({ error: "recipientEmail is required" }), {
@@ -95,13 +95,22 @@ Deno.serve(async (req) => {
         recipientEmail
       );
 
+      const meetSection = meetLink
+        ? `<a href="${meetLink}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 12px 28px; background: #00897B; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 600; margin-right: 8px;">
+            🎥 Entrar no Google Meet
+          </a>`
+        : "";
+
       calendarSection = `
         <div style="margin: 24px 0; padding: 20px; border-radius: 12px; background: #f8f9fa; border: 1px solid #e9ecef; text-align: center;">
           <p style="margin: 0 0 8px; font-size: 14px; color: #495057; font-weight: 600;">📅 Sua reunião</p>
           <p style="margin: 0 0 16px; font-size: 16px; color: #212529; font-weight: 700;">${scheduledDay} · ${scheduledDate} · ${scheduledTime}</p>
-          <a href="${calUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 12px 28px; background: #4285f4; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 600;">
-            Adicionar ao Google Calendar
-          </a>
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            ${meetSection}
+            <a href="${calUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 12px 28px; background: #4285f4; color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 600;">
+              📅 Adicionar ao Calendar
+            </a>
+          </div>
         </div>
       `;
     }
