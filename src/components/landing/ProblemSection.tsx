@@ -1,59 +1,58 @@
 import { motion } from "framer-motion";
-import { AlertTriangle, Eye, Target } from "lucide-react";
 
-const problems = [
+const painPoints = [
   {
-    icon: AlertTriangle,
-    title: "Insegurança Constante",
-    desc: "Resultados irregulares. Um dia fica bom… no outro, completamente diferente. Sem previsibilidade, a confiança desaparece.",
+    emoji: "😰",
+    title: "Você restaura… e torce para dar certo",
+    desc: "A insegurança de não saber se o resultado vai ficar natural faz cada caso virar uma aposta. A confiança clínica desaparece quando não existe método.",
   },
   {
-    icon: Eye,
-    title: "Morfologia pobre = dentes artificiais",
-    desc: "Sem domínio de largura ótica, terços, linhas de transição e textura, o dente fica largo, curto, quadrado, sem profundidade.",
+    emoji: "🦷",
+    title: "Dentes que parecem artificiais",
+    desc: "Sem domínio real de morfologia — largura ótica, terços, transições, textura — seus dentes ficam largos, curtos, opacos. Falta a naturalidade que o paciente percebe.",
   },
   {
-    icon: Target,
-    title: "Dependência do 'olhômetro'",
-    desc: "Sem lógica óptica, você trabalha no achismo: matiz, croma, valor, opacidade, translucidez… Tudo vira tentativa e erro.",
+    emoji: "🎯",
+    title: "Escolher cor ainda é 'tentativa e erro'",
+    desc: "Matiz, croma, valor, opacidade, translucidez… sem lógica óptica, cada restauração é um tiro no escuro. O problema não é o material — é a ausência de um raciocínio treinado.",
   },
 ];
 
 const ProblemSection = () => {
   return (
-    <section className="py-24 relative">
+    <section className="py-24 sm:py-32">
       <div className="section-container">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-16 max-w-3xl mx-auto"
         >
-          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl mb-6">
-            <span className="text-foreground">O VERDADEIRO </span>
-            <span className="gold-text">PROBLEMA...</span>
+          <p className="text-[11px] tracking-[0.2em] uppercase font-medium text-accent mb-4">O verdadeiro desafio</p>
+          <div className="divider-elegant mb-6" />
+          <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-medium text-foreground leading-tight text-balance mb-6">
+            A odontologia mudou. <br />
+            <span className="italic text-muted-foreground">Mas o ensino ficou para trás.</span>
           </h2>
-          <p className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
-            A odontologia mudou. A resina composta exige consciência clínica, domínio técnico e visão treinada.
-            Mas o que a maioria dos dentistas aprende é um passo a passo engessado, que não prepara para os desafios reais do consultório.
+          <p className="text-muted-foreground text-lg leading-relaxed">
+            A resina composta exige consciência clínica, domínio técnico e visão treinada.
+            Mas a maioria dos cursos ensina um passo a passo engessado que não prepara para a realidade do consultório.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {problems.map((p, i) => (
+        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+          {painPoints.map((p, i) => (
             <motion.div
               key={p.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.15 }}
-              className="glass-card p-8 group hover:border-primary/30 transition-all duration-500"
+              transition={{ delay: i * 0.12 }}
+              className="premium-card p-8 group"
             >
-              <div className="w-14 h-14 rounded-xl bg-destructive/10 flex items-center justify-center mb-6 group-hover:bg-destructive/20 transition-colors">
-                <p.icon className="w-7 h-7 text-destructive" />
-              </div>
-              <h3 className="font-body text-xl font-bold mb-3 text-foreground">{p.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">{p.desc}</p>
+              <span className="text-3xl mb-5 block">{p.emoji}</span>
+              <h3 className="font-serif text-xl font-medium text-foreground mb-3 leading-snug">{p.title}</h3>
+              <p className="text-muted-foreground text-[15px] leading-relaxed">{p.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -62,18 +61,21 @@ const ProblemSection = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 glass-card p-8 sm:p-12 border-l-4 border-l-primary text-center"
+          className="mt-20 max-w-3xl mx-auto text-center"
         >
-          <p className="text-xl sm:text-2xl text-foreground/90 italic leading-relaxed font-body">
-            "A maior causa da insegurança não é falta de talento… é a ausência de um{" "}
-            <span className="gold-text font-bold not-italic">método estruturado</span>,
+          <div className="divider-elegant mb-8" />
+          <p className="font-serif text-xl sm:text-2xl text-foreground/80 italic leading-relaxed">
+            "A maior causa da insegurança não é falta de talento — é a ausência de um{" "}
+            <span className="not-italic font-semibold gold-text">método estruturado</span>{" "}
             que organize o conhecimento e traga clareza do começo ao fim."
           </p>
+          <p className="mt-6 text-sm text-muted-foreground font-medium">— Prof. Breno Mont'Alverne</p>
+          <div className="divider-elegant mt-8" />
         </motion.blockquote>
 
-        <div className="text-center mt-10">
+        <div className="text-center mt-12">
           <a href="#preco" className="btn-cta">
-            Quero chegar ao topo! <span className="text-2xl">⛰️</span>
+            Quero dominar o método <ArrowRight className="w-4 h-4" />
           </a>
         </div>
       </div>
@@ -81,4 +83,5 @@ const ProblemSection = () => {
   );
 };
 
+import { ArrowRight } from "lucide-react";
 export default ProblemSection;
