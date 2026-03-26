@@ -98,7 +98,7 @@ const Agendar = () => {
                   Você está há <span className="summit-text">1 passo</span> de falar com a nossa equipe.
                 </h1>
                 <p className="text-[13px] text-foreground/35 leading-relaxed">
-                  Em uma reunião rápida de 20 minutos, vamos mostrar como o Treinamento Online do Instituto Mont'Alverne vai conduzir sua carreira até o ponto mais alto.
+                  Em 20 minutos, vamos mostrar como o Instituto Mont'Alverne pode levar sua carreira ao próximo nível.
                 </p>
               </div>
 
