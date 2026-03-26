@@ -124,7 +124,7 @@ const Agendar = () => {
                 {/* Treatment + Name */}
                 <div className="flex gap-2">
                   <div className="w-[90px] flex-shrink-0">
-                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Tratamento</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Tratamento <span className="text-primary">*</span></Label>
                     <select
                       value={form.treatment}
                       onChange={(e) => handleChange("treatment", e.target.value)}
@@ -135,7 +135,7 @@ const Agendar = () => {
                     </select>
                   </div>
                   <div className="flex-1">
-                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Seu nome</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Seu nome <span className="text-primary">*</span></Label>
                     <Input
                       value={form.name}
                       onChange={(e) => handleChange("name", e.target.value)}
@@ -147,7 +147,7 @@ const Agendar = () => {
 
                 {/* Phone */}
                 <div>
-                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Telefone</Label>
+                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Telefone <span className="text-primary">*</span></Label>
                   <Input
                     value={form.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
@@ -159,7 +159,7 @@ const Agendar = () => {
 
                 {/* Email */}
                 <div>
-                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Email</Label>
+                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Email <span className="text-primary">*</span></Label>
                   <Input
                     value={form.email}
                     onChange={(e) => handleChange("email", e.target.value)}
@@ -172,7 +172,7 @@ const Agendar = () => {
                 {/* UF + City */}
                 <div className="flex gap-2">
                   <div className="w-[80px] flex-shrink-0">
-                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">UF</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">UF <span className="text-primary">*</span></Label>
                     <select
                       value={form.uf}
                       onChange={(e) => handleChange("uf", e.target.value)}
@@ -185,7 +185,7 @@ const Agendar = () => {
                     </select>
                   </div>
                   <div className="flex-1">
-                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Cidade</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Cidade <span className="text-primary">*</span></Label>
                     <Input
                       value={form.city}
                       onChange={(e) => handleChange("city", e.target.value)}
@@ -197,7 +197,7 @@ const Agendar = () => {
 
                 {/* Career */}
                 <div>
-                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Carreira</Label>
+                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Carreira <span className="text-primary">*</span></Label>
                   <div className="flex gap-2">
                     {getCareers(form.treatment).map((c) => (
                       <button
