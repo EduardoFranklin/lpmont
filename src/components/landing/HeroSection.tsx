@@ -41,17 +41,7 @@ const HeroSection = () => {
 
       <div className="section-container relative z-10 pt-32 pb-20 lg:pt-40 lg:pb-24">
         <div className="max-w-4xl mx-auto text-center">
-          {/* Avatar */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2 }}
-            className="flex justify-center mb-4"
-          >
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-primary/30 shadow-lg">
-              <img src="/images/brenno.png" alt="Dr. Breno Mont'Alverne" className="w-full h-full object-cover" />
-            </div>
-          </motion.div>
+
 
           {/* Caption line + tag */}
           <motion.div
