@@ -75,9 +75,9 @@ const HeroSection = () => {
             transition={{ delay: 0.5 }}
             className="text-lg sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-10"
           >
-            O método que leva dentistas da insegurança à excelência clínica.
-            13 módulos, 5 Hands-On e o acompanhamento de um dos maiores nomes
-            da dentística restauradora do Brasil.
+            Reputação vira indicação. Indicação vira agenda cheia.
+            Agenda cheia vira clínica. Clínica vira instituto.
+            Tudo começa com o método.
           </motion.p>
 
           {/* CTA */}
