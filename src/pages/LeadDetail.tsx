@@ -146,10 +146,13 @@ const LeadDetail = () => {
             </span>
             <Badge variant="outline" className={statusOpt?.color}>{statusOpt?.label}</Badge>
             <Badge variant="outline" className={tempOpt?.color}>{tempOpt?.label}</Badge>
+            {lead.scheduled_day && lead.scheduled_time && (
+              <CalendarCheck className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            )}
+            <span className="text-xs text-muted-foreground flex items-center gap-1 flex-shrink-0">
+              <Timer className="w-3 h-3" /> há {formatElapsed(lead.updated_at)}
+            </span>
           </div>
-          <Button variant="ghost" size="icon" className="text-emerald-400" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
-            <MessageCircle className="w-4 h-4" />
-          </Button>
         </div>
       </header>
 
