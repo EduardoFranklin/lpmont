@@ -13,13 +13,16 @@ Deno.serve(async (req) => {
 
   const url = new URL(req.url);
 
-  // Step 1: Generate auth URL
+  // Step 1: POST → Generate auth URL (called from frontend)
   if (req.method === "POST") {
     try {
       const clientId = Deno.env.get("GOOGLE_CLIENT_ID");
       if (!clientId) throw new Error("GOOGLE_CLIENT_ID not configured");
 
-      const { redirectUri } = await req.json();
+      const { redirectUri, userId } = await req.json();
+      if (!userId) throw new Error("userId is required");
+
+      const state = JSON.stringify({ userId, redirectUri });
 
       const params = new URLSearchParams({
         client_id: clientId,
@@ -28,6 +31,7 @@ Deno.serve(async (req) => {
         scope: "https://www.googleapis.com/auth/calendar.events",
         access_type: "offline",
         prompt: "consent",
+        state,
       });
 
       return new Response(
@@ -45,19 +49,20 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Step 2: Exchange code for tokens (GET with ?code=...&userId=...)
+  // Step 2: GET → Google redirects here with ?code=...&state=...
   if (req.method === "GET") {
     try {
       const code = url.searchParams.get("code");
-      const userId = url.searchParams.get("userId");
-      const redirectUri = url.searchParams.get("redirectUri");
+      const stateParam = url.searchParams.get("state");
 
-      if (!code || !userId || !redirectUri) {
-        return new Response(JSON.stringify({ error: "Missing code, userId, or redirectUri" }), {
+      if (!code || !stateParam) {
+        return new Response("<p>Erro: parâmetros ausentes.</p>", {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/html" },
         });
       }
+
+      const { userId, redirectUri } = JSON.parse(stateParam);
 
       const clientId = Deno.env.get("GOOGLE_CLIENT_ID")!;
       const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET")!;
@@ -77,9 +82,10 @@ Deno.serve(async (req) => {
 
       const tokenData = await tokenRes.json();
       if (!tokenRes.ok) {
-        return new Response(JSON.stringify({ error: "Token exchange failed", details: tokenData }), {
+        console.error("Token exchange failed:", tokenData);
+        return new Response(`<p>Erro na troca de token: ${JSON.stringify(tokenData)}</p>`, {
           status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          headers: { "Content-Type": "text/html" },
         });
       }
 
@@ -89,38 +95,38 @@ Deno.serve(async (req) => {
       });
       const profile = await profileRes.json();
 
-      // Store tokens
+      // Store tokens in database
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
       const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
       const supabase = createClient(supabaseUrl, serviceKey);
 
       const tokenExpiry = new Date(Date.now() + tokenData.expires_in * 1000).toISOString();
 
-      await supabase.from("google_oauth_tokens").upsert(
-        {
-          user_id: userId,
-          access_token: tokenData.access_token,
-          refresh_token: tokenData.refresh_token,
-          token_expiry: tokenExpiry,
-          email: profile.email || null,
-        },
-        { onConflict: "user_id" }
-      );
+      // Delete existing tokens for this user then insert new ones
+      await supabase.from("google_oauth_tokens").delete().eq("user_id", userId);
+      await supabase.from("google_oauth_tokens").insert({
+        user_id: userId,
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token,
+        token_expiry: tokenExpiry,
+        email: profile.email || null,
+      });
 
-      // Return HTML that closes the popup
+      // Return HTML that notifies the opener and closes
       const html = `<!DOCTYPE html><html><body><script>
         window.opener?.postMessage({ type: "google-auth-success" }, "*");
         window.close();
-      </script><p>Autorização concluída! Pode fechar esta janela.</p></body></html>`;
+      </script><p>✅ Autorização concluída! Pode fechar esta janela.</p></body></html>`;
 
       return new Response(html, {
         headers: { "Content-Type": "text/html" },
       });
     } catch (err) {
+      console.error("OAuth callback error:", err);
       const msg = err instanceof Error ? err.message : "Unknown error";
-      return new Response(JSON.stringify({ error: msg }), {
+      return new Response(`<p>Erro: ${msg}</p>`, {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/html" },
       });
     }
   }
