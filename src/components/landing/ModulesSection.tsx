@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
@@ -36,6 +36,27 @@ const phaseColors: Record<string, string> = {
 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    camps.forEach((_, i) => {
+      const el = itemRefs.current[i];
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setOpenIdx(i);
+            obs.disconnect();
+          }
+        },
+        { threshold: 0.6 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
 
   return (
     <section id="modulos" className="py-28 sm:py-36 relative">
@@ -75,6 +96,7 @@ const ModulesSection = () => {
               return (
                 <motion.div
                   key={mod.num}
+                  ref={(el) => { itemRefs.current[i] = el; }}
                   initial={{ opacity: 0, x: -12 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
