@@ -263,7 +263,7 @@ const ModulesSection = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
                         <div className="px-5 sm:px-6 pb-5 pt-3 ml-0 sm:ml-[68px]">
@@ -419,7 +419,7 @@ const ModulesSection = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
+                        transition={{ duration: 0.5, ease: "easeInOut" }}
                         className="overflow-hidden"
                       >
                         <div className="px-5 sm:px-6 pb-5 pt-3 ml-0 sm:ml-[68px]">
