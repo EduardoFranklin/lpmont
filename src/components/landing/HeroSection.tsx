@@ -194,11 +194,14 @@ const HeroSection = () => {
                     </button>
                   ) : (
                     <iframe
-                      src="about:blank"
+                      id="panda-d49c541c-010d-4a28-bdf6-80a535639867"
+                      src="https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=d49c541c-010d-4a28-bdf6-80a535639867&playOpensFullscreenNative=true"
                       title="VSL - Método Mont'"
                       className="w-full h-full"
-                      allow="autoplay; fullscreen"
+                      style={{ border: "none" }}
+                      allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
                       allowFullScreen
+                      fetchpriority="high"
                     />
                   )}
                 </div>
