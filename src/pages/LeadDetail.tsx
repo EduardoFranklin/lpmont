@@ -9,6 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
+  Plus, Save, Thermometer, User, FileText, Globe
+} from "lucide-react";
+import {
+  ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
   Plus, Save, Thermometer, User, FileText
 } from "lucide-react";
 import { format } from "date-fns";
@@ -170,6 +174,26 @@ const LeadDetail = () => {
                 <Briefcase className="w-3.5 h-3.5" />
                 <span className="capitalize">{lead.career?.replace("_", " ")}</span>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2"><Globe className="w-4 h-4" /> Origem (UTM)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              {[
+                { label: "Source", value: (lead as any).utm_source },
+                { label: "Medium", value: (lead as any).utm_medium },
+                { label: "Campaign", value: (lead as any).utm_campaign },
+                { label: "Term", value: (lead as any).utm_term },
+                { label: "Content", value: (lead as any).utm_content },
+              ].map((u) => (
+                <div key={u.label} className="flex justify-between text-muted-foreground">
+                  <span className="text-xs uppercase tracking-wider">{u.label}</span>
+                  <span className="text-foreground text-xs font-medium">{u.value || "—"}</span>
+                </div>
+              ))}
             </CardContent>
           </Card>
 

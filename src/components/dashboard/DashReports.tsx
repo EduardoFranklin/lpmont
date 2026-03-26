@@ -1,6 +1,7 @@
 import type { Lead } from "@/pages/Dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CalendarCheck, UserCheck, TrendingUp } from "lucide-react";
+import { Users, CalendarCheck, UserCheck, TrendingUp, Globe, Megaphone, Target } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const statusLabels: Record<string, string> = {
   novo: "Novos",
@@ -44,8 +45,41 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
   });
   const topUfs = Object.entries(byUf).sort((a, b) => b[1] - a[1]).slice(0, 10);
 
+  // UTM origin reports
+  const bySource: Record<string, { total: number; convertidos: number }> = {};
+  const byCampaign: Record<string, { total: number; convertidos: number }> = {};
+  const byMedium: Record<string, { total: number; convertidos: number }> = {};
+
+  leads.forEach((l) => {
+    const src = (l as any).utm_source || "Orgânico / Direto";
+    const camp = (l as any).utm_campaign;
+    const med = (l as any).utm_medium;
+    const isConv = l.status === "convertido";
+
+    if (!bySource[src]) bySource[src] = { total: 0, convertidos: 0 };
+    bySource[src].total++;
+    if (isConv) bySource[src].convertidos++;
+
+    if (camp) {
+      if (!byCampaign[camp]) byCampaign[camp] = { total: 0, convertidos: 0 };
+      byCampaign[camp].total++;
+      if (isConv) byCampaign[camp].convertidos++;
+    }
+
+    if (med) {
+      if (!byMedium[med]) byMedium[med] = { total: 0, convertidos: 0 };
+      byMedium[med].total++;
+      if (isConv) byMedium[med].convertidos++;
+    }
+  });
+
+  const sortedSources = Object.entries(bySource).sort((a, b) => b[1].total - a[1].total);
+  const sortedCampaigns = Object.entries(byCampaign).sort((a, b) => b[1].total - a[1].total);
+  const sortedMediums = Object.entries(byMedium).sort((a, b) => b[1].total - a[1].total);
+
   return (
     <div className="space-y-6">
+      {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m) => {
           const Icon = m.icon;
@@ -65,6 +99,85 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
         })}
       </div>
 
+      {/* Origin reports */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Globe className="w-4 h-4 text-blue-400" /> Por Origem (Source)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {sortedSources.map(([src, data]) => {
+              const rate = data.total > 0 ? ((data.convertidos / data.total) * 100).toFixed(0) : "0";
+              return (
+                <div key={src} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground truncate max-w-[140px]">{src}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{data.total}</span>
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                      {data.convertidos} conv. ({rate}%)
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+            {sortedSources.length === 0 && <p className="text-sm text-muted-foreground">Sem dados</p>}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Megaphone className="w-4 h-4 text-amber-400" /> Por Campanha
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {sortedCampaigns.map(([camp, data]) => {
+              const rate = data.total > 0 ? ((data.convertidos / data.total) * 100).toFixed(0) : "0";
+              return (
+                <div key={camp} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground truncate max-w-[140px]">{camp}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{data.total}</span>
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                      {data.convertidos} conv. ({rate}%)
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+            {sortedCampaigns.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma campanha rastreada</p>}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Target className="w-4 h-4 text-primary" /> Por Mídia (Medium)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {sortedMediums.map(([med, data]) => {
+              const rate = data.total > 0 ? ((data.convertidos / data.total) * 100).toFixed(0) : "0";
+              return (
+                <div key={med} className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground truncate max-w-[140px]">{med}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{data.total}</span>
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                      {data.convertidos} conv. ({rate}%)
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+            {sortedMediums.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma mídia rastreada</p>}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Existing reports */}
       <div className="grid md:grid-cols-3 gap-4">
         <Card>
           <CardHeader><CardTitle className="text-sm">Por Status</CardTitle></CardHeader>

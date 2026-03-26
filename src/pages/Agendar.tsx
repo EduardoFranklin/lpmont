@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useTrackingScripts from "@/hooks/useTrackingScripts";
+import useUtmCapture from "@/hooks/useUtmCapture";
 
 const UFS = [
   "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
@@ -73,6 +74,7 @@ const benefits = [
 
 const Agendar = () => {
   useTrackingScripts();
+  const utmParams = useUtmCapture();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     treatment: "Dr.",
@@ -196,7 +198,12 @@ const Agendar = () => {
         scheduled_day: selectedSlot.day,
         scheduled_time: selectedSlot.time,
         status: "agendado",
-      });
+        utm_source: utmParams.utm_source || null,
+        utm_medium: utmParams.utm_medium || null,
+        utm_campaign: utmParams.utm_campaign || null,
+        utm_term: utmParams.utm_term || null,
+        utm_content: utmParams.utm_content || null,
+      } as any);
 
       // Send welcome email (fire-and-forget)
       supabase.functions.invoke("send-welcome-email", {
