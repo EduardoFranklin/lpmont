@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,57 +6,46 @@
 
 @layer base {
   :root {
-    --background: 215 28% 7%;
-    --foreground: 210 20% 92%;
+    --background: 230 30% 6%;
+    --foreground: 0 0% 100%;
 
-    --card: 215 25% 10%;
-    --card-foreground: 210 20% 92%;
+    --card: 230 25% 9%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 215 28% 9%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 230 25% 9%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 35 90% 55%;
-    --primary-foreground: 215 28% 7%;
+    --primary: 38 100% 55%;
+    --primary-foreground: 230 30% 6%;
 
-    --secondary: 215 20% 14%;
-    --secondary-foreground: 210 20% 85%;
+    --secondary: 230 20% 12%;
+    --secondary-foreground: 230 10% 70%;
 
-    --muted: 215 18% 16%;
-    --muted-foreground: 215 12% 50%;
+    --muted: 230 15% 15%;
+    --muted-foreground: 230 10% 50%;
 
-    --accent: 35 90% 55%;
-    --accent-foreground: 215 28% 7%;
+    --accent: 38 100% 55%;
+    --accent-foreground: 230 30% 6%;
 
     --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 18% 16%;
-    --input: 215 18% 16%;
-    --ring: 35 90% 55%;
+    --border: 230 15% 14%;
+    --input: 230 15% 14%;
+    --ring: 38 100% 55%;
 
     --radius: 0.75rem;
 
-    /* Mountain palette */
-    --summit-gold: 35 90% 55%;
-    --alpine-blue: 215 35% 25%;
-    --night-sky: 215 28% 7%;
-    --snow-white: 210 20% 92%;
-    --fog: 215 15% 40%;
-    --ridge: 215 20% 18%;
-    --base-camp: 215 22% 12%;
+    /* Brand palette */
+    --brand-dark: 230 30% 6%;
+    --brand-gold: 38 100% 55%;
+    --brand-gold-soft: 38 80% 70%;
+    --brand-green: 155 98% 61%;
+    --brand-neutral: 230 10% 55%;
+    --brand-neutral-light: 230 10% 72%;
+    --brand-dark-card: 230 22% 10%;
 
-    /* Gradients */
-    --gradient-summit: linear-gradient(135deg, hsl(35 90% 55%), hsl(25 85% 50%));
-    --gradient-sky: linear-gradient(180deg, hsl(215 30% 5%) 0%, hsl(215 28% 10%) 50%, hsl(215 22% 14%) 100%);
-    --gradient-dawn: linear-gradient(135deg, hsl(35 90% 55% / 0.15), hsl(15 80% 50% / 0.05));
-    --gradient-ridge: linear-gradient(180deg, hsl(215 22% 12%), hsl(215 28% 7%));
-
-    /* Shadows */
-    --shadow-summit: 0 0 60px -15px hsl(35 90% 55% / 0.25);
-    --shadow-mountain: 0 20px 60px -20px hsl(215 30% 5% / 0.7);
-    --shadow-card: 0 4px 30px -10px hsl(215 30% 5% / 0.5);
-    --shadow-glow: 0 0 40px -10px hsl(35 90% 55% / 0.2);
-
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
@@ -79,109 +68,186 @@
 }
 
 @layer components {
-  .font-serif {
-    font-family: 'Playfair Display', serif;
-  }
-
   .section-container {
-    @apply max-w-6xl mx-auto px-5 sm:px-8;
+    @apply max-w-[80rem] mx-auto px-5 sm:px-8;
   }
 
-  /* Summit CTA — the golden peak button */
+  /* === GRADIENT BORDER BUTTON (Yeldra-inspired) === */
+  .btn-gradient {
+    @apply relative inline-flex items-center justify-center gap-2.5 text-sm font-medium tracking-wide;
+    text-decoration: none;
+  }
+  .btn-gradient .btn-gradient-wrapper {
+    background-image: linear-gradient(0deg, hsl(var(--brand-gold)), hsl(30 80% 40%));
+    border-radius: 150px;
+    padding: 2px 1px 1px;
+  }
+  .btn-gradient .btn-gradient-inner {
+    background-color: hsl(var(--brand-dark));
+    border-radius: 150px;
+    padding: 0.75rem 1.75rem;
+    box-shadow: inset 0 -10px 30px hsl(var(--brand-gold) / 0.25), inset 0 4px 120px hsl(var(--brand-gold) / 0.05);
+    transition: box-shadow 0.3s ease;
+  }
+  .btn-gradient:hover .btn-gradient-inner {
+    box-shadow: inset 0 -10px 40px hsl(var(--brand-gold) / 0.4), inset 0 4px 120px hsl(var(--brand-gold) / 0.1);
+  }
+  .btn-gradient .btn-gradient-bg {
+    background-color: hsl(var(--brand-gold));
+    border-radius: 150px;
+    position: absolute;
+    inset: 0%;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .btn-gradient:hover .btn-gradient-bg {
+    opacity: 0.15;
+  }
+  .btn-gradient .btn-gradient-text {
+    @apply relative z-10 flex items-center gap-2.5 text-foreground font-medium;
+  }
+
+  /* === SECONDARY BUTTON === */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all duration-300;
+    border: 1px solid hsl(var(--brand-gold) / 0.3);
+    color: hsl(var(--foreground) / 0.7);
+  }
+  .btn-secondary:hover {
+    border-color: hsl(var(--brand-gold) / 0.6);
+    color: hsl(var(--foreground));
+    background: hsl(var(--brand-gold) / 0.05);
+  }
+
+  /* === SIMPLE GOLD BUTTON (for CTA) === */
   .btn-summit {
-    @apply inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-base transition-all duration-500 tracking-wide;
-    background: var(--gradient-summit);
-    color: hsl(var(--primary-foreground));
-    box-shadow: var(--shadow-summit);
+    @apply inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-sm transition-all duration-300 tracking-wide;
+    background: linear-gradient(135deg, hsl(var(--brand-gold)), hsl(30 80% 45%));
+    color: hsl(var(--brand-dark));
+    box-shadow: 0 0 60px -15px hsl(var(--brand-gold) / 0.3);
   }
   .btn-summit:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0 80px -10px hsl(35 90% 55% / 0.4);
-  }
-  .btn-summit:active {
-    transform: translateY(0);
+    transform: translateY(-2px);
+    box-shadow: 0 0 80px -10px hsl(var(--brand-gold) / 0.5);
   }
 
-  /* Ridge button — translucent outline */
-  .btn-ridge {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-medium text-sm transition-all duration-300;
-    border: 1px solid hsl(var(--snow-white) / 0.15);
-    color: hsl(var(--snow-white) / 0.7);
-    backdrop-filter: blur(4px);
+  /* === GRADIENT BORDER CARD === */
+  .gradient-card {
+    background-image: linear-gradient(315deg, hsl(var(--brand-dark-card)), hsl(230 15% 18%));
+    border-radius: 16px;
+    padding: 1px;
   }
-  .btn-ridge:hover {
-    background: hsl(var(--snow-white) / 0.05);
-    border-color: hsl(var(--snow-white) / 0.25);
-    color: hsl(var(--snow-white) / 0.95);
+  .gradient-card-inner {
+    @apply rounded-2xl;
+    background-color: hsl(var(--brand-dark-card));
   }
 
-  /* Mountain card — frosted glass on dark */
+  /* === MOUNTAIN CARD (frosted glass) === */
   .mountain-card {
     @apply rounded-2xl transition-all duration-500;
-    background: hsl(var(--base-camp) / 0.6);
-    border: 1px solid hsl(var(--snow-white) / 0.06);
+    background: hsl(var(--brand-dark-card) / 0.6);
+    border: 1px solid hsl(var(--foreground) / 0.06);
     backdrop-filter: blur(12px);
-    box-shadow: var(--shadow-card);
   }
   .mountain-card:hover {
-    border-color: hsl(var(--snow-white) / 0.1);
-    box-shadow: var(--shadow-mountain);
+    border-color: hsl(var(--foreground) / 0.1);
   }
 
-  /* Gold gradient text */
+  /* === CAPTION LINE (Yeldra-inspired connector) === */
+  .caption-line-h {
+    width: 2.5rem;
+    height: 1px;
+    overflow: hidden;
+  }
+  .caption-line-h-inner {
+    background-image: linear-gradient(90deg, transparent, hsl(var(--brand-gold)));
+    width: 100%;
+    height: 100%;
+  }
+  .caption-line-v {
+    width: 1px;
+    overflow: hidden;
+  }
+  .caption-line-v-inner {
+    background-image: linear-gradient(180deg, transparent, hsl(var(--brand-gold)));
+    width: 100%;
+    height: 100%;
+  }
+  .caption-dot {
+    @apply rounded-full flex-shrink-0;
+    width: 6px;
+    height: 6px;
+    background-color: hsl(var(--brand-gold));
+  }
+  .caption-dot-green {
+    @apply rounded-full flex-shrink-0;
+    width: 6px;
+    height: 6px;
+    background-color: hsl(var(--brand-green));
+  }
+
+  /* === SUMMIT GRADIENT TEXT === */
   .summit-text {
-    background: var(--gradient-summit);
+    background: linear-gradient(135deg, hsl(var(--brand-gold)), hsl(30 80% 45%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* Divider — golden trail */
+  /* === TRAIL DIVIDER === */
   .trail-divider {
     @apply mx-auto;
     width: 48px;
     height: 2px;
-    background: var(--gradient-summit);
+    background: linear-gradient(90deg, hsl(var(--brand-gold)), hsl(30 80% 45%));
     border-radius: 2px;
-    box-shadow: 0 0 12px hsl(35 90% 55% / 0.4);
+    box-shadow: 0 0 12px hsl(var(--brand-gold) / 0.4);
   }
 
-  /* Mountain SVG silhouette for section dividers */
+  /* === ALTITUDE MARKER === */
+  .altitude-marker {
+    @apply flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold;
+    background: hsl(var(--brand-gold) / 0.1);
+    color: hsl(var(--brand-gold));
+    border: 1px solid hsl(var(--brand-gold) / 0.2);
+  }
+
+  /* === GLOW / LUEUR === */
+  .glow-gold {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, hsl(var(--brand-gold) / 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* === FAQ ICON === */
+  .faq-icon {
+    background-image: linear-gradient(hsl(var(--brand-gold-soft)), hsl(var(--brand-gold)));
+    border-radius: 50%;
+    padding: 1px;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .faq-icon-inner {
+    @apply w-full h-full rounded-full flex items-center justify-center;
+    background-color: hsl(var(--brand-dark));
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Mountain divider */
   .mountain-divider {
     @apply w-full overflow-hidden leading-[0];
   }
   .mountain-divider svg {
     @apply w-full;
     display: block;
-  }
-
-  /* Fog overlay */
-  .fog-overlay {
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      hsl(var(--night-sky) / 0.4) 40%,
-      hsl(var(--night-sky) / 0.8) 70%,
-      hsl(var(--night-sky)) 100%
-    );
-  }
-
-  /* Altitude marker — used for module numbering */
-  .altitude-marker {
-    @apply flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold;
-    background: hsl(var(--summit-gold) / 0.1);
-    color: hsl(var(--summit-gold));
-    border: 1px solid hsl(var(--summit-gold) / 0.2);
-  }
-
-  /* Trail line — vertical connector */
-  .trail-line {
-    width: 2px;
-    background: linear-gradient(180deg, hsl(var(--summit-gold) / 0.3), hsl(var(--summit-gold) / 0.05));
-  }
-
-  .text-balance {
-    text-wrap: balance;
   }
 }
 
