@@ -63,13 +63,13 @@ const PricingSection = () => {
                 <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/[0.03] to-transparent" />
                 <p className="relative text-[11px] tracking-[0.15em] uppercase font-medium text-foreground/30 mb-1">Treinamento Online</p>
                 <p className="relative text-foreground/50 text-sm font-medium mb-1">Comunidade + Cursos + Mentorias ao Vivo</p>
-                <p className="relative text-foreground/25 text-sm line-through mb-3">De R$ 1.790,00</p>
+                <p className="relative text-foreground/25 text-sm line-through mb-3">De R$ 3.500,00</p>
                 <div className="relative flex items-baseline justify-center gap-1.5">
                   <span className="text-foreground/40 text-lg font-medium">12x de</span>
-                  <span className="text-[3.5rem] sm:text-6xl font-extrabold sm:font-medium summit-text">R$ 79</span>
-                  <span className="text-foreground/40 text-lg font-medium">,90</span>
+                  <span className="text-[3.5rem] sm:text-6xl font-extrabold sm:font-medium summit-text">R$ 165</span>
+                  <span className="text-foreground/40 text-lg font-medium">,00</span>
                 </div>
-                <p className="relative text-foreground/15 text-sm mt-2">sem juros · ou R$ 958,80 à vista</p>
+                <p className="relative text-foreground/15 text-sm mt-2">sem juros · ou R$ 1.980,00 à vista</p>
               </div>
 
               <div className="trail-divider mb-0" />
