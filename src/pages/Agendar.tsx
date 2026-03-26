@@ -11,9 +11,9 @@ const UFS = [
 ];
 
 const getCareers = (treatment: string) => [
-  { label: "Sou Estudante", value: "estudante" },
   { label: "Sou Dentista", value: "dentista" },
   { label: treatment === "Dra." ? "Sou Dona de Clínica" : "Sou Dono de Clínica", value: "dono_clinica" },
+  { label: "Sou Estudante", value: "estudante" },
 ];
 
 const TIME_SLOTS = [
