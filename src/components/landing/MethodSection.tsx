@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Wrench, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -14,6 +14,7 @@ const handsOnImages = [
 const MethodSection = () => {
   const [current, setCurrent] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
+  const touchStart = useRef(0);
 
   const next = useCallback(() => {
     setCurrent((c) => (c + 1) % handsOnImages.length);
@@ -122,6 +123,12 @@ const MethodSection = () => {
                 className="relative aspect-video bg-background overflow-hidden cursor-pointer"
                 onMouseEnter={() => setAutoPlay(false)}
                 onMouseLeave={() => setAutoPlay(true)}
+                onTouchStart={(e) => { touchStart.current = e.touches[0].clientX; }}
+                onTouchEnd={(e) => {
+                  const diff = touchStart.current - e.changedTouches[0].clientX;
+                  if (diff > 50) next();
+                  else if (diff < -50) prev();
+                }}
               >
                 {handsOnImages.map((img, i) => (
                   <div

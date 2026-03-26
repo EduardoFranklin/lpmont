@@ -129,6 +129,7 @@ const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => 
 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const clinicalTouchStart = useRef(0);
   const [openHandsOn, setOpenHandsOn] = useState<number | null>(0);
   const [synopsisModule, setSynopsisModule] = useState<number | null>(null);
   const handsOnRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -322,6 +323,12 @@ const ModulesSection = () => {
                 className="relative aspect-video bg-background overflow-hidden cursor-pointer"
                 onMouseEnter={() => setClinicalAutoPlay(false)}
                 onMouseLeave={() => setClinicalAutoPlay(true)}
+                onTouchStart={(e) => { clinicalTouchStart.current = e.touches[0].clientX; }}
+                onTouchEnd={(e) => {
+                  const diff = clinicalTouchStart.current - e.changedTouches[0].clientX;
+                  if (diff > 50) clinicalNext();
+                  else if (diff < -50) clinicalPrev();
+                }}
               >
                 {clinicalImages.map((img, i) => (
                   <div
