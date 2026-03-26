@@ -3,19 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 const camps = [
-  { num: "01", altitude: "1.200m", title: "Início da Expedição", desc: "Boas-vindas e mapeamento da jornada. Entenda cada etapa que vai te levar do chão ao cume da odontologia restauradora.", phase: "Base" },
-  { num: "02", altitude: "1.800m", title: "Princípios do Método Mont'", desc: "20+ anos de experiência clínica condensados em um método progressivo e estratégico.", phase: "Base" },
-  { num: "03", altitude: "2.400m", title: "Morfologia — Dentes Anteriores", desc: "A fundação do Método. Textura, sulcos, transições, largura ótica. Aprenda a enxergar como um clínico de excelência.", phase: "Ascensão" },
-  { num: "04", altitude: "3.000m", title: "Morfologia — Dentes Posteriores", desc: "Os 5 pilares da morfologia oclusal: fossas, sulcos, lóbulos, vertentes e arestas.", phase: "Ascensão" },
-  { num: "05", altitude: "3.600m", title: "Propriedades Ópticas", desc: "Matiz, croma, valor, opacidade, translucidez — a lógica óptica que transforma restaurações em dentes vivos.", phase: "Ascensão" },
-  { num: "06", altitude: "4.200m", title: "Restauração Classe I e II", desc: "Diagnóstico, matrizes, técnica restauradora e casos clínicos reais.", phase: "Altitude" },
-  { num: "07", altitude: "4.800m", title: "Restauração Classe III, IV e V", desc: "Domine cor, bisel, estratificação e naturalidade nas restaurações 'simples' que mais derrubam dentistas.", phase: "Altitude" },
-  { num: "08", altitude: "5.400m", title: "Dentes Extensamente Destruídos", desc: "Procedimentos rotineiros transformados em resultados impecáveis e previsíveis.", phase: "Altitude" },
-  { num: "09", altitude: "6.000m", title: "Adesão e Fotoativação", desc: "A base da longevidade. Substratos, adesivos e a ciência real por trás da fotoativação.", phase: "Crista" },
-  { num: "10", altitude: "6.600m", title: "Facetas — Conóides e Diastemas", desc: "Facetas em resina com naturalidade e previsibilidade. Do planejamento ao polimento.", phase: "Crista" },
-  { num: "11", altitude: "7.200m", title: "Facetas — Casos Complexos", desc: "O trecho mais desafiador da escalada. Resolva qualquer caso anterior com segurança total.", phase: "Crista" },
-  { num: "12", altitude: "7.800m", title: "Finalização e Polimento", desc: "Acabamento, texturização e polimento — o que separa clínicos comuns de clínicos de excelência.", phase: "Cume" },
-  { num: "13", altitude: "8.848m", title: "Reabilitação Oral — O CUME", desc: "O topo da montanha. Reabilite sorrisos completos com resina composta.", phase: "Cume" },
+  { num: "01", altitude: "1.200m", title: "Início da Expedição", desc: "Boas-vindas e mapeamento da jornada. Entenda cada etapa que vai te levar do chão ao cume da odontologia restauradora.", phase: "Base", img: "/images/freepik_1.jpg" },
+  { num: "02", altitude: "1.800m", title: "Princípios do Método Mont'", desc: "20+ anos de experiência clínica condensados em um método progressivo e estratégico.", phase: "Base", img: "/images/freepik_2.jpg" },
+  { num: "03", altitude: "2.400m", title: "Morfologia — Dentes Anteriores", desc: "A fundação do Método. Textura, sulcos, transições, largura ótica. Aprenda a enxergar como um clínico de excelência.", phase: "Ascensão", img: "/images/freepik_3.jpg" },
+  { num: "04", altitude: "3.000m", title: "Morfologia — Dentes Posteriores", desc: "Os 5 pilares da morfologia oclusal: fossas, sulcos, lóbulos, vertentes e arestas.", phase: "Ascensão", img: "/images/freepik_4.jpg" },
+  { num: "05", altitude: "3.600m", title: "Propriedades Ópticas", desc: "Matiz, croma, valor, opacidade, translucidez — a lógica óptica que transforma restaurações em dentes vivos.", phase: "Ascensão", img: "/images/freepik_5.jpg" },
+  { num: "06", altitude: "4.200m", title: "Restauração Classe I e II", desc: "Diagnóstico, matrizes, técnica restauradora e casos clínicos reais.", phase: "Altitude", img: "/images/freepik_6.jpg" },
+  { num: "07", altitude: "4.800m", title: "Restauração Classe III, IV e V", desc: "Domine cor, bisel, estratificação e naturalidade nas restaurações 'simples' que mais derrubam dentistas.", phase: "Altitude", img: "/images/freepik_7.jpg" },
+  { num: "08", altitude: "5.400m", title: "Dentes Extensamente Destruídos", desc: "Procedimentos rotineiros transformados em resultados impecáveis e previsíveis.", phase: "Altitude", img: "/images/freepik_8.jpg" },
+  { num: "09", altitude: "6.000m", title: "Adesão e Fotoativação", desc: "A base da longevidade. Substratos, adesivos e a ciência real por trás da fotoativação.", phase: "Crista", img: "/images/freepik_9.jpg" },
+  { num: "10", altitude: "6.600m", title: "Facetas — Conóides e Diastemas", desc: "Facetas em resina com naturalidade e previsibilidade. Do planejamento ao polimento.", phase: "Crista", img: "/images/freepik_10.jpg" },
+  { num: "11", altitude: "7.200m", title: "Facetas — Casos Complexos", desc: "O trecho mais desafiador da escalada. Resolva qualquer caso anterior com segurança total.", phase: "Crista", img: "/images/freepik_11.jpg" },
+  { num: "12", altitude: "7.800m", title: "Finalização e Polimento", desc: "Acabamento, texturização e polimento — o que separa clínicos comuns de clínicos de excelência.", phase: "Cume", img: "/images/freepik_11.jpg" },
+  { num: "13", altitude: "8.848m", title: "Reabilitação Oral — O CUME", desc: "O topo da montanha. Reabilite sorrisos completos com resina composta.", phase: "Cume", img: "/images/freepik_12.jpg" },
 ];
 
 const handsOn = [
