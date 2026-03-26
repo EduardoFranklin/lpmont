@@ -18,10 +18,11 @@ const FloatingCTA = () => {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-background/80 backdrop-blur-2xl border-t border-foreground/5 sm:hidden"
+          className="fixed bottom-0 left-0 right-0 z-50 p-3 backdrop-blur-2xl border-t border-foreground/[0.04] sm:hidden"
+          style={{ backgroundColor: "hsl(var(--background) / 0.85)" }}
         >
           <a href="#preco" className="btn-summit w-full justify-center text-sm py-3">
-            Iniciar expedição <ArrowRight className="w-4 h-4" />
+            Começar agora <ArrowRight className="w-4 h-4" />
           </a>
         </motion.div>
       )}

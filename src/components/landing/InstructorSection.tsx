@@ -1,27 +1,18 @@
 import { motion } from "framer-motion";
-import MountainDivider from "./MountainDivider";
 
 const stats = [
-  { value: "20+", label: "anos de escalada clínica", icon: "⛰️" },
-  { value: "2.000+", label: "dentistas guiados ao cume", icon: "🧗" },
+  { value: "20+", label: "anos de clínica", icon: "⛰️" },
+  { value: "2.000+", label: "dentistas formados", icon: "🧗" },
   { value: "FOB-USP", label: "Doutor e Mestre", icon: "🎓" },
   { value: "UFMA", label: "Professor universitário", icon: "📚" },
 ];
 
 const InstructorSection = () => {
   return (
-    <section id="professor" className="relative overflow-hidden">
-      {/* Summit background */}
-      <div className="absolute inset-0">
-        <img src="/images/summit-glow.jpg" alt="" className="w-full h-full object-cover opacity-15" loading="lazy" width={1200} height={800} />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/90 to-background" />
-      </div>
+    <section id="professor" className="py-28 sm:py-36 relative overflow-hidden">
+      <div className="glow-gold" style={{ width: 600, height: 600, top: "20%", right: "-20%", opacity: 0.3 }} />
 
-      <div className="text-background relative z-10">
-        <MountainDivider flip />
-      </div>
-
-      <div className="section-container relative z-10 py-24 sm:py-32">
+      <div className="section-container relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
           <motion.div
@@ -31,13 +22,15 @@ const InstructorSection = () => {
             className="relative flex justify-center order-2 lg:order-1"
           >
             <div className="relative">
-              <div className="absolute -inset-10 bg-primary/5 rounded-[3rem] blur-[80px]" />
-              <img
-                src="/images/breno.png"
-                alt="Prof. Breno Montalverne"
-                className="relative rounded-3xl w-full max-w-sm"
-                loading="lazy"
-              />
+              <div className="absolute -inset-10 rounded-full bg-primary/5 blur-[80px]" />
+              <div className="gradient-card rounded-3xl overflow-hidden">
+                <img
+                  src="/images/breno.png"
+                  alt="Prof. Breno Montalverne"
+                  className="relative w-full max-w-sm"
+                  loading="lazy"
+                />
+              </div>
             </div>
           </motion.div>
 
@@ -48,32 +41,36 @@ const InstructorSection = () => {
             viewport={{ once: true }}
             className="order-1 lg:order-2"
           >
-            <p className="text-[11px] tracking-[0.2em] uppercase font-medium text-primary mb-4">O guia da expedição</p>
-            <div className="trail-divider mb-6 mx-0" style={{ marginLeft: 0 }} />
+            <div className="flex items-center gap-3 mb-6">
+              <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
+              <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">O guia da expedição</span>
+            </div>
 
-            <h2 className="font-serif text-3xl sm:text-4xl font-medium text-foreground mb-8 leading-tight">
-              Prof. Breno <br />
-              <span className="italic summit-text">Mont'Alverne</span>
+            <h2 className="text-3xl sm:text-4xl font-normal text-foreground mb-8 leading-tight">
+              Prof. Breno{" "}
+              <span className="summit-text font-medium">Mont'Alverne</span>
             </h2>
 
-            <div className="space-y-4 text-muted-foreground text-[15px] leading-relaxed">
+            <div className="space-y-4 text-foreground/35 text-[15px] leading-relaxed">
               <p>
-                Dentista há mais de 20 anos, vivi intensamente a odontologia em todas as suas fases. Cada curso que criei é fruto de milhares de horas no consultório, na pesquisa e na sala de aula.
+                Dentista há mais de 20 anos, vivi intensamente a odontologia em todas as suas fases. Cada curso é fruto de milhares de horas no consultório, na pesquisa e na sala de aula.
               </p>
               <p>
-                <span className="text-foreground font-medium">Doutor em Ciências Odontológicas</span> pela FOB-USP. <span className="text-foreground font-medium">Mestre em Dentística</span> pela FOB-USP. Professor da UFMA e fundador do Instituto Mont'Alverne.
+                <span className="text-foreground/70 font-medium">Doutor em Ciências Odontológicas</span> pela FOB-USP. <span className="text-foreground/70 font-medium">Mestre em Dentística</span> pela FOB-USP. Professor da UFMA e fundador do Instituto Mont'Alverne.
               </p>
               <p>
-                Já guiei mais de 2.000 dentistas nesta escalada. Agora é a sua vez de chegar ao cume.
+                Já guiei mais de 2.000 dentistas nesta escalada. Agora é a sua vez.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-10">
               {stats.map((s) => (
-                <div key={s.label} className="mountain-card p-5 text-center">
-                  <span className="text-lg mb-1 block">{s.icon}</span>
-                  <p className="font-serif text-xl font-medium summit-text">{s.value}</p>
-                  <p className="text-[11px] text-muted-foreground mt-1">{s.label}</p>
+                <div key={s.label} className="gradient-card">
+                  <div className="gradient-card-inner p-5 text-center">
+                    <span className="text-lg mb-1 block">{s.icon}</span>
+                    <p className="text-lg font-medium summit-text">{s.value}</p>
+                    <p className="text-[11px] text-foreground/30 mt-1">{s.label}</p>
+                  </div>
                 </div>
               ))}
             </div>
