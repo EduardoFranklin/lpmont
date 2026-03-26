@@ -104,7 +104,7 @@ const PricingSection = () => {
                         <Users className="w-4 h-4" /> Mont'Alverne Experience
                       </p>
                       <p className="text-foreground/30 text-[12px] mt-2">
-                        Grupo exclusivo no WhatsApp com acesso direto à equipe e outros expedicionários.
+                        Grupo exclusivo no WhatsApp com acesso direto à equipe e outros alunos.
                       </p>
                     </div>
                   </div>
