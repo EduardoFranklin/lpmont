@@ -195,6 +195,15 @@ const Agendar = () => {
         scheduled_time: selectedSlot.time,
         status: "agendado",
       });
+
+      // Send welcome email (fire-and-forget)
+      supabase.functions.invoke("send-welcome-email", {
+        body: {
+          recipientEmail: form.email,
+          recipientName: form.name,
+          treatment: form.treatment,
+        },
+      }).catch((err) => console.error("Welcome email error:", err));
     } catch (err) {
       console.error("Erro ao salvar lead:", err);
     }
