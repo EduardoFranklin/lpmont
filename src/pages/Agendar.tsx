@@ -100,7 +100,9 @@ const Agendar = () => {
     fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.uf}/municipios?orderBy=nome`)
       .then((res) => res.json())
       .then((data: { nome: string }[]) => {
-        setCities(data.map((c) => c.nome));
+        const names = data.map((c) => c.nome);
+        setCities(names);
+        if (names.length > 0) handleChange("city", names[0]);
       })
       .catch(() => setCities([]))
       .finally(() => setLoadingCities(false));
