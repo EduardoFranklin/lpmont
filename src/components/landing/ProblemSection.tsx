@@ -35,7 +35,7 @@ const ProblemSection = () => {
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">O vale da estagnação</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-normal leading-[1.2] text-foreground mb-6">
+          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-semibold leading-[1.2] text-foreground mb-6">
             Antes de subir,{" "}
             <span className="text-foreground/40">reconheça onde você está</span>
           </h2>
