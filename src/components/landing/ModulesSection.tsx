@@ -81,7 +81,7 @@ const CampsCarousel = () => {
         <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
         
         <motion.div
-          className="flex gap-4 w-max"
+          className="flex gap-4 w-max cursor-grab active:cursor-grabbing"
           animate={{ x: [0, -totalWidth] }}
           transition={{
             x: {
@@ -91,6 +91,9 @@ const CampsCarousel = () => {
               ease: "linear",
             },
           }}
+          drag="x"
+          dragConstraints={{ left: -totalWidth, right: 0 }}
+          dragElastic={0.1}
           style={{ willChange: "transform" }}
         >
           {doubled.map((src, i) => (
