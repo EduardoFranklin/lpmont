@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -13,61 +13,76 @@ const NavBar = () => {
   }, []);
 
   const links = [
-    { label: "Módulos", href: "#modulos" },
+    { label: "O Curso", href: "#modulos" },
     { label: "Professor", href: "#professor" },
-    { label: "Preço", href: "#preco" },
+    { label: "Investimento", href: "#preco" },
   ];
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
+      initial={{ y: -80 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-background/90 backdrop-blur-lg border-b border-border shadow-lg" : "bg-transparent"
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-popover/95 backdrop-blur-xl border-b border-border shadow-sm"
+          : "bg-transparent"
       }`}
     >
-      <div className="section-container flex items-center justify-between h-16">
-        <a href="#">
-          <img src="/images/logo.png" alt="Método Mont" className="h-8" />
+      <div className="section-container flex items-center justify-between h-[72px]">
+        <a href="#" className="flex items-center gap-2">
+          <img src="/images/logo.png" alt="Método Mont" className="h-9" />
         </a>
 
-        <div className="hidden sm:flex items-center gap-8">
-          {links.map((l) => (
-            <a key={l.href} href={l.href} className="text-sm font-medium text-foreground/70 hover:text-primary transition-colors">
-              {l.label}
-            </a>
-          ))}
-          <a href="#preco" className="btn-cta py-2 px-5 text-sm">
-            Quero me inscrever
-          </a>
-        </div>
-
-        <button onClick={() => setMenuOpen(!menuOpen)} className="sm:hidden text-foreground">
-          {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-
-      {menuOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="sm:hidden bg-background border-b border-border px-4 pb-4 space-y-3"
-        >
+        <div className="hidden md:flex items-center gap-10">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              onClick={() => setMenuOpen(false)}
-              className="block text-foreground/70 hover:text-primary py-2"
+              className="text-[13px] font-medium tracking-widest uppercase text-foreground/60 hover:text-foreground transition-colors duration-300"
             >
               {l.label}
             </a>
           ))}
-          <a href="#preco" onClick={() => setMenuOpen(false)} className="btn-cta w-full justify-center py-3 text-sm">
-            Quero me inscrever
+        </div>
+
+        <div className="hidden md:block">
+          <a href="#preco" className="btn-cta py-2.5 px-6 text-sm">
+            Quero me inscrever <ArrowRight className="w-4 h-4" />
           </a>
-        </motion.div>
-      )}
+        </div>
+
+        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-foreground p-1">
+          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-popover border-b border-border overflow-hidden"
+          >
+            <div className="px-5 py-6 space-y-4">
+              {links.map((l) => (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="block text-sm font-medium text-foreground/70 hover:text-foreground py-1"
+                >
+                  {l.label}
+                </a>
+              ))}
+              <a href="#preco" onClick={() => setMenuOpen(false)} className="btn-cta w-full justify-center py-3 text-sm mt-2">
+                Quero me inscrever
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 };
