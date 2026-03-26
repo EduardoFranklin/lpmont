@@ -10,9 +10,9 @@ const includes = [
 ];
 
 const bonuses = [
-  "Curso completo de Clareamento Dental",
-  "Fotografia Odontológica com Prof. Caio Calisto",
-  "Comunidade Exclusiva de expedicionários",
+  { text: "Curso completo de Clareamento Dental", image: "/images/capa-rayssa.png" },
+  { text: "Fotografia Odontológica com Prof. Caio Calisto", image: "/images/capa-caio.png" },
+  { text: "Comunidade Exclusiva de expedicionários", image: null },
 ];
 
 const PricingSection = () => {
@@ -78,17 +78,28 @@ const PricingSection = () => {
                 </div>
 
                 <div className="mb-8 pt-6 border-t border-foreground/[0.04]">
-                  <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-primary/50 flex items-center gap-2 mb-4">
+                  <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-primary/50 flex items-center gap-2 mb-5">
                     <Gift className="w-3.5 h-3.5" /> Bônus da expedição
                   </p>
-                  <div className="space-y-3">
-                    {bonuses.map((item) => (
-                      <div key={item} className="flex items-start gap-3">
-                        <span className="caption-dot-green mt-1.5 flex-shrink-0" />
-                        <span className="text-foreground/50 text-[14px]">{item}</span>
+
+                  {/* Bonus cards with covers */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    {bonuses.filter(b => b.image).map((bonus) => (
+                      <div key={bonus.text} className="group relative rounded-xl overflow-hidden border border-foreground/[0.06] bg-secondary/30">
+                        <img src={bonus.image!} alt={bonus.text} className="w-full aspect-[3/4] object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+                        <p className="absolute bottom-0 left-0 right-0 p-3 text-[11px] leading-tight font-medium text-foreground/70">{bonus.text}</p>
                       </div>
                     ))}
                   </div>
+
+                  {/* Text-only bonus */}
+                  {bonuses.filter(b => !b.image).map((bonus) => (
+                    <div key={bonus.text} className="flex items-start gap-3">
+                      <span className="caption-dot-green mt-1.5 flex-shrink-0" />
+                      <span className="text-foreground/50 text-[14px]">{bonus.text}</span>
+                    </div>
+                  ))}
                 </div>
 
                 <a
