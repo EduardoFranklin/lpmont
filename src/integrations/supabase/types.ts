@@ -169,6 +169,30 @@ export type Database = {
         }
         Relationships: []
       }
+      sale_notification_contacts: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          phone: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          phone: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
