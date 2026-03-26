@@ -3,8 +3,7 @@ const FooterSection = () => {
     <footer className="py-16 border-t border-foreground/[0.04]">
       <div className="section-container text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <span className="text-lg">⛰️</span>
-          <span className="text-sm font-medium text-foreground/30">Método Mont'</span>
+          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-6 opacity-30" />
         </div>
         <p className="text-foreground/20 text-sm mb-1">
           A expedição até o topo da odontologia restauradora.
