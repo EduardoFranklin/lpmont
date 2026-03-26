@@ -112,11 +112,11 @@ const PricingSection = () => {
                   <div className="space-y-2.5">
                     <div className="rounded-xl border border-primary/10 bg-primary/[0.03] px-5 py-4 flex items-center gap-3">
                       <Gift className="w-4 h-4 text-primary/50 flex-shrink-0" />
-                      <p className="text-[13px] font-medium text-foreground/55">Curso de Clareamento — Rayssa Cavaleiro</p>
+                      <p className="text-[13px] font-medium text-foreground/55">Curso de Clareamento: Dra. Rayssa Cavaleiro</p>
                     </div>
                     <div className="rounded-xl border border-primary/10 bg-primary/[0.03] px-5 py-4 flex items-center gap-3">
                       <Gift className="w-4 h-4 text-primary/50 flex-shrink-0" />
-                      <p className="text-[13px] font-medium text-foreground/55">Curso de Fotografia — Caio Calixto</p>
+                      <p className="text-[13px] font-medium text-foreground/55">Curso de Fotografia: Dr. Caio Calixto</p>
                     </div>
                     <div className="rounded-xl border border-primary/10 bg-primary/[0.03] px-5 py-4 flex items-center gap-3">
                       <Gift className="w-4 h-4 text-primary/50 flex-shrink-0" />
