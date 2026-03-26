@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Save, MessageCircle, Mail, Bold, Italic, Link2, Image, Type,
-  Variable, Strikethrough, Code, Plus, Trash2, Clock, Bell,
+  Variable, Strikethrough, Code, Plus, Trash2, Clock, Bell, Trophy, Phone,
 } from "lucide-react";
 import {
   Popover, PopoverContent, PopoverTrigger,
@@ -501,6 +501,9 @@ const DashMessaging = () => {
         <TabsTrigger value="lembretes" className="gap-1.5">
           <Bell className="w-4 h-4" /> Lembretes
         </TabsTrigger>
+        <TabsTrigger value="vendas" className="gap-1.5">
+          <Trophy className="w-4 h-4" /> Vendas
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="geral" className="space-y-6">
@@ -536,7 +539,145 @@ const DashMessaging = () => {
       <TabsContent value="lembretes">
         <RemindersTab />
       </TabsContent>
+
+      <TabsContent value="vendas">
+        <SaleNotificationsTab />
+      </TabsContent>
     </Tabs>
+  );
+};
+
+/* ─── Sale Notifications Tab ─── */
+
+interface SaleContact {
+  id?: string;
+  name: string;
+  phone: string;
+  active: boolean;
+}
+
+const SaleNotificationsTab = () => {
+  const [contacts, setContacts] = useState<SaleContact[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newName, setNewName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+
+  const fetchContacts = useCallback(async () => {
+    const { data } = await supabase.from("sale_notification_contacts").select("*").order("created_at");
+    setContacts((data as any[]) || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchContacts(); }, [fetchContacts]);
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits.length ? `(${digits}` : "";
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
+  const handleAdd = async () => {
+    if (!newPhone.trim()) return;
+    await supabase.from("sale_notification_contacts").insert({
+      name: newName.trim() || "Sem nome",
+      phone: newPhone.trim(),
+      active: true,
+    });
+    setNewName("");
+    setNewPhone("");
+    toast.success("Contato adicionado!");
+    fetchContacts();
+  };
+
+  const handleToggle = async (contact: SaleContact) => {
+    if (!contact.id) return;
+    await supabase.from("sale_notification_contacts").update({ active: !contact.active }).eq("id", contact.id);
+    fetchContacts();
+  };
+
+  const handleDelete = async (contact: SaleContact) => {
+    if (!contact.id || !confirm("Excluir este contato?")) return;
+    await supabase.from("sale_notification_contacts").delete().eq("id", contact.id);
+    toast.success("Contato removido");
+    fetchContacts();
+  };
+
+  if (loading) return <p className="text-muted-foreground text-sm">Carregando...</p>;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Cadastre os números que devem receber uma notificação via WhatsApp quando um lead for convertido (venda realizada).
+      </p>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Plus className="w-4 h-4" /> Adicionar contato
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Input
+              placeholder="Nome (opcional)"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              className="sm:w-48"
+            />
+            <Input
+              placeholder="(00) 00000-0000"
+              value={newPhone}
+              onChange={(e) => setNewPhone(formatPhone(e.target.value))}
+              className="sm:w-48"
+              maxLength={15}
+              type="tel"
+            />
+            <Button onClick={handleAdd} disabled={!newPhone.trim()} size="sm" className="gap-1.5">
+              <Plus className="w-3.5 h-3.5" /> Adicionar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {contacts.length === 0 ? (
+        <Card>
+          <CardContent className="py-8 text-center text-muted-foreground text-sm">
+            Nenhum contato cadastrado. Adicione números acima para receber alertas de vendas.
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm">Contatos cadastrados ({contacts.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {contacts.map((contact) => (
+              <div
+                key={contact.id}
+                className={`flex items-center justify-between rounded-lg border border-border p-3 transition-opacity ${
+                  !contact.active ? "opacity-50" : ""
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">{contact.name}</p>
+                    <p className="text-xs text-muted-foreground">{contact.phone}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch checked={contact.active} onCheckedChange={() => handleToggle(contact)} />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(contact)}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+    </div>
   );
 };
 
