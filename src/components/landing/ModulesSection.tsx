@@ -114,9 +114,6 @@ const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => 
                     loading="lazy"
                   />
                 </div>
-                <p className="mt-2 text-[11px] sm:text-[12px] text-foreground/40 font-medium text-center leading-tight truncate px-1">
-                  {camp?.title}
-                </p>
               </div>
             );
           })}
