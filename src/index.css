@@ -104,7 +104,7 @@
 
   /* Ridge button — translucent outline */
   .btn-ridge {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-medium text-sm transition-all duration-400;
+    @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-medium text-sm transition-all duration-300;
     border: 1px solid hsl(var(--snow-white) / 0.15);
     color: hsl(var(--snow-white) / 0.7);
     backdrop-filter: blur(4px);
