@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2, MessageCircle, Calendar } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -72,6 +72,46 @@ const benefits = [
   { icon: Tag, label: "Descontos em Cursos Presenciais" },
 ];
 
+const ADMIN_EMAIL = "mktmetodomont@gmail.com";
+
+// Generate Google Calendar URL with Meet
+const buildGoogleCalendarUrl = (
+  title: string,
+  description: string,
+  dateStr: string, // "dd/mm"
+  timeSlot: string, // "9h às 9h30"
+  guestEmail: string
+): string => {
+  const [dd, mm] = dateStr.split("/").map(Number);
+  const year = new Date().getFullYear();
+  const timeMatch = timeSlot.match(/^(\d+)h/);
+  const startHour = timeMatch ? parseInt(timeMatch[1]) : 9;
+
+  // Build start and end dates in local time (São Paulo = UTC-3)
+  const start = new Date(year, mm - 1, dd, startHour, 0, 0);
+  const end = new Date(year, mm - 1, dd, startHour, 30, 0);
+
+  const fmt = (d: Date) =>
+    d.getFullYear().toString() +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    String(d.getDate()).padStart(2, "0") +
+    "T" +
+    String(d.getHours()).padStart(2, "0") +
+    String(d.getMinutes()).padStart(2, "0") +
+    "00";
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details: description,
+    add: `${guestEmail},${ADMIN_EMAIL}`,
+    ctz: "America/Sao_Paulo",
+  });
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+};
+
 const Agendar = () => {
   useTrackingScripts();
   const utmParams = useUtmCapture();
@@ -85,7 +125,7 @@ const Agendar = () => {
     city: "",
     career: "",
   });
-  const [selectedSlot, setSelectedSlot] = useState<{ day: string; time: string } | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ day: string; date: string; time: string } | null>(null);
   const [dynamicUnavailable, setDynamicUnavailable] = useState<{ day: string; time: string } | null>(null);
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -205,25 +245,17 @@ const Agendar = () => {
         utm_content: utmParams.utm_content || null,
       } as any);
 
-      // Send welcome email (fire-and-forget)
+      // Send welcome email with calendar info (fire-and-forget)
       supabase.functions.invoke("send-welcome-email", {
         body: {
           recipientEmail: form.email,
           recipientName: form.name,
           treatment: form.treatment,
-        },
-      }).catch((err) => console.error("Welcome email error:", err));
-
-      // Create Google Calendar event + Meet (fire-and-forget)
-      supabase.functions.invoke("google-calendar-create", {
-        body: {
-          leadEmail: form.email,
-          leadName: form.name,
-          treatment: form.treatment,
           scheduledDay: selectedSlot.day,
+          scheduledDate: selectedSlot.date,
           scheduledTime: selectedSlot.time,
         },
-      }).catch((err) => console.error("Calendar event error:", err));
+      }).catch((err) => console.error("Welcome email error:", err));
     } catch (err) {
       console.error("Erro ao salvar lead:", err);
     }
@@ -453,7 +485,7 @@ const Agendar = () => {
                         return (
                           <button
                             key={`${day.day}-${time}`}
-                            onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, time })}
+                            onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, date: day.date, time })}
                             disabled={isUnavailable}
                             className={`py-2.5 rounded-lg text-[13px] font-medium border transition-all duration-200 ${
                               isUnavailable
@@ -504,14 +536,32 @@ const Agendar = () => {
               <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
                 {form.treatment} {form.name}, sua reunião está marcada para:
               </p>
-              <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-6 py-4 mb-6">
+              <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-6 py-4 mb-4">
                 <p className="text-base font-semibold text-foreground/70">
-                  {selectedSlot?.day} · {selectedSlot?.time}
+                  {selectedSlot?.day} · {selectedSlot?.date} · {selectedSlot?.time}
                 </p>
                 <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
               </div>
 
-              <p className="text-[13px] text-foreground/35 mb-6 max-w-xs">
+              {/* Google Calendar button */}
+              {selectedSlot && (
+                <a
+                  href={buildGoogleCalendarUrl(
+                    `Reunião Método Mont' - ${form.treatment} ${form.name}`,
+                    `Reunião online de 30 min com a equipe do Método Mont'.\n\nParticipantes:\n- ${form.treatment} ${form.name} (${form.email})\n- Equipe Método Mont' (${ADMIN_EMAIL})`,
+                    selectedSlot.date,
+                    selectedSlot.time,
+                    form.email
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full rounded-lg border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm font-medium text-foreground/60 hover:bg-foreground/[0.06] hover:text-foreground/80 transition-all mb-4"
+                >
+                  <Calendar className="w-4 h-4" /> Adicionar ao Google Calendar
+                </a>
+              )}
+
+              <p className="text-[13px] text-foreground/35 mb-4 max-w-xs">
                 Enquanto isso, entre no nosso grupo do WhatsApp para receber lembretes e conteúdos exclusivos.
               </p>
 
