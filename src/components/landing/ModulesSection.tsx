@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Printer } from "lucide-react";
 
 const clinicalImages = [
   { src: "/images/clinicas-1.png", caption: "Classe I — Visão oclusal isolada" },
