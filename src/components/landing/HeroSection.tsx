@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Users, BookOpen, Radio } from "lucide-react";
 
 const HeroSection = () => {
   const [playing, setPlaying] = useState(false);
