@@ -19,7 +19,7 @@ html, body {
   .text-lg { font-size: 1.175rem !important; }
   .text-base { font-size: 1.0625rem !important; }
   .btn-summit, .btn-gradient-text, .btn-secondary { 
-    font-size: 0.8125rem !important; 
+    font-size: 0.875rem !important; 
     white-space: nowrap !important; 
   }
 }
