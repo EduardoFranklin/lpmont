@@ -312,7 +312,7 @@ const Agendar = () => {
                 Escolha o melhor <span className="summit-text">horário</span>
               </h2>
               <p className="text-[13px] text-foreground/35 mb-5">
-                Reunião online de 20 min com nosso especialista.
+                Reunião online de 30 min com nosso consultor.
               </p>
 
               <div className="space-y-4">
@@ -346,10 +346,13 @@ const Agendar = () => {
               <button
                 onClick={goToStep3}
                 disabled={!selectedSlot}
-                className="btn-summit w-full justify-center text-sm py-3.5 mt-6 disabled:opacity-40 disabled:pointer-events-none"
+                className="btn-summit w-full justify-center text-sm py-3.5 mt-6 disabled:opacity-40 disabled:pointer-events-none hidden sm:inline-flex"
               >
                 Confirmar Agendamento <ArrowRight className="w-4 h-4" />
               </button>
+
+              {/* Spacer for floating button on mobile */}
+              <div className="h-20 sm:hidden" />
             </motion.div>
           )}
 
