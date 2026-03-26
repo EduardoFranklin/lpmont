@@ -107,8 +107,19 @@ const ModulesSection = () => {
                         transition={{ duration: 0.25 }}
                         className="overflow-hidden"
                       >
-                        <div className="px-5 sm:px-6 pb-5 pt-1 ml-[60px] sm:ml-[68px] text-foreground/30 text-[14px] leading-relaxed">
-                          {mod.desc}
+                        <div className="px-5 sm:px-6 pb-5 pt-3 ml-0 sm:ml-[68px]">
+                          <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="w-full sm:w-32 h-32 sm:h-24 rounded-xl overflow-hidden flex-shrink-0 border border-foreground/[0.06]">
+                              <img
+                                src={mod.img}
+                                alt={mod.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <p className="text-foreground/30 text-[14px] leading-relaxed">
+                              {mod.desc}
+                            </p>
+                          </div>
                         </div>
                       </motion.div>
                     )}
