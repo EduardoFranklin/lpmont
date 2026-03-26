@@ -91,7 +91,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-4xl sm:text-5xl lg:text-[4.25rem] font-normal leading-[1.15] text-foreground/95 text-balance mb-6"
+            className="text-4xl sm:text-5xl lg:text-[4.25rem] font-semibold leading-[1.15] text-foreground/95 text-balance mb-6"
           >
             Dentista, construa a reputação que{" "}
             <span className="summit-text font-medium">

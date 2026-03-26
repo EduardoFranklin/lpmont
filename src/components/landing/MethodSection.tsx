@@ -46,7 +46,7 @@ const MethodSection = () => {
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">Teoria + Prática</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-normal leading-[1.2] text-foreground mb-5">
+          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-semibold leading-[1.2] text-foreground mb-5">
             Não é só teoria.{" "}
             <span className="summit-text font-medium">É mão na massa.</span>
           </h2>

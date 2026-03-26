@@ -213,7 +213,7 @@ const ModulesSection = () => {
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">A trilha completa</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-normal leading-[1.2] text-foreground mb-5">
+          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-semibold leading-[1.2] text-foreground mb-5">
             13 acampamentos até o cume
           </h2>
           <p className="text-foreground/30 text-lg font-light">
@@ -388,7 +388,7 @@ const ModulesSection = () => {
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">Hands-On</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-normal leading-[1.2] text-foreground mb-3">
+          <h3 className="text-2xl sm:text-3xl font-semibold leading-[1.2] text-foreground mb-3">
             Treino prático no terreno real
           </h3>
           <p className="text-foreground/30 text-base font-light">Imersões práticas com casos reais do Instituto Mont'Alverne.</p>
