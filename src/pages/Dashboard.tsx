@@ -99,6 +99,9 @@ const Dashboard = () => {
             <TabsTrigger value="kanban" className="gap-1.5">
               <Columns3 className="w-4 h-4" /> Kanban
             </TabsTrigger>
+            <TabsTrigger value="messaging" className="gap-1.5">
+              <MessageSquare className="w-4 h-4" /> Mensageria
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="reports">
             <DashReports leads={filteredLeads} />
@@ -108,6 +111,9 @@ const Dashboard = () => {
           </TabsContent>
           <TabsContent value="kanban">
             <DashKanban leads={filteredLeads} onRefresh={fetchLeads} />
+          </TabsContent>
+          <TabsContent value="messaging">
+            <DashMessaging />
           </TabsContent>
         </Tabs>
       </main>
