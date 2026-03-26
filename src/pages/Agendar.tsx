@@ -24,6 +24,22 @@ const TIME_SLOTS = [
   { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["14h às 14h30"] },
 ];
 
+// Parse start hour from slot label like "9h às 9h30" → 9
+const parseSlotHour = (slot: string): number => {
+  const match = slot.match(/^(\d+)h/);
+  return match ? parseInt(match[1], 10) : 0;
+};
+
+// Check if a slot is too soon (less than 2h from now)
+const isSlotTooSoon = (date: string, slot: string): boolean => {
+  const now = new Date();
+  const [dd, mm] = date.split("/").map(Number);
+  const year = now.getFullYear();
+  const slotDate = new Date(year, mm - 1, dd, parseSlotHour(slot), 0, 0);
+  const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+  return slotDate < minTime;
+};
+
 const benefits = [
   { icon: BookOpen, label: "Biblioteca de Cursos" },
   { icon: Radio, label: "Mentorias Ao Vivo" },
