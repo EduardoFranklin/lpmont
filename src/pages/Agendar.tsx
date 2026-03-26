@@ -279,14 +279,17 @@ const Agendar = () => {
                 </div>
               </div>
 
-              {/* CTA */}
+              {/* CTA - inline on desktop */}
               <button
                 onClick={goToStep2}
                 disabled={!isStep1Valid}
-                className="btn-summit w-full justify-center text-sm py-3.5 mt-5 disabled:opacity-40 disabled:pointer-events-none"
+                className="btn-summit w-full justify-center text-sm py-3.5 mt-5 disabled:opacity-40 disabled:pointer-events-none hidden sm:inline-flex"
               >
                 Escolher Horário <ArrowRight className="w-4 h-4" />
               </button>
+
+              {/* Spacer for floating button on mobile */}
+              <div className="h-20 sm:hidden" />
             </motion.div>
           )}
 
@@ -388,6 +391,22 @@ const Agendar = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Floating CTA on mobile - Step 1 only */}
+      {step === 1 && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-50 p-3 backdrop-blur-2xl border-t border-foreground/[0.04] sm:hidden"
+          style={{ backgroundColor: "hsl(var(--background) / 0.85)" }}
+        >
+          <button
+            onClick={goToStep2}
+            disabled={!isStep1Valid}
+            className="btn-summit w-full justify-center text-sm py-3.5 disabled:opacity-40 disabled:pointer-events-none"
+          >
+            Escolher Horário <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
