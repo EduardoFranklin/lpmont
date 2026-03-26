@@ -65,6 +65,9 @@ const coverSlides = [
 
 const CampsCarousel = () => {
   const doubled = [...coverSlides, ...coverSlides];
+  const itemWidth = 200; // sm:w-[200px]
+  const gapWidth = 16; // gap-4 = 16px
+  const totalWidth = coverSlides.length * (itemWidth + gapWidth);
 
   return (
     <motion.div
@@ -74,13 +77,12 @@ const CampsCarousel = () => {
       className="mb-16 overflow-hidden"
     >
       <div className="relative group">
-        {/* Fade edges */}
         <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
         
         <motion.div
           className="flex gap-4 w-max"
-          animate={{ x: ["0%", "-50%"] }}
+          animate={{ x: [0, -totalWidth] }}
           transition={{
             x: {
               repeat: Infinity,
@@ -89,7 +91,6 @@ const CampsCarousel = () => {
               ease: "linear",
             },
           }}
-          whileHover={{ animationPlayState: "paused" }}
           style={{ willChange: "transform" }}
         >
           {doubled.map((src, i) => (
