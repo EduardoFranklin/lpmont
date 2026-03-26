@@ -1,12 +1,17 @@
+import { Mountain } from "lucide-react";
+
 const FooterSection = () => {
   return (
-    <footer className="py-16 border-t border-border">
+    <footer className="py-16 border-t border-foreground/5">
       <div className="section-container text-center">
-        <img src="/images/logo.png" alt="Método Mont" className="h-10 mx-auto mb-5 opacity-60" loading="lazy" />
-        <p className="text-muted-foreground text-sm mb-1">
-          Método Mont' — Treinamento online de odontologia restauradora
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Mountain className="w-4 h-4 text-primary/40" />
+          <img src="/images/logo.png" alt="Método Mont" className="h-8 opacity-40" loading="lazy" />
+        </div>
+        <p className="text-muted-foreground/60 text-sm mb-1">
+          Método Mont' — A expedição até o topo da odontologia
         </p>
-        <p className="text-muted-foreground/50 text-xs">
+        <p className="text-muted-foreground/30 text-xs">
           © {new Date().getFullYear()} Método Mont'. Todos os direitos reservados.
         </p>
       </div>
