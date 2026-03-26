@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Lead } from "@/pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,7 @@ interface LeadNote {
 }
 
 const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void }) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<LeadStatus | "">("");
   const [editLead, setEditLead] = useState<Lead | null>(null);
@@ -165,7 +167,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
           </TableHeader>
           <TableBody>
             {filtered.map((lead, idx) => (
-              <TableRow key={lead.id}>
+              <TableRow key={lead.id} className="cursor-pointer hover:bg-muted/30" onClick={() => navigate(`/dash/lead/${lead.id}`)}>
                 <TableCell className="text-muted-foreground text-xs">{idx + 1}</TableCell>
                 <TableCell className="font-medium">{lead.treatment} {lead.name}</TableCell>
                 <TableCell className="hidden md:table-cell text-muted-foreground">{lead.email}</TableCell>
@@ -187,7 +189,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
                 <TableCell className="hidden lg:table-cell text-muted-foreground text-xs whitespace-nowrap">
                   {format(new Date(lead.created_at), "dd/MM/yyyy 'às' HH'h'mm", { locale: ptBR })}
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
                       <MessageCircle className="w-3.5 h-3.5" />
