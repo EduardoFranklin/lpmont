@@ -105,7 +105,7 @@ const DashSettings = () => {
       const redirectUri = `https://${projectId}.supabase.co/functions/v1/google-auth-callback`;
 
       const { data, error } = await supabase.functions.invoke("google-auth-callback", {
-        body: { redirectUri },
+        body: { redirectUri, userId: user.id },
       });
 
       if (error) throw error;
