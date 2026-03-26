@@ -138,8 +138,7 @@ const ModulesSection = () => {
   }, [clinicalAutoPlay, clinicalNext]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
+  // Sequential scroll: only move ±1 at a time so no items get skipped
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
     camps.forEach((_, i) => {
@@ -148,24 +147,24 @@ const ModulesSection = () => {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-            scrollTimeoutRef.current = setTimeout(() => {
-              setOpenIdx(i);
-            }, 400);
+            setOpenIdx((prev) => {
+              if (prev === null) return i;
+              // Only allow moving to adjacent item
+              if (i === prev + 1 || i === prev - 1) return i;
+              // If further away, step one closer
+              if (i > (prev ?? 0)) return (prev ?? 0) + 1;
+              if (i < (prev ?? 0)) return (prev ?? 0) - 1;
+              return prev;
+            });
           }
         },
-        { threshold: 0.7 }
+        { threshold: 0.3 }
       );
       obs.observe(el);
       observers.push(obs);
     });
-    return () => {
-      observers.forEach((o) => o.disconnect());
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-    };
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
-
-  const handsOnTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
@@ -175,21 +174,21 @@ const ModulesSection = () => {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            if (handsOnTimeoutRef.current) clearTimeout(handsOnTimeoutRef.current);
-            handsOnTimeoutRef.current = setTimeout(() => {
-              setOpenHandsOn(i);
-            }, 400);
+            setOpenHandsOn((prev) => {
+              if (prev === null) return i;
+              if (i === prev + 1 || i === prev - 1) return i;
+              if (i > (prev ?? 0)) return (prev ?? 0) + 1;
+              if (i < (prev ?? 0)) return (prev ?? 0) - 1;
+              return prev;
+            });
           }
         },
-        { threshold: 0.7 }
+        { threshold: 0.3 }
       );
       obs.observe(el);
       observers.push(obs);
     });
-    return () => {
-      observers.forEach((o) => o.disconnect());
-      if (handsOnTimeoutRef.current) clearTimeout(handsOnTimeoutRef.current);
-    };
+    return () => observers.forEach((o) => o.disconnect());
   }, []);
 
   return (
