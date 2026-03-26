@@ -43,8 +43,7 @@ const NavBar = () => {
     >
       <div className="section-container flex items-center justify-between h-[72px]">
         <a href="#" className="flex items-center gap-2">
-          <span className="text-xl">⛰️</span>
-          <span className="text-sm font-semibold tracking-wide text-foreground/90">Método Mont'</span>
+          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" />
         </a>
 
         <div className="hidden md:flex items-center gap-10">
