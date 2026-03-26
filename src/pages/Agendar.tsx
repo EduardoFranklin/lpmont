@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2, MessageCircle, Calendar } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CalendarCheck, MessageCircle, Calendar } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -527,14 +527,14 @@ const Agendar = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
-                className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
+                className="w-20 h-20 rounded-full flex items-center justify-center mb-6 animate-pulse"
                 style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))", border: "1px solid hsl(var(--brand-gold) / 0.2)" }}
               >
-                <CheckCircle2 className="w-10 h-10 text-primary" />
+                <CalendarCheck className="w-10 h-10 text-primary" />
               </motion.div>
 
               <h2 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-2">
-                Agendamento <span className="summit-text">confirmado!</span>
+                Adicione ao Google Calendar para <span className="summit-text">confirmar.</span>
               </h2>
               <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
                 {form.treatment} {form.name}, sua reunião está marcada para:
