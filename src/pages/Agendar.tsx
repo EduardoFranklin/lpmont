@@ -43,6 +43,7 @@ const Agendar = () => {
     career: "",
   });
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; time: string } | null>(null);
+  const [dynamicUnavailable, setDynamicUnavailable] = useState<{ day: string; time: string } | null>(null);
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
   const [citySearch, setCitySearch] = useState("");
@@ -98,7 +99,22 @@ const Agendar = () => {
   };
 
   const goToStep2 = () => {
-    if (isStep1Valid) setStep(2);
+    if (isStep1Valid) {
+      setStep(2);
+      setDynamicUnavailable(null);
+      // After 3s, mark a random available slot as unavailable
+      setTimeout(() => {
+        const available: { day: string; time: string }[] = [];
+        TIME_SLOTS.forEach((d) => {
+          d.slots.forEach((t) => {
+            if (!d.unavailable?.includes(t)) available.push({ day: d.day, time: t });
+          });
+        });
+        if (available.length > 0) {
+          setDynamicUnavailable(available[Math.floor(Math.random() * available.length)]);
+        }
+      }, 3000);
+    }
   };
 
   const goToStep3 = () => {
@@ -323,7 +339,7 @@ const Agendar = () => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
-                        const isUnavailable = day.unavailable?.includes(time);
+                        const isUnavailable = day.unavailable?.includes(time) || (dynamicUnavailable?.day === day.day && dynamicUnavailable?.time === time);
                         const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
                           <button
