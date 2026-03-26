@@ -109,7 +109,7 @@ const PricingSection = () => {
                 </div>
 
                 <div className="mt-5 flex justify-center">
-                  <img src="/images/pagamentos.svg" alt="Formas de pagamento" className="h-7 opacity-20" loading="lazy" />
+                  <img src="/images/pagamentos.svg" alt="Formas de pagamento" className="h-7 opacity-50 brightness-150" loading="lazy" />
                 </div>
               </div>
             </div>
