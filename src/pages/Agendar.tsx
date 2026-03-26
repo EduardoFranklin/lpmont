@@ -245,25 +245,17 @@ const Agendar = () => {
         utm_content: utmParams.utm_content || null,
       } as any);
 
-      // Send welcome email (fire-and-forget)
+      // Send welcome email with calendar info (fire-and-forget)
       supabase.functions.invoke("send-welcome-email", {
         body: {
           recipientEmail: form.email,
           recipientName: form.name,
           treatment: form.treatment,
-        },
-      }).catch((err) => console.error("Welcome email error:", err));
-
-      // Create Google Calendar event + Meet (fire-and-forget)
-      supabase.functions.invoke("google-calendar-create", {
-        body: {
-          leadEmail: form.email,
-          leadName: form.name,
-          treatment: form.treatment,
           scheduledDay: selectedSlot.day,
+          scheduledDate: selectedSlot.date,
           scheduledTime: selectedSlot.time,
         },
-      }).catch((err) => console.error("Calendar event error:", err));
+      }).catch((err) => console.error("Welcome email error:", err));
     } catch (err) {
       console.error("Erro ao salvar lead:", err);
     }
