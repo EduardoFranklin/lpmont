@@ -17,11 +17,11 @@ const getCareers = (treatment: string) => [
 ];
 
 const TIME_SLOTS = [
-  { day: "Segunda", date: "31/03", slots: ["09:00", "10:00", "14:00", "15:00"] },
-  { day: "Terça", date: "01/04", slots: ["09:00", "10:00", "14:00", "16:00"] },
-  { day: "Quarta", date: "02/04", slots: ["09:00", "11:00", "14:00", "15:00"] },
-  { day: "Quinta", date: "03/04", slots: ["09:00", "10:00", "14:00", "16:00"] },
-  { day: "Sexta", date: "04/04", slots: ["09:00", "10:00", "14:00", "15:00"] },
+  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "15h às 15h30"] },
+  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "16h às 16h30"] },
+  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "11h às 11h30", "14h às 14h30", "15h às 15h30"] },
+  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "16h às 16h30"] },
+  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "15h às 15h30"] },
 ];
 
 const benefits = [
@@ -321,7 +321,7 @@ const Agendar = () => {
                     <p className="text-[12px] font-semibold text-foreground/30 mb-2">
                       {day.day} · <span className="text-foreground/20">{day.date}</span>
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
                         const isSelected = selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
