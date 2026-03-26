@@ -4,6 +4,11 @@ import { ArrowRight, Play, Users, BookOpen, Radio } from "lucide-react";
 
 const HeroSection = () => {
   const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setPlaying(true), 3000);
+    return () => clearTimeout(timer);
+  }, []);
   const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
 
