@@ -133,6 +133,42 @@ export type Database = {
         }
         Relationships: []
       }
+      reminder_templates: {
+        Row: {
+          active: boolean
+          body: string
+          channel: string
+          created_at: string
+          id: string
+          subject: string | null
+          timing_unit: string
+          timing_value: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string
+          channel: string
+          created_at?: string
+          id?: string
+          subject?: string | null
+          timing_unit?: string
+          timing_value?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          channel?: string
+          created_at?: string
+          id?: string
+          subject?: string | null
+          timing_unit?: string
+          timing_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
