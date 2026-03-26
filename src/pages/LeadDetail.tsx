@@ -153,6 +153,9 @@ const LeadDetail = () => {
               <Timer className="w-3 h-3" /> há {formatElapsed(lead.updated_at)}
             </span>
           </div>
+          <Button variant="ghost" size="icon" className="text-emerald-400" onClick={() => openWhatsApp(lead.phone)}>
+            <MessageCircle className="w-4 h-4" />
+          </Button>
         </div>
       </header>
 
