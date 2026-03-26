@@ -82,7 +82,7 @@ const ProblemSection = () => {
         </motion.div>
 
         <div className="text-center mt-14">
-          <a href="#preco" className="btn-summit">
+          <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" className="btn-summit">
             Começar a subida <ArrowRight className="w-4 h-4" />
           </a>
         </div>

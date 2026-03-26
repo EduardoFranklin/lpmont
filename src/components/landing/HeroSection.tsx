@@ -87,7 +87,7 @@ const HeroSection = () => {
             transition={{ delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
           >
-            <a href="#preco" className="btn-gradient">
+            <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" className="btn-gradient">
               <div className="btn-gradient-wrapper">
                 <div className="btn-gradient-inner">
                   <div className="btn-gradient-bg" />
