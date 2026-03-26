@@ -21,7 +21,7 @@ const FloatingCTA = () => {
           className="fixed bottom-0 left-0 right-0 z-50 p-3 backdrop-blur-2xl border-t border-foreground/[0.04] sm:hidden"
           style={{ backgroundColor: "hsl(var(--background) / 0.85)" }}
         >
-          <a href="#preco" className="btn-summit w-full justify-center text-sm py-3">
+          <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" className="btn-summit w-full justify-center text-sm py-3">
             Começar agora <ArrowRight className="w-4 h-4" />
           </a>
         </motion.div>
