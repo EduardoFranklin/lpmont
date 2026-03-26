@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Check, Shield, ArrowRight, Gift, Users, Video, RefreshCw, Clock } from "lucide-react";
-import goldenTicket from "@/assets/golden-ticket.png";
+
 
 const includes = [
   "13 módulos — do vale ao cume",
@@ -79,8 +79,7 @@ const PricingSection = () => {
                     <Gift className="w-3.5 h-3.5" /> Bônus da expedição
                   </p>
 
-                  <div className="rounded-xl border border-primary/10 bg-primary/[0.03] p-5 flex items-center gap-5">
-                    <img src={goldenTicket} alt="Golden Ticket" className="w-20 h-auto flex-shrink-0 drop-shadow-lg" loading="lazy" />
+                  <div className="rounded-xl border border-primary/10 bg-primary/[0.03] p-5">
                     <div>
                       <p className="text-[13px] font-medium text-foreground/60 mb-1">
                         Seja membro fundador da comunidade:
