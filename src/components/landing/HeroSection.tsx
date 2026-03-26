@@ -1,15 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 
 const HeroSection = () => {
   const [playing, setPlaying] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      {/* Background mountain image */}
+    <section ref={sectionRef} className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+      {/* Background mountain image with parallax */}
       <div className="absolute inset-0">
-        <img src="/images/bg-montanha.jpg" alt="" className="w-full h-full object-cover" />
+        <img
+          src="/images/bg-montanha.jpg"
+          alt=""
+          className="w-full h-full object-cover will-change-transform"
+          style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.1)` }}
+        />
       </div>
       {/* Dark overlay to keep text readable */}
       <div className="absolute inset-0 bg-background/70" />
