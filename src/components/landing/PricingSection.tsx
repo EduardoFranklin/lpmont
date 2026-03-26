@@ -29,7 +29,7 @@ const PricingSection = () => {
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">Investimento</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-semibold leading-[1.2] text-foreground">
+          <h2 className="text-[2.1rem] sm:text-4xl lg:text-[3.25rem] font-extrabold sm:font-semibold leading-[1.12] sm:leading-[1.2] text-foreground">
             Sua expedição começa aqui
           </h2>
         </motion.div>
@@ -50,7 +50,7 @@ const PricingSection = () => {
                 <p className="relative text-foreground/20 text-sm line-through mb-4">De R$ 1.790,00</p>
                 <div className="relative flex items-baseline justify-center gap-1.5">
                   <span className="text-foreground/40 text-lg font-medium">12x de</span>
-                  <span className="text-5xl sm:text-6xl font-medium summit-text">R$ 79</span>
+                  <span className="text-[3.5rem] sm:text-6xl font-extrabold sm:font-medium summit-text">R$ 79</span>
                   <span className="text-foreground/40 text-lg font-medium">,90</span>
                 </div>
                 <p className="relative text-foreground/15 text-sm mt-2">sem juros · ou R$ 958,80 à vista</p>

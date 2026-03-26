@@ -220,7 +220,7 @@ const ModulesSection = () => {
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">A trilha completa</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[3.25rem] font-semibold leading-[1.2] text-foreground mb-5">
+          <h2 className="text-[2.1rem] sm:text-4xl lg:text-[3.25rem] font-extrabold sm:font-semibold leading-[1.12] sm:leading-[1.2] text-foreground mb-5">
             13 acampamentos até o cume
           </h2>
           <p className="text-foreground/30 text-lg font-light">

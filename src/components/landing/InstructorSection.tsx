@@ -47,7 +47,7 @@ const InstructorSection = () => {
               <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">O guia da expedição</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-8 leading-tight">
+            <h2 className="text-[2.1rem] sm:text-4xl font-extrabold sm:font-semibold text-foreground mb-8 leading-[1.12] sm:leading-tight">
               Prof. Breno{" "}
               <span className="summit-text font-medium">Mont'Alverne</span>
             </h2>
