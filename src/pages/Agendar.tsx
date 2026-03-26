@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, BookOpen, Radio, Users, Tag, CheckCircle2, MessageCircle, Calendar } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -85,7 +85,7 @@ const Agendar = () => {
     city: "",
     career: "",
   });
-  const [selectedSlot, setSelectedSlot] = useState<{ day: string; time: string } | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ day: string; date: string; time: string } | null>(null);
   const [dynamicUnavailable, setDynamicUnavailable] = useState<{ day: string; time: string } | null>(null);
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
@@ -453,7 +453,7 @@ const Agendar = () => {
                         return (
                           <button
                             key={`${day.day}-${time}`}
-                            onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, time })}
+                            onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, date: day.date, time })}
                             disabled={isUnavailable}
                             className={`py-2.5 rounded-lg text-[13px] font-medium border transition-all duration-200 ${
                               isUnavailable
