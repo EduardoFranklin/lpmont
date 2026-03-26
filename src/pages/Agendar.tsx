@@ -534,7 +534,7 @@ const Agendar = () => {
               </motion.div>
 
               <h2 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-2">
-                Adicione ao Google Calendar para <span className="summit-text">confirmar.</span>
+                Adicione ao Google Calendar <span className="summit-text">para confirmar.</span>
               </h2>
               <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
                 {form.treatment} {form.name}, sua reunião está marcada para:
