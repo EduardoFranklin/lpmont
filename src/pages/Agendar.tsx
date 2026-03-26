@@ -143,7 +143,7 @@ const Agendar = () => {
                   Você está há <span className="summit-text">1 passo</span> de falar com a nossa equipe.
                 </h1>
                 <p className="text-[13px] text-foreground/35 leading-relaxed">
-                  Em 20 minutos, vamos mostrar como o treinamento pode conduzir sua carreira até o topo.
+                  Em 30 minutos, vamos mostrar como o treinamento pode conduzir sua carreira até o topo.
                 </p>
               </div>
 
@@ -379,7 +379,7 @@ const Agendar = () => {
                 <p className="text-base font-semibold text-foreground/70">
                   {selectedSlot?.day} · {selectedSlot?.time}
                 </p>
-                <p className="text-[12px] text-foreground/30 mt-1">20 minutos · Online</p>
+                <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
               </div>
 
               <p className="text-[13px] text-foreground/35 mb-6 max-w-xs">
