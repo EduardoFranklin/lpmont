@@ -131,6 +131,9 @@ const ModulesSection = () => {
           </p>
         </motion.div>
 
+        {/* Covers Carousel */}
+        <CampsCarousel />
+
         {/* Trail */}
         <div className="max-w-3xl mx-auto relative">
           {/* Vertical line */}
