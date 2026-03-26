@@ -321,7 +321,7 @@ const Agendar = () => {
                     <p className="text-[12px] font-semibold text-foreground/30 mb-2">
                       {day.day} · <span className="text-foreground/20">{day.date}</span>
                     </p>
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
                         const isSelected = selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
