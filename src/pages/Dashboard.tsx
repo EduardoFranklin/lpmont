@@ -4,10 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, BarChart3, List, Columns3 } from "lucide-react";
+import { LogOut, BarChart3, List, Columns3, MessageSquare } from "lucide-react";
 import DashReports from "@/components/dashboard/DashReports";
 import DashLeadsList from "@/components/dashboard/DashLeadsList";
 import DashKanban from "@/components/dashboard/DashKanban";
+import DashMessaging from "@/components/dashboard/DashMessaging";
 import DashDateFilter, { type DatePreset, getDateRange } from "@/components/dashboard/DashDateFilter";
 import type { Session } from "@supabase/supabase-js";
 import { startOfDay, endOfDay } from "date-fns";
@@ -98,6 +99,9 @@ const Dashboard = () => {
             <TabsTrigger value="kanban" className="gap-1.5">
               <Columns3 className="w-4 h-4" /> Kanban
             </TabsTrigger>
+            <TabsTrigger value="messaging" className="gap-1.5">
+              <MessageSquare className="w-4 h-4" /> Mensageria
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="reports">
             <DashReports leads={filteredLeads} />
@@ -107,6 +111,9 @@ const Dashboard = () => {
           </TabsContent>
           <TabsContent value="kanban">
             <DashKanban leads={filteredLeads} onRefresh={fetchLeads} />
+          </TabsContent>
+          <TabsContent value="messaging">
+            <DashMessaging />
           </TabsContent>
         </Tabs>
       </main>
