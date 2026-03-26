@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Check, Shield, ArrowRight, Gift, Users, Video, RefreshCw, Clock } from "lucide-react";
+import goldenTicket from "@/assets/golden-ticket.png";
 
 const includes = [
   "13 módulos — do vale ao cume",
