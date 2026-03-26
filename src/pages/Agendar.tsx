@@ -323,15 +323,19 @@ const Agendar = () => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
-                        const isSelected = selectedSlot?.day === day.day && selectedSlot?.time === time;
+                        const isUnavailable = day.unavailable?.includes(time);
+                        const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
                           <button
                             key={`${day.day}-${time}`}
-                            onClick={() => setSelectedSlot({ day: day.day, time })}
+                            onClick={() => !isUnavailable && setSelectedSlot({ day: day.day, time })}
+                            disabled={isUnavailable}
                             className={`py-2.5 rounded-lg text-[13px] font-medium border transition-all duration-200 ${
-                              isSelected
-                                ? "border-primary/50 bg-primary/15 text-primary"
-                                : "border-foreground/[0.08] bg-foreground/[0.03] text-foreground/45 hover:border-foreground/[0.15]"
+                              isUnavailable
+                                ? "border-foreground/[0.04] bg-foreground/[0.02] text-foreground/15 line-through cursor-not-allowed"
+                                : isSelected
+                                  ? "border-primary/50 bg-primary/15 text-primary"
+                                  : "border-foreground/[0.08] bg-foreground/[0.03] text-foreground/45 hover:border-foreground/[0.15]"
                             }`}
                           >
                             {time}
