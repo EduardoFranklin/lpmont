@@ -17,11 +17,11 @@ const getCareers = (treatment: string) => [
 ];
 
 const TIME_SLOTS = [
-  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "15h às 15h30"] },
-  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "16h às 16h30"] },
-  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "11h às 11h30", "14h às 14h30", "15h às 15h30"] },
-  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "16h às 16h30"] },
-  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "14h às 14h30", "15h às 15h30"] },
+  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
+  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
+  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
+  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
+  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
 ];
 
 const benefits = [
@@ -143,7 +143,7 @@ const Agendar = () => {
                   Você está há <span className="summit-text">1 passo</span> de falar com a nossa equipe.
                 </h1>
                 <p className="text-[13px] text-foreground/35 leading-relaxed">
-                  Em 20 minutos, vamos mostrar como o treinamento pode conduzir sua carreira até o topo.
+                  Em 30 minutos, vamos mostrar como o treinamento pode conduzir sua carreira até o topo.
                 </p>
               </div>
 
@@ -312,7 +312,7 @@ const Agendar = () => {
                 Escolha o melhor <span className="summit-text">horário</span>
               </h2>
               <p className="text-[13px] text-foreground/35 mb-5">
-                Reunião online de 20 min com nosso especialista.
+                Reunião online de 30 min com nosso consultor.
               </p>
 
               <div className="space-y-4">
@@ -346,10 +346,13 @@ const Agendar = () => {
               <button
                 onClick={goToStep3}
                 disabled={!selectedSlot}
-                className="btn-summit w-full justify-center text-sm py-3.5 mt-6 disabled:opacity-40 disabled:pointer-events-none"
+                className="btn-summit w-full justify-center text-sm py-3.5 mt-6 disabled:opacity-40 disabled:pointer-events-none hidden sm:inline-flex"
               >
                 Confirmar Agendamento <ArrowRight className="w-4 h-4" />
               </button>
+
+              {/* Spacer for floating button on mobile */}
+              <div className="h-20 sm:hidden" />
             </motion.div>
           )}
 
@@ -376,7 +379,7 @@ const Agendar = () => {
                 <p className="text-base font-semibold text-foreground/70">
                   {selectedSlot?.day} · {selectedSlot?.time}
                 </p>
-                <p className="text-[12px] text-foreground/30 mt-1">20 minutos · Online</p>
+                <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
               </div>
 
               <p className="text-[13px] text-foreground/35 mb-6 max-w-xs">
@@ -400,7 +403,7 @@ const Agendar = () => {
         </AnimatePresence>
       </div>
 
-      {/* Floating CTA on mobile - Step 1 only */}
+      {/* Floating CTA on mobile */}
       {step === 1 && (
         <div
           className="fixed bottom-0 left-0 right-0 z-50 p-3 backdrop-blur-2xl border-t border-foreground/[0.04] sm:hidden"
@@ -412,6 +415,20 @@ const Agendar = () => {
             className="btn-summit w-full justify-center text-sm py-3.5 disabled:opacity-40 disabled:pointer-events-none"
           >
             Escolher Horário <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      {step === 2 && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-50 p-3 backdrop-blur-2xl border-t border-foreground/[0.04] sm:hidden"
+          style={{ backgroundColor: "hsl(var(--background) / 0.85)" }}
+        >
+          <button
+            onClick={goToStep3}
+            disabled={!selectedSlot}
+            className="btn-summit w-full justify-center text-sm py-3.5 disabled:opacity-40 disabled:pointer-events-none"
+          >
+            Confirmar Agendamento <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}
