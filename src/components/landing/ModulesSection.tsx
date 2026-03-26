@@ -99,18 +99,24 @@ const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => 
         >
           {doubled.map((src, i) => {
             const moduleNum = (i % coverSlides.length) + 1;
+            const camp = camps[moduleNum - 1];
             return (
               <div
                 key={i}
-                className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-colors duration-300 cursor-pointer"
+                className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group"
                 onClick={() => onCoverClick(moduleNum)}
               >
-                <img
-                  src={src}
-                  alt={`Acampamento ${moduleNum}`}
-                  className="w-full h-auto object-cover"
-                  loading="lazy"
-                />
+                <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover:border-primary/20 transition-colors duration-300">
+                  <img
+                    src={src}
+                    alt={camp?.title || `Acampamento ${moduleNum}`}
+                    className="w-full h-auto object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="mt-2 text-[11px] sm:text-[12px] text-foreground/40 font-medium text-center leading-tight truncate px-1">
+                  {camp?.title}
+                </p>
               </div>
             );
           })}
