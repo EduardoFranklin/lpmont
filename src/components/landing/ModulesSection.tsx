@@ -2,7 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { ChevronDown, ChevronLeft, ChevronRight, Printer } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Printer, BookOpen } from "lucide-react";
+import SynopsisModal from "./SynopsisModal";
 
 const clinicalImages = [
   { src: "/images/thumbs/clinicas-1-thumb.webp", caption: "Classe I — Visão oclusal isolada" },
@@ -63,10 +64,10 @@ const coverSlides = [
   "/images/capa13.webp",
 ];
 
-const CampsCarousel = () => {
+const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => void }) => {
   const doubled = [...coverSlides, ...coverSlides];
-  const itemWidth = 200; // sm:w-[200px]
-  const gapWidth = 16; // gap-4 = 16px
+  const itemWidth = 200;
+  const gapWidth = 16;
   const totalWidth = coverSlides.length * (itemWidth + gapWidth);
 
   return (
@@ -96,19 +97,23 @@ const CampsCarousel = () => {
           dragElastic={0.1}
           style={{ willChange: "transform" }}
         >
-          {doubled.map((src, i) => (
-            <div
-              key={i}
-              className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-colors duration-300"
-            >
-              <img
-                src={src}
-                alt={`Acampamento ${(i % coverSlides.length) + 1}`}
-                className="w-full h-auto object-cover"
-                loading="lazy"
-              />
-            </div>
-          ))}
+          {doubled.map((src, i) => {
+            const moduleNum = (i % coverSlides.length) + 1;
+            return (
+              <div
+                key={i}
+                className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-colors duration-300 cursor-pointer"
+                onClick={() => onCoverClick(moduleNum)}
+              >
+                <img
+                  src={src}
+                  alt={`Acampamento ${moduleNum}`}
+                  className="w-full h-auto object-cover"
+                  loading="lazy"
+                />
+              </div>
+            );
+          })}
         </motion.div>
       </div>
     </motion.div>
@@ -119,6 +124,7 @@ const CampsCarousel = () => {
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const [openHandsOn, setOpenHandsOn] = useState<number | null>(0);
+  const [synopsisModule, setSynopsisModule] = useState<number | null>(null);
   const handsOnRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [clinicalCurrent, setClinicalCurrent] = useState(0);
   const [clinicalAutoPlay, setClinicalAutoPlay] = useState(true);
@@ -216,7 +222,7 @@ const ModulesSection = () => {
         </motion.div>
 
         {/* Covers Carousel */}
-        <CampsCarousel />
+        <CampsCarousel onCoverClick={(num) => setSynopsisModule(num)} />
 
         {/* Trail */}
         <div className="max-w-3xl mx-auto relative">
@@ -280,6 +286,13 @@ const ModulesSection = () => {
                               {mod.desc}
                             </p>
                           </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSynopsisModule(i + 1); }}
+                            className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-primary/70 hover:text-primary transition-colors font-medium"
+                          >
+                            <BookOpen className="w-3.5 h-3.5" />
+                            Sinopse
+                          </button>
                         </div>
                       </motion.div>
                     )}
@@ -518,6 +531,11 @@ const ModulesSection = () => {
           </div>
         </motion.div>
       </div>
+      <SynopsisModal
+        moduleNum={synopsisModule}
+        open={synopsisModule !== null}
+        onOpenChange={(open) => { if (!open) setSynopsisModule(null); }}
+      />
     </section>
   );
 };
