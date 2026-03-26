@@ -124,6 +124,7 @@ const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const [openHandsOn, setOpenHandsOn] = useState<number | null>(0);
+  const [synopsisModule, setSynopsisModule] = useState<number | null>(null);
   const handsOnRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [clinicalCurrent, setClinicalCurrent] = useState(0);
   const [clinicalAutoPlay, setClinicalAutoPlay] = useState(true);
@@ -221,7 +222,7 @@ const ModulesSection = () => {
         </motion.div>
 
         {/* Covers Carousel */}
-        <CampsCarousel />
+        <CampsCarousel onCoverClick={(num) => setSynopsisModule(num)} />
 
         {/* Trail */}
         <div className="max-w-3xl mx-auto relative">
@@ -285,7 +286,13 @@ const ModulesSection = () => {
                               {mod.desc}
                             </p>
                           </div>
-                        </div>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setSynopsisModule(i + 1); }}
+                            className="mt-3 inline-flex items-center gap-1.5 text-[13px] text-primary/70 hover:text-primary transition-colors font-medium"
+                          >
+                            <BookOpen className="w-3.5 h-3.5" />
+                            Sinopse
+                          </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -523,6 +530,11 @@ const ModulesSection = () => {
           </div>
         </motion.div>
       </div>
+      <SynopsisModal
+        moduleNum={synopsisModule}
+        open={synopsisModule !== null}
+        onOpenChange={(open) => { if (!open) setSynopsisModule(null); }}
+      />
     </section>
   );
 };
