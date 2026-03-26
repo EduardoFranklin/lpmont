@@ -22,7 +22,7 @@ const FloatingCTA = () => {
           style={{ backgroundColor: "hsl(var(--background) / 0.85)" }}
         >
           <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" className="btn-summit w-full justify-center text-sm py-3">
-            Começar agora <ArrowRight className="w-4 h-4" />
+            Falar com a Equipe <ArrowRight className="w-4 h-4" />
           </a>
         </motion.div>
       )}

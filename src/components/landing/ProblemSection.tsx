@@ -83,7 +83,7 @@ const ProblemSection = () => {
 
         <div className="text-center mt-14">
           <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" className="btn-summit w-full sm:w-auto justify-center">
-            Começar a subida <ArrowRight className="w-4 h-4" />
+            Falar com a Equipe <ArrowRight className="w-4 h-4" />
           </a>
         </div>
       </div>

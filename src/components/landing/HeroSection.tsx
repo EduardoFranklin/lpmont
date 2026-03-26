@@ -141,7 +141,7 @@ const HeroSection = () => {
                 <div className="btn-gradient-inner w-full sm:w-auto">
                   <div className="btn-gradient-bg" />
                   <span className="btn-gradient-text text-base px-2 justify-center w-full sm:w-auto">
-                    Começar a escalada <ArrowRight className="w-4 h-4" />
+                    Falar com a Equipe <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
               </div>

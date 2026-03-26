@@ -60,7 +60,7 @@ const NavBar = () => {
 
         <div className="hidden md:block">
           <GradientButton href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer">
-            Começar agora <ArrowRight className="w-3.5 h-3.5" />
+            Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
           </GradientButton>
         </div>
 
@@ -84,7 +84,7 @@ const NavBar = () => {
                 </a>
               ))}
               <a href="https://pay.hotmart.com/F97566234Y?off=68pkkb40&bid=1759193560368" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="btn-summit w-full justify-center py-3 text-sm mt-2">
-                Começar agora
+                Falar com a Equipe
               </a>
             </div>
           </motion.div>

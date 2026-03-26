@@ -115,7 +115,7 @@ const PricingSection = () => {
                   rel="noopener noreferrer"
                   className="btn-summit w-full justify-center text-base"
                 >
-                  Iniciar minha expedição <ArrowRight className="w-4 h-4" />
+                  Falar com a Equipe <ArrowRight className="w-4 h-4" />
                 </a>
 
                 <div className="mt-6 flex items-center justify-center gap-2 text-[13px] text-foreground/25">
