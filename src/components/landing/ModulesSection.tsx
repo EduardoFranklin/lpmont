@@ -47,6 +47,22 @@ const phaseColors: Record<string, string> = {
 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const [clinicalCurrent, setClinicalCurrent] = useState(0);
+  const [clinicalAutoPlay, setClinicalAutoPlay] = useState(true);
+
+  const clinicalNext = useCallback(() => {
+    setClinicalCurrent((c) => (c + 1) % clinicalImages.length);
+  }, []);
+
+  const clinicalPrev = useCallback(() => {
+    setClinicalCurrent((c) => (c - 1 + clinicalImages.length) % clinicalImages.length);
+  }, []);
+
+  useEffect(() => {
+    if (!clinicalAutoPlay) return;
+    const id = setInterval(clinicalNext, 3500);
+    return () => clearInterval(id);
+  }, [clinicalAutoPlay, clinicalNext]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
