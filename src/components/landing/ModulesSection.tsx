@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Printer } from "lucide-react";
 
 const clinicalImages = [
   { src: "/images/clinicas-1.png", caption: "Classe I — Visão oclusal isolada" },
@@ -354,6 +354,38 @@ const ModulesSection = () => {
             })}
           </div>
         </div>
+
+        {/* Modelo para Impressão */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-3xl mx-auto mt-14"
+        >
+          <div className="gradient-card">
+            <div className="gradient-card-inner p-6 sm:p-8">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Printer className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block">Incluso no curso</span>
+                  <h3 className="text-foreground/90 font-medium text-base">Arquivo para Impressão 3D do Modelo</h3>
+                </div>
+              </div>
+              <p className="text-foreground/30 text-sm leading-relaxed mb-6 sm:ml-[52px]">
+                Você receberá o arquivo digital para imprimir o mesmo modelo utilizado nas aulas práticas (Hands-On). Treine no seu próprio ritmo, com o mesmo modelo usado pelo Prof. Breno Mont'Alverne.
+              </p>
+              <div className="grid grid-cols-3 gap-3 sm:ml-[52px]">
+                {["/images/modelo-handson-1.webp", "/images/modelo-handson-2.webp", "/images/modelo-handson-3.webp"].map((src, i) => (
+                  <div key={i} className="rounded-xl overflow-hidden border border-foreground/[0.06] aspect-[4/3]">
+                    <img src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
