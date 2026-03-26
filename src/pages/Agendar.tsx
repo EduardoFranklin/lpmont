@@ -124,59 +124,59 @@ const Agendar = () => {
                 {/* Treatment + Name */}
                 <div className="flex gap-2">
                   <div className="w-[90px] flex-shrink-0">
-                    <Label className="text-[11px] text-foreground/30 mb-1 block">Tratamento</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Tratamento</Label>
                     <select
                       value={form.treatment}
                       onChange={(e) => handleChange("treatment", e.target.value)}
-                      className="w-full h-10 rounded-md border border-input bg-background px-2 text-sm text-foreground/70 focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full h-10 rounded-md border border-foreground/20 bg-foreground/[0.06] px-2 text-sm text-foreground/80 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/40"
                     >
                       <option value="Dr.">Dr.</option>
                       <option value="Dra.">Dra.</option>
                     </select>
                   </div>
                   <div className="flex-1">
-                    <Label className="text-[11px] text-foreground/30 mb-1 block">Seu nome</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Seu nome</Label>
                     <Input
                       value={form.name}
                       onChange={(e) => handleChange("name", e.target.value)}
                       placeholder="Nome completo"
-                      className="bg-background text-foreground/70"
+                      className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25"
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <Label className="text-[11px] text-foreground/30 mb-1 block">Telefone</Label>
+                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Telefone</Label>
                   <Input
                     value={form.phone}
                     onChange={(e) => handleChange("phone", e.target.value)}
                     placeholder="(00) 00000-0000"
                     type="tel"
-                    className="bg-background text-foreground/70"
+                    className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25"
                   />
                 </div>
 
                 {/* Email */}
                 <div>
-                  <Label className="text-[11px] text-foreground/30 mb-1 block">Email</Label>
+                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Email</Label>
                   <Input
                     value={form.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     placeholder="seu@email.com"
                     type="email"
-                    className="bg-background text-foreground/70"
+                    className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25"
                   />
                 </div>
 
                 {/* UF + City */}
                 <div className="flex gap-2">
                   <div className="w-[80px] flex-shrink-0">
-                    <Label className="text-[11px] text-foreground/30 mb-1 block">UF</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">UF</Label>
                     <select
                       value={form.uf}
                       onChange={(e) => handleChange("uf", e.target.value)}
-                      className="w-full h-10 rounded-md border border-input bg-background px-2 text-sm text-foreground/70 focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full h-10 rounded-md border border-foreground/20 bg-foreground/[0.06] px-2 text-sm text-foreground/80 focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary/40"
                     >
                       <option value="">UF</option>
                       {UFS.map((uf) => (
@@ -185,29 +185,29 @@ const Agendar = () => {
                     </select>
                   </div>
                   <div className="flex-1">
-                    <Label className="text-[11px] text-foreground/30 mb-1 block">Cidade</Label>
+                    <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Cidade</Label>
                     <Input
                       value={form.city}
                       onChange={(e) => handleChange("city", e.target.value)}
                       placeholder="Sua cidade"
-                      className="bg-background text-foreground/70"
+                      className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25"
                     />
                   </div>
                 </div>
 
                 {/* Career */}
                 <div>
-                  <Label className="text-[11px] text-foreground/30 mb-1 block">Carreira</Label>
+                  <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Carreira</Label>
                   <div className="flex gap-2">
                     {CAREERS.map((c) => (
                       <button
                         key={c.value}
                         type="button"
                         onClick={() => handleChange("career", c.value)}
-                        className={`flex-1 py-2.5 rounded-lg text-[11px] font-medium border transition-all duration-200 ${
+                        className={`flex-1 py-2.5 rounded-lg text-[12px] font-medium border transition-all duration-200 ${
                           form.career === c.value
-                            ? "border-primary/40 bg-primary/10 text-primary"
-                            : "border-foreground/[0.08] bg-foreground/[0.03] text-foreground/40 hover:border-foreground/[0.15]"
+                            ? "border-primary/50 bg-primary/15 text-primary"
+                            : "border-foreground/15 bg-foreground/[0.06] text-foreground/50 hover:border-foreground/25"
                         }`}
                       >
                         {c.label}
