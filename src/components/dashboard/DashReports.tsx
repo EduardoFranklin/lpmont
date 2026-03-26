@@ -5,7 +5,7 @@ import { Users, CalendarCheck, UserCheck, TrendingUp } from "lucide-react";
 const statusLabels: Record<string, string> = {
   novo: "Novos",
   agendado: "Agendados",
-  compareceu: "Compareceram",
+  compareceu: "Em negociação",
   nao_compareceu: "Não compareceram",
   convertido: "Convertidos",
   perdido: "Perdidos",
