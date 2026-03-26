@@ -52,7 +52,7 @@ const HeroSection = () => {
           >
             <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
             <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-foreground/40">
-              Treinamento Restauração e Resina
+              Treinamento Mont'Alverne
             </span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </motion.div>
