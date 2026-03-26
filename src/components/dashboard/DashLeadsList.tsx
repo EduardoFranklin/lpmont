@@ -51,6 +51,9 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<LeadStatus | "">("");
+  const [filterSource, setFilterSource] = useState("");
+  const [filterCampaign, setFilterCampaign] = useState("");
+  const [filterMedium, setFilterMedium] = useState("");
   const [editLead, setEditLead] = useState<Lead | null>(null);
   const [editStatus, setEditStatus] = useState<LeadStatus>("novo");
   const [editTemp, setEditTemp] = useState<string>("frio");
@@ -58,13 +61,21 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
   const [leadNotes, setLeadNotes] = useState<LeadNote[]>([]);
   const [newNote, setNewNote] = useState("");
 
+  // Extract unique UTM values for autocomplete
+  const utmSources = [...new Set(leads.map((l) => (l as any).utm_source).filter(Boolean))].sort();
+  const utmCampaigns = [...new Set(leads.map((l) => (l as any).utm_campaign).filter(Boolean))].sort();
+  const utmMediums = [...new Set(leads.map((l) => (l as any).utm_medium).filter(Boolean))].sort();
+
   const filtered = leads.filter((l) => {
     const matchSearch = !search ||
       l.name.toLowerCase().includes(search.toLowerCase()) ||
       l.email.toLowerCase().includes(search.toLowerCase()) ||
       l.phone.includes(search);
     const matchStatus = !filterStatus || l.status === filterStatus;
-    return matchSearch && matchStatus;
+    const matchSource = !filterSource || (l as any).utm_source === filterSource;
+    const matchCampaign = !filterCampaign || (l as any).utm_campaign === filterCampaign;
+    const matchMedium = !filterMedium || (l as any).utm_medium === filterMedium;
+    return matchSearch && matchStatus && matchSource && matchCampaign && matchMedium;
   });
 
   const handleEdit = async (lead: Lead) => {
@@ -141,6 +152,36 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
           <option value="">Todos os status</option>
           {STATUS_OPTIONS.map((s) => (
             <option key={s.value} value={s.value}>{s.label}</option>
+          ))}
+        </select>
+        <select
+          value={filterSource}
+          onChange={(e) => setFilterSource(e.target.value)}
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="">Origem</option>
+          {utmSources.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+        <select
+          value={filterCampaign}
+          onChange={(e) => setFilterCampaign(e.target.value)}
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="">Campanha</option>
+          {utmCampaigns.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <select
+          value={filterMedium}
+          onChange={(e) => setFilterMedium(e.target.value)}
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="">Mídia</option>
+          {utmMediums.map((m) => (
+            <option key={m} value={m}>{m}</option>
           ))}
         </select>
         <Button variant="outline" size="icon" onClick={onRefresh}>
