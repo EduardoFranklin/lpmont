@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
+import { Mountain, Users, GraduationCap, BookOpen } from "lucide-react";
 
 const stats = [
-  { value: "20+", label: "anos de clínica", icon: "⛰️" },
-  { value: "2.000+", label: "dentistas formados", icon: "🧗" },
-  { value: "FOB-USP", label: "Doutor e Mestre", icon: "🎓" },
-  { value: "UFMA", label: "Professor universitário", icon: "📚" },
+  { value: "20+", label: "anos de clínica", icon: Mountain },
+  { value: "2.000+", label: "dentistas formados", icon: Users },
+  { value: "FOB-USP", label: "Doutor e Mestre", icon: GraduationCap },
+  { value: "UFMA", label: "Professor universitário", icon: BookOpen },
 ];
 
 const InstructorSection = () => {
@@ -67,7 +68,7 @@ const InstructorSection = () => {
               {stats.map((s) => (
                 <div key={s.label} className="gradient-card">
                   <div className="gradient-card-inner p-5 text-center">
-                    <span className="text-lg mb-1 block">{s.icon}</span>
+                    <s.icon className="w-5 h-5 text-primary mx-auto mb-1" />
                     <p className="text-lg font-medium summit-text">{s.value}</p>
                     <p className="text-[11px] text-foreground/30 mt-1">{s.label}</p>
                   </div>
