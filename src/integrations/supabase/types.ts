@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      leads: {
+        Row: {
+          career: string
+          city: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          notes: string | null
+          phone: string
+          scheduled_day: string | null
+          scheduled_time: string | null
+          status: Database["public"]["Enums"]["lead_status"]
+          treatment: string
+          uf: string
+          updated_at: string
+        }
+        Insert: {
+          career: string
+          city: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          notes?: string | null
+          phone: string
+          scheduled_day?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          treatment?: string
+          uf: string
+          updated_at?: string
+        }
+        Update: {
+          career?: string
+          city?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string
+          scheduled_day?: string | null
+          scheduled_time?: string | null
+          status?: Database["public"]["Enums"]["lead_status"]
+          treatment?: string
+          uf?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +73,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      lead_status:
+        | "novo"
+        | "agendado"
+        | "compareceu"
+        | "nao_compareceu"
+        | "convertido"
+        | "perdido"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +206,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      lead_status: [
+        "novo",
+        "agendado",
+        "compareceu",
+        "nao_compareceu",
+        "convertido",
+        "perdido",
+      ],
+    },
   },
 } as const
