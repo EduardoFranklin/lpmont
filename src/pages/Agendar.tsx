@@ -186,8 +186,11 @@ const Agendar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  const normalize = (s: string) =>
+    s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
   const filteredCities = citySearch
-    ? cities.filter((c) => c.toLowerCase().includes(citySearch.toLowerCase()))
+    ? cities.filter((c) => normalize(c).includes(normalize(citySearch)))
     : cities;
 
   const progress = step === 1 ? 50 : step === 2 ? 90 : 100;
