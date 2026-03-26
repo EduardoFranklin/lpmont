@@ -9,7 +9,6 @@ import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FooterSection from "@/components/landing/FooterSection";
-import FloatingCTA from "@/components/landing/FloatingCTA";
 import WhatsAppButton from "@/components/landing/WhatsAppButton";
 
 const Index = () => {
@@ -26,7 +25,6 @@ const Index = () => {
       <PricingSection />
       <FAQSection />
       <FooterSection />
-      <FloatingCTA />
       <WhatsAppButton />
     </div>
   );
