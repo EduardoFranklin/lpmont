@@ -90,6 +90,13 @@ const Agendar = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 11);
+    if (digits.length <= 2) return digits.length ? `(${digits}` : "";
+    if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+  };
+
   const goToStep2 = () => {
     if (isStep1Valid) setStep(2);
   };
@@ -188,9 +195,10 @@ const Agendar = () => {
                   <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Telefone <span className="text-primary">*</span></Label>
                   <Input
                     value={form.phone}
-                    onChange={(e) => handleChange("phone", e.target.value)}
+                    onChange={(e) => handleChange("phone", formatPhone(e.target.value))}
                     placeholder="(00) 00000-0000"
                     type="tel"
+                    maxLength={15}
                     className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25"
                   />
                 </div>
@@ -200,10 +208,10 @@ const Agendar = () => {
                   <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Email <span className="text-primary">*</span></Label>
                   <Input
                     value={form.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
+                    onChange={(e) => handleChange("email", e.target.value.toLowerCase())}
                     placeholder="seu@email.com"
                     type="email"
-                    className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25"
+                    className="border-foreground/20 bg-foreground/[0.06] text-foreground/80 placeholder:text-foreground/25 lowercase"
                   />
                 </div>
 
