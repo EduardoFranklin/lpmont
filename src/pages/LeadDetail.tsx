@@ -9,10 +9,21 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
-  Plus, Save, Thermometer, User, FileText, Globe
+  Plus, Save, Thermometer, User, FileText, Globe, CalendarCheck, Timer
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+const formatElapsed = (dateStr: string) => {
+  const mins = differenceInMinutes(new Date(), new Date(dateStr));
+  if (mins < 60) return `${mins}min`;
+  const hours = Math.floor(mins / 60);
+  const remMins = mins % 60;
+  if (hours < 48) return `${hours}h${remMins > 0 ? String(remMins).padStart(2, "0") + "m" : ""}`;
+  const days = Math.floor(hours / 24);
+  const remHours = hours % 24;
+  return `${days}d ${remHours}h`;
+};
 import type { Database } from "@/integrations/supabase/types";
 
 type LeadStatus = Database["public"]["Enums"]["lead_status"];

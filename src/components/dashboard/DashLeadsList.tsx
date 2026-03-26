@@ -226,7 +226,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
                     <span className="flex items-center gap-1.5">
                       {lead.treatment} {lead.name}
                       {hasSchedule && (
-                        <CalendarCheck className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" title={`Agendado: ${lead.scheduled_day} ${lead.scheduled_time}`} />
+                        <CalendarCheck className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                       )}
                     </span>
                   </TableCell>
