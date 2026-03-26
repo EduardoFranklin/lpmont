@@ -138,6 +138,8 @@ const ModulesSection = () => {
   }, [clinicalAutoPlay, clinicalNext]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
     camps.forEach((_, i) => {
@@ -146,16 +148,24 @@ const ModulesSection = () => {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setOpenIdx(i);
+            if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+            scrollTimeoutRef.current = setTimeout(() => {
+              setOpenIdx(i);
+            }, 400);
           }
         },
-        { threshold: 0.5 }
+        { threshold: 0.7 }
       );
       obs.observe(el);
       observers.push(obs);
     });
-    return () => observers.forEach((o) => o.disconnect());
+    return () => {
+      observers.forEach((o) => o.disconnect());
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
   }, []);
+
+  const handsOnTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
@@ -165,15 +175,21 @@ const ModulesSection = () => {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {
-            setOpenHandsOn(i);
+            if (handsOnTimeoutRef.current) clearTimeout(handsOnTimeoutRef.current);
+            handsOnTimeoutRef.current = setTimeout(() => {
+              setOpenHandsOn(i);
+            }, 400);
           }
         },
-        { threshold: 0.5 }
+        { threshold: 0.7 }
       );
       obs.observe(el);
       observers.push(obs);
     });
-    return () => observers.forEach((o) => o.disconnect());
+    return () => {
+      observers.forEach((o) => o.disconnect());
+      if (handsOnTimeoutRef.current) clearTimeout(handsOnTimeoutRef.current);
+    };
   }, []);
 
   return (
