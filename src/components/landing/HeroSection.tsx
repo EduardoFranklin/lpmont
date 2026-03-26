@@ -63,7 +63,7 @@ const HeroSection = () => {
               return (
                 <div
                   key={i}
-                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 px-4 sm:px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium text-foreground/30 bg-foreground/[0.04] border border-foreground/[0.06] min-h-[48px] sm:min-h-0 justify-center"
+                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 px-4 sm:px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium text-foreground/45 bg-foreground/[0.06] border border-foreground/[0.10] min-h-[48px] sm:min-h-0 justify-center"
                 >
                   <Icon className="w-3.5 h-3.5 shrink-0" />
                   <span className="text-center leading-tight whitespace-nowrap">{t.label}</span>
