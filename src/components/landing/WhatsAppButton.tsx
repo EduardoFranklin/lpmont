@@ -25,7 +25,7 @@ const WhatsAppButton = () => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
-          className="fixed bottom-20 sm:bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1DA851] hover:bg-[#189444] shadow-lg shadow-[#1DA851]/25 flex items-center justify-center transition-colors duration-200"
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#1DA851] hover:bg-[#189444] shadow-lg shadow-[#1DA851]/25 flex items-center justify-center transition-colors duration-200"
           aria-label="Fale conosco no WhatsApp"
         >
           <svg viewBox="0 0 24 24" className="w-6 h-6 fill-white">
