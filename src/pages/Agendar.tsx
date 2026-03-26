@@ -89,24 +89,46 @@ const Agendar = () => {
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const cityRef = useRef<HTMLDivElement>(null);
 
+  // Cache cities per UF to avoid repeated API calls
+  const citiesCacheRef = useRef<Record<string, string[]>>({});
+
   // Fetch cities from IBGE API when UF changes
   useEffect(() => {
     if (!form.uf) {
       setCities([]);
       return;
     }
-    setLoadingCities(true);
+
     handleChange("city", "");
     setCitySearch("");
-    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.uf}/municipios?orderBy=nome`)
+
+    // Use cache if available
+    if (citiesCacheRef.current[form.uf]) {
+      const cached = citiesCacheRef.current[form.uf];
+      setCities(cached);
+      if (cached.length > 0) handleChange("city", cached[0]);
+      return;
+    }
+
+    setLoadingCities(true);
+    const controller = new AbortController();
+
+    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${form.uf}/municipios?orderBy=nome`, {
+      signal: controller.signal,
+    })
       .then((res) => res.json())
       .then((data: { nome: string }[]) => {
         const names = data.map((c) => c.nome);
+        citiesCacheRef.current[form.uf] = names;
         setCities(names);
         if (names.length > 0) handleChange("city", names[0]);
       })
-      .catch(() => setCities([]))
+      .catch((err) => {
+        if (err.name !== "AbortError") setCities([]);
+      })
       .finally(() => setLoadingCities(false));
+
+    return () => controller.abort();
   }, [form.uf]);
 
   // Close city dropdown on outside click
