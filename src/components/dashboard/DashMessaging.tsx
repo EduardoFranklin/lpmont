@@ -326,100 +326,114 @@ const RemindersTab = () => {
         </Card>
       )}
 
-      {reminders.map((reminder, idx) => {
-        const textareaRef = useRef<HTMLTextAreaElement>(null);
-        const isEmail = reminder.channel === "email";
-        const ChannelIcon = isEmail ? Mail : MessageCircle;
-
-        return (
-          <Card key={reminder.id || `new-${idx}`}>
-            <CardContent className="p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <ChannelIcon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">{isEmail ? "E-mail" : "WhatsApp"}</span>
-                  <Clock className="w-3.5 h-3.5 text-muted-foreground ml-2" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">Ativo</span>
-                  <Switch checked={reminder.active} onCheckedChange={(v) => handleChange(idx, "active", v)} />
-                </div>
-              </div>
-
-              {/* Timing */}
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  value={reminder.timing_value}
-                  onChange={(e) => handleChange(idx, "timing_value", parseInt(e.target.value) || 1)}
-                  className="w-20 h-8 text-sm"
-                />
-                <select
-                  value={reminder.timing_unit}
-                  onChange={(e) => handleChange(idx, "timing_unit", e.target.value)}
-                  className="h-8 rounded-md border border-input bg-background px-2 text-sm"
-                >
-                  <option value="dias">dia(s) antes</option>
-                  <option value="horas">hora(s) antes</option>
-                </select>
-                <div className="flex-1" />
-                <div className="flex gap-1 flex-wrap">
-                  {TIMING_PRESETS.map((p) => (
-                    <button
-                      key={`${p.value}-${p.unit}`}
-                      onClick={() => {
-                        handleChange(idx, "timing_value", p.value);
-                        handleChange(idx, "timing_unit", p.unit);
-                      }}
-                      className={`text-[10px] px-2 py-1 rounded border transition-colors ${
-                        reminder.timing_value === p.value && reminder.timing_unit === p.unit
-                          ? "border-primary/50 bg-primary/10 text-primary"
-                          : "border-border text-muted-foreground hover:border-primary/30"
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {isEmail && (
-                <Input
-                  placeholder="Assunto do e-mail"
-                  value={reminder.subject}
-                  onChange={(e) => handleChange(idx, "subject", e.target.value)}
-                  className="text-sm"
-                />
-              )}
-
-              {isEmail ? <EmailToolbar textareaRef={textareaRef} /> : <WhatsAppToolbar textareaRef={textareaRef} />}
-
-              <textarea
-                ref={textareaRef}
-                value={reminder.body}
-                onChange={(e) => handleChange(idx, "body", e.target.value)}
-                onInput={(e) => handleChange(idx, "body", (e.target as HTMLTextAreaElement).value)}
-                rows={3}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
-                placeholder={isEmail
-                  ? "Olá {{nome}}, lembramos que seu agendamento é em breve..."
-                  : "Olá {{nome}}, lembrete: seu agendamento é amanhã!"}
-              />
-
-              <div className="flex justify-between">
-                <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive gap-1" onClick={() => handleDelete(reminder)}>
-                  <Trash2 className="w-3 h-3" /> Excluir
-                </Button>
-                <Button size="sm" className="h-7 text-xs gap-1" onClick={() => handleSave(reminder)}>
-                  <Save className="w-3 h-3" /> Salvar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+      {reminders.map((reminder, idx) => (
+        <ReminderCard
+          key={reminder.id || `new-${idx}`}
+          reminder={reminder}
+          onChange={(field, value) => handleChange(idx, field, value)}
+          onSave={() => handleSave(reminder)}
+          onDelete={() => handleDelete(reminder)}
+        />
+      ))}
     </div>
+  );
+};
+
+const ReminderCard = ({ reminder, onChange, onSave, onDelete }: {
+  reminder: Reminder;
+  onChange: (field: keyof Reminder, value: any) => void;
+  onSave: () => void;
+  onDelete: () => void;
+}) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isEmail = reminder.channel === "email";
+  const ChannelIcon = isEmail ? Mail : MessageCircle;
+
+  return (
+    <Card>
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ChannelIcon className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium">{isEmail ? "E-mail" : "WhatsApp"}</span>
+            <Clock className="w-3.5 h-3.5 text-muted-foreground ml-2" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Ativo</span>
+            <Switch checked={reminder.active} onCheckedChange={(v) => onChange("active", v)} />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Input
+            type="number"
+            min={1}
+            value={reminder.timing_value}
+            onChange={(e) => onChange("timing_value", parseInt(e.target.value) || 1)}
+            className="w-20 h-8 text-sm"
+          />
+          <select
+            value={reminder.timing_unit}
+            onChange={(e) => onChange("timing_unit", e.target.value)}
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+          >
+            <option value="dias">dia(s) antes</option>
+            <option value="horas">hora(s) antes</option>
+          </select>
+          <div className="flex-1" />
+          <div className="flex gap-1 flex-wrap">
+            {TIMING_PRESETS.map((p) => (
+              <button
+                key={`${p.value}-${p.unit}`}
+                onClick={() => {
+                  onChange("timing_value", p.value);
+                  onChange("timing_unit", p.unit);
+                }}
+                className={`text-[10px] px-2 py-1 rounded border transition-colors ${
+                  reminder.timing_value === p.value && reminder.timing_unit === p.unit
+                    ? "border-primary/50 bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {isEmail && (
+          <Input
+            placeholder="Assunto do e-mail"
+            value={reminder.subject}
+            onChange={(e) => onChange("subject", e.target.value)}
+            className="text-sm"
+          />
+        )}
+
+        {isEmail ? <EmailToolbar textareaRef={textareaRef} /> : <WhatsAppToolbar textareaRef={textareaRef} />}
+
+        <textarea
+          ref={textareaRef}
+          value={reminder.body}
+          onChange={(e) => onChange("body", e.target.value)}
+          onInput={(e) => onChange("body", (e.target as HTMLTextAreaElement).value)}
+          rows={3}
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
+          placeholder={isEmail
+            ? "Olá {{nome}}, lembramos que seu agendamento é em breve..."
+            : "Olá {{nome}}, lembrete: seu agendamento é amanhã!"}
+        />
+
+        <div className="flex justify-between">
+          <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive gap-1" onClick={onDelete}>
+            <Trash2 className="w-3 h-3" /> Excluir
+          </Button>
+          <Button size="sm" className="h-7 text-xs gap-1" onClick={onSave}>
+            <Save className="w-3 h-3" /> Salvar
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
