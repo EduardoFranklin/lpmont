@@ -17,11 +17,11 @@ const getCareers = (treatment: string) => [
 ];
 
 const TIME_SLOTS = [
-  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
+  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["10h às 10h30", "15h às 15h30"] },
+  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["9h às 9h30", "14h às 14h30", "16h às 16h30"] },
+  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["11h às 11h30"] },
+  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["9h às 9h30", "10h às 10h30", "15h às 15h30"] },
+  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["14h às 14h30"] },
 ];
 
 const benefits = [
