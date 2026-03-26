@@ -96,7 +96,7 @@ const CampsCarousel = () => {
           {doubled.map((src, i) => (
             <div
               key={i}
-              className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-all duration-300 hover:scale-105"
+              className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-colors duration-300"
             >
               <img
                 src={src}
