@@ -1,139 +1,120 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Play } from "lucide-react";
-import MountainDivider from "./MountainDivider";
+import { ArrowRight } from "lucide-react";
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      {/* Mountain background */}
-      <div className="absolute inset-0">
-        <img
-          src="/images/hero-mountain.jpg"
-          alt=""
-          className="w-full h-full object-cover"
-          loading="eager"
-          width={1920}
-          height={1080}
-        />
-        {/* Atmospheric overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/40" />
+      {/* Deep dark bg with subtle radial glow */}
+      <div className="absolute inset-0 bg-background" />
+      <div className="glow-gold" style={{ width: 800, height: 800, top: "-20%", left: "50%", transform: "translateX(-50%)" }} />
+      <div className="glow-gold" style={{ width: 500, height: 500, bottom: "0", right: "-10%", opacity: 0.5 }} />
+
+      {/* Circular rotating SVG decoration (Yeldra-style) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-[0.04] animate-spin-slow pointer-events-none">
+        <svg viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="350" cy="350" r="340" stroke="currentColor" strokeWidth="0.5" className="text-foreground" />
+          <circle cx="350" cy="350" r="280" stroke="currentColor" strokeWidth="0.5" className="text-foreground" strokeDasharray="4 8" />
+          <circle cx="350" cy="350" r="220" stroke="currentColor" strokeWidth="0.3" className="text-foreground" strokeDasharray="2 12" />
+        </svg>
       </div>
 
-      {/* Drifting fog */}
-      <div className="absolute bottom-0 left-0 right-0 h-[40%] fog-overlay pointer-events-none" />
-
-      <div className="section-container relative z-10 pt-32 pb-12 lg:pt-40 lg:pb-16">
-        <div className="grid lg:grid-cols-12 gap-10 items-center">
+      <div className="section-container relative z-10 pt-32 pb-20 lg:pt-40 lg:pb-24">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Caption line + tag */}
           <motion.div
-            className="lg:col-span-7"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex items-center justify-center gap-3 mb-10"
           >
-            {/* Altitude badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-wrap gap-2.5 mb-8"
-            >
-              {["⛰️ +2.000 dentistas no cume", "🏔️ Doutor pela USP", "🧗 +20 anos de escalada clínica"].map((b) => (
-                <span key={b} className="text-[11px] tracking-wider uppercase font-medium px-3 py-1.5 rounded-full border border-foreground/10 text-foreground/40 bg-foreground/[0.03]">
-                  {b}
-                </span>
-              ))}
-            </motion.div>
-
-            {/* Headline */}
-            <h1 className="text-balance">
-              <span className="block font-serif text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[3.75rem] leading-[1.08] font-medium text-foreground/95 mb-2">
-                Cada restauração é
-              </span>
-              <span className="block font-serif text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[3.75rem] leading-[1.08] font-medium text-foreground/95 mb-2">
-                uma etapa da subida.
-              </span>
-              <span className="block font-serif italic text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[3.75rem] leading-[1.08] font-medium summit-text">
-                Você já está pronto para o topo?
-              </span>
-            </h1>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="mt-8 text-lg sm:text-xl text-foreground/40 max-w-xl leading-relaxed font-light"
-            >
-              O método que guia dentistas do vale da insegurança até o cume da excelência clínica. Morfologia, cor, restauração — cada módulo é um acampamento rumo ao domínio total da resina composta.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="mt-10 flex flex-wrap items-center gap-4"
-            >
-              <a href="#preco" className="btn-summit text-base">
-                Começar a escalada <ArrowRight className="w-4 h-4" />
-              </a>
-              <a href="#modulos" className="btn-ridge">
-                <Play className="w-3.5 h-3.5" /> Ver a trilha completa
-              </a>
-            </motion.div>
-
-            {/* Micro social proof */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-              className="mt-10 flex items-center gap-3"
-            >
-              <div className="flex -space-x-2">
-                {["B", "R", "C", "L"].map((l, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-secondary flex items-center justify-center text-[10px] font-bold text-foreground/50">
-                    {l}
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-foreground/30">
-                <span className="text-primary font-semibold">4.9 ★</span> · Avaliação dos alunos
-              </p>
-            </motion.div>
-          </motion.div>
-
-          {/* Prof image */}
-          <motion.div
-            className="lg:col-span-5 relative hidden lg:flex justify-center"
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1.2, delay: 0.3 }}
-          >
-            <div className="relative">
-              <div className="absolute -inset-8 bg-primary/5 rounded-[3rem] blur-[60px]" />
-              <img
-                src="/images/breno.png"
-                alt="Prof. Breno Montalverne"
-                className="relative w-full max-w-[340px] rounded-3xl"
-                loading="eager"
-              />
-              {/* Floating card */}
-              <motion.div
-                className="absolute -bottom-4 -left-6 mountain-card px-5 py-4"
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/60 mb-1">Seu guia</p>
-                <p className="text-sm font-semibold text-foreground/90">Dr. Breno Mont'Alverne</p>
-                <p className="text-[11px] text-foreground/35 mt-0.5">Doutor FOB-USP · Prof. UFMA</p>
-              </motion.div>
+            <div className="caption-line-h">
+              <div className="caption-line-h-inner" />
+            </div>
+            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-foreground/40">
+              Treinamento em Resina Composta
+            </span>
+            <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}>
+              <div className="caption-line-h-inner" />
             </div>
           </motion.div>
-        </div>
-      </div>
 
-      {/* Mountain silhouette transition */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 text-background">
-        <MountainDivider />
+          {/* Headline — large clean typography */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-4xl sm:text-5xl lg:text-[4.25rem] font-normal leading-[1.15] text-foreground/95 text-balance mb-8"
+          >
+            Domine cada restauração.{" "}
+            <span className="summit-text font-medium">
+              Chegue ao topo da odontologia.
+            </span>
+          </motion.h1>
+
+          {/* Subheadline */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-lg sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-12"
+          >
+            O método que leva dentistas da insegurança à excelência clínica.
+            13 módulos, 5 Hands-On e o acompanhamento de um dos maiores nomes
+            da dentística restauradora do Brasil.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
+          >
+            <a href="#preco" className="btn-gradient">
+              <div className="btn-gradient-wrapper">
+                <div className="btn-gradient-inner">
+                  <div className="btn-gradient-bg" />
+                  <span className="btn-gradient-text text-base px-2">
+                    Começar a escalada <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </div>
+            </a>
+            <a href="#modulos" className="btn-secondary">
+              Ver a trilha completa
+            </a>
+          </motion.div>
+
+          {/* Reassurance items with green dots */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="flex flex-wrap items-center justify-center gap-6 text-[13px] text-foreground/30"
+          >
+            <div className="flex items-center gap-2">
+              <span className="caption-dot-green" />
+              <span>+2.000 dentistas formados</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="caption-dot-green" />
+              <span>Garantia de 15 dias</span>
+            </div>
+          </motion.div>
+
+          {/* Vertical caption line going down */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.1 }}
+            className="flex flex-col items-center mt-16"
+          >
+            <div className="caption-line-v h-16">
+              <div className="caption-line-v-inner" />
+            </div>
+            <div className="caption-dot" />
+          </motion.div>
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,17 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowRight, Mountain } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
+
+const GradientButton = ({ href, children, className = "" }: { href: string; children: React.ReactNode; className?: string }) => (
+  <a href={href} className={`btn-gradient ${className}`}>
+    <div className="btn-gradient-wrapper">
+      <div className="btn-gradient-inner">
+        <div className="btn-gradient-bg" />
+        <span className="btn-gradient-text">{children}</span>
+      </div>
+    </div>
+  </a>
+);
 
 const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -15,7 +26,7 @@ const NavBar = () => {
   const links = [
     { label: "A Trilha", href: "#modulos" },
     { label: "O Guia", href: "#professor" },
-    { label: "Base Camp", href: "#preco" },
+    { label: "Investimento", href: "#preco" },
   ];
 
   return (
@@ -25,14 +36,15 @@ const NavBar = () => {
       transition={{ duration: 0.7, ease: "easeOut" }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-background/80 backdrop-blur-2xl border-b border-foreground/5 shadow-lg shadow-background/50"
+          ? "backdrop-blur-xl bg-background/60 border-b border-foreground/[0.04]"
           : "bg-transparent"
       }`}
+      style={scrolled ? { backgroundImage: "linear-gradient(hsl(var(--background)), hsl(var(--background) / 0.3))" } : {}}
     >
       <div className="section-container flex items-center justify-between h-[72px]">
-        <a href="#" className="flex items-center gap-2.5">
-          <Mountain className="w-5 h-5 text-primary" />
-          <img src="/images/logo.png" alt="Método Mont" className="h-7 opacity-90" />
+        <a href="#" className="flex items-center gap-2">
+          <span className="text-xl">⛰️</span>
+          <span className="text-sm font-semibold tracking-wide text-foreground/90">Método Mont'</span>
         </a>
 
         <div className="hidden md:flex items-center gap-10">
@@ -40,7 +52,7 @@ const NavBar = () => {
             <a
               key={l.href}
               href={l.href}
-              className="text-[12px] font-medium tracking-[0.15em] uppercase text-foreground/40 hover:text-primary transition-colors duration-300"
+              className="text-[13px] font-medium text-foreground/40 hover:text-foreground transition-colors duration-300"
             >
               {l.label}
             </a>
@@ -48,9 +60,9 @@ const NavBar = () => {
         </div>
 
         <div className="hidden md:block">
-          <a href="#preco" className="btn-summit py-2.5 px-6 text-sm">
-            Iniciar Expedição <ArrowRight className="w-3.5 h-3.5" />
-          </a>
+          <GradientButton href="#preco">
+            Começar agora <ArrowRight className="w-3.5 h-3.5" />
+          </GradientButton>
         </div>
 
         <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-foreground/70 p-1">
@@ -73,7 +85,7 @@ const NavBar = () => {
                 </a>
               ))}
               <a href="#preco" onClick={() => setMenuOpen(false)} className="btn-summit w-full justify-center py-3 text-sm mt-2">
-                Iniciar Expedição
+                Começar agora
               </a>
             </div>
           </motion.div>
