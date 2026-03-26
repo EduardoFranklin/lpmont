@@ -17,11 +17,11 @@ const getCareers = (treatment: string) => [
 ];
 
 const TIME_SLOTS = [
-  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
-  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"] },
+  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["10h às 10h30", "15h às 15h30"] },
+  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["9h às 9h30", "14h às 14h30", "16h às 16h30"] },
+  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["11h às 11h30"] },
+  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["9h às 9h30", "10h às 10h30", "15h às 15h30"] },
+  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["14h às 14h30"] },
 ];
 
 const benefits = [
@@ -323,15 +323,19 @@ const Agendar = () => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
-                        const isSelected = selectedSlot?.day === day.day && selectedSlot?.time === time;
+                        const isUnavailable = day.unavailable?.includes(time);
+                        const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
                           <button
                             key={`${day.day}-${time}`}
-                            onClick={() => setSelectedSlot({ day: day.day, time })}
+                            onClick={() => !isUnavailable && setSelectedSlot({ day: day.day, time })}
+                            disabled={isUnavailable}
                             className={`py-2.5 rounded-lg text-[13px] font-medium border transition-all duration-200 ${
-                              isSelected
-                                ? "border-primary/50 bg-primary/15 text-primary"
-                                : "border-foreground/[0.08] bg-foreground/[0.03] text-foreground/45 hover:border-foreground/[0.15]"
+                              isUnavailable
+                                ? "border-foreground/[0.04] bg-foreground/[0.02] text-foreground/15 line-through cursor-not-allowed"
+                                : isSelected
+                                  ? "border-primary/50 bg-primary/15 text-primary"
+                                  : "border-foreground/[0.08] bg-foreground/[0.03] text-foreground/45 hover:border-foreground/[0.15]"
                             }`}
                           >
                             {time}
