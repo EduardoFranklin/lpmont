@@ -1,16 +1,14 @@
 import { motion } from "framer-motion";
-import { Check, Shield, ArrowRight, Gift } from "lucide-react";
+import { Check, Shield, ArrowRight, Gift, Users, Video, RefreshCw, Clock } from "lucide-react";
 
 const includes = [
   "13 módulos — do vale ao cume",
   "5 Hands-On com casos reais do Instituto",
   "Aulas objetivas e materiais exclusivos",
   "Suporte próximo da equipe",
-  "Atualizações contínuas incluídas",
-];
-
-const bonuses = [
-  { text: "Comunidade Exclusiva de expedicionários", image: null },
+  "12 encontros ao vivo com Breno Mont'Alverne no ano",
+  "Atualização permanente de conteúdos",
+  "Acesso disponível por 12 meses",
 ];
 
 const PricingSection = () => {
