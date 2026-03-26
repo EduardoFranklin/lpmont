@@ -16,13 +16,35 @@ const getCareers = (treatment: string) => [
   { label: "Sou Estudante", value: "estudante" },
 ];
 
-const TIME_SLOTS = [
-  { day: "Segunda", date: "31/03", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["10h às 10h30", "15h às 15h30"] },
-  { day: "Terça", date: "01/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["9h às 9h30", "14h às 14h30", "16h às 16h30"] },
-  { day: "Quarta", date: "02/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["11h às 11h30"] },
-  { day: "Quinta", date: "03/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["9h às 9h30", "10h às 10h30", "15h às 15h30"] },
-  { day: "Sexta", date: "04/04", slots: ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"], unavailable: ["14h às 14h30"] },
-];
+const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+const ALL_SLOTS = ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"];
+
+// Generate slots for today + next 3 days (skip weekends)
+const generateTimeSlots = () => {
+  const result: { day: string; date: string; slots: string[]; unavailable: string[] }[] = [];
+  const now = new Date();
+  let d = new Date(now);
+  while (result.length < 4) {
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) {
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      // Pseudo-random unavailable based on date seed
+      const seed = d.getDate() * 7 + d.getMonth() * 13;
+      const unavailable = ALL_SLOTS.filter((_, i) => (seed + i * 3) % 5 === 0);
+      result.push({
+        day: WEEKDAYS[dow],
+        date: `${dd}/${mm}`,
+        slots: [...ALL_SLOTS],
+        unavailable,
+      });
+    }
+    d = new Date(d.getTime() + 86400000);
+  }
+  return result;
+};
+
+const TIME_SLOTS = generateTimeSlots();
 
 // Parse start hour from slot label like "9h às 9h30" → 9
 const parseSlotHour = (slot: string): number => {
