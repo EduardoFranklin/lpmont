@@ -123,7 +123,7 @@ const Agendar = () => {
         const available: { day: string; time: string }[] = [];
         TIME_SLOTS.forEach((d) => {
           d.slots.forEach((t) => {
-            if (!d.unavailable?.includes(t)) available.push({ day: d.day, time: t });
+            if (!d.unavailable?.includes(t) && !isSlotTooSoon(d.date, t)) available.push({ day: d.day, time: t });
           });
         });
         if (available.length > 0) {
