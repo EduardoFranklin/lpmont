@@ -61,8 +61,9 @@ const PricingSection = () => {
               {/* Header */}
               <div className="px-8 pt-10 pb-8 text-center relative">
                 <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-primary/[0.03] to-transparent" />
-                <p className="relative text-foreground/35 text-sm mb-1">O Método Mont' — Treinamento Completo</p>
-                <p className="relative text-foreground/20 text-sm line-through mb-4">De R$ 1.790,00</p>
+                <p className="relative text-[11px] tracking-[0.15em] uppercase font-medium text-foreground/30 mb-1">Treinamento Online</p>
+                <p className="relative text-foreground/50 text-sm font-medium mb-1">Comunidade + Cursos + Mentorias ao Vivo</p>
+                <p className="relative text-foreground/25 text-sm line-through mb-3">De R$ 1.790,00</p>
                 <div className="relative flex items-baseline justify-center gap-1.5">
                   <span className="text-foreground/40 text-lg font-medium">12x de</span>
                   <span className="text-[3.5rem] sm:text-6xl font-extrabold sm:font-medium summit-text">R$ 79</span>
