@@ -18,6 +18,10 @@ html, body {
   .text-sm { font-size: 0.9375rem !important; }
   .text-lg { font-size: 1.175rem !important; }
   .text-base { font-size: 1.0625rem !important; }
+  .btn-summit, .btn-gradient-text, .btn-secondary { 
+    font-size: 0.8125rem !important; 
+    white-space: nowrap !important; 
+  }
 }
 
 @layer base {
