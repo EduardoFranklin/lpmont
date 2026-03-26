@@ -79,16 +79,19 @@ const PricingSection = () => {
                     <Gift className="w-3.5 h-3.5" /> Bônus da expedição
                   </p>
 
-                  <div className="rounded-xl border border-primary/10 bg-primary/[0.03] p-5">
-                    <p className="text-[13px] font-medium text-foreground/60 mb-1">
-                      Seja membro fundador da comunidade:
-                    </p>
-                    <p className="text-base font-semibold summit-text flex items-center gap-2">
-                      <Users className="w-4 h-4" /> Mont'Alverne Experience
-                    </p>
-                    <p className="text-foreground/30 text-[12px] mt-2">
-                      Grupo exclusivo no WhatsApp com acesso direto à equipe e outros expedicionários.
-                    </p>
+                  <div className="rounded-xl border border-primary/10 bg-primary/[0.03] p-5 flex items-center gap-5">
+                    <img src={goldenTicket} alt="Golden Ticket" className="w-20 h-auto flex-shrink-0 drop-shadow-lg" loading="lazy" />
+                    <div>
+                      <p className="text-[13px] font-medium text-foreground/60 mb-1">
+                        Seja membro fundador da comunidade:
+                      </p>
+                      <p className="text-base font-semibold summit-text flex items-center gap-2">
+                        <Users className="w-4 h-4" /> Mont'Alverne Experience
+                      </p>
+                      <p className="text-foreground/30 text-[12px] mt-2">
+                        Grupo exclusivo no WhatsApp com acesso direto à equipe e outros expedicionários.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
