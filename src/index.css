@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,49 +6,56 @@
 
 @layer base {
   :root {
-    --background: 30 25% 97%;
-    --foreground: 220 25% 12%;
+    --background: 215 28% 7%;
+    --foreground: 210 20% 92%;
 
-    --card: 30 20% 95%;
-    --card-foreground: 220 25% 12%;
+    --card: 215 25% 10%;
+    --card-foreground: 210 20% 92%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 12%;
+    --popover: 215 28% 9%;
+    --popover-foreground: 210 20% 92%;
 
-    --primary: 220 30% 18%;
-    --primary-foreground: 40 30% 96%;
+    --primary: 35 90% 55%;
+    --primary-foreground: 215 28% 7%;
 
-    --secondary: 30 15% 90%;
-    --secondary-foreground: 220 25% 18%;
+    --secondary: 215 20% 14%;
+    --secondary-foreground: 210 20% 85%;
 
-    --muted: 30 10% 92%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 215 18% 16%;
+    --muted-foreground: 215 12% 50%;
 
-    --accent: 38 65% 52%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 35 90% 55%;
+    --accent-foreground: 215 28% 7%;
 
     --destructive: 0 60% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 38 65% 52%;
+    --border: 215 18% 16%;
+    --input: 215 18% 16%;
+    --ring: 35 90% 55%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
-    /* Premium tokens */
-    --warm-gold: 38 65% 52%;
-    --deep-navy: 220 30% 18%;
-    --soft-cream: 30 25% 97%;
-    --warm-stone: 30 12% 82%;
-    --elegant-gray: 220 10% 45%;
+    /* Mountain palette */
+    --summit-gold: 35 90% 55%;
+    --alpine-blue: 215 35% 25%;
+    --night-sky: 215 28% 7%;
+    --snow-white: 210 20% 92%;
+    --fog: 215 15% 40%;
+    --ridge: 215 20% 18%;
+    --base-camp: 215 22% 12%;
 
-    --gradient-warm: linear-gradient(135deg, hsl(38 65% 52%), hsl(28 70% 58%));
-    --gradient-hero: linear-gradient(170deg, hsl(220 30% 14%) 0%, hsl(220 25% 22%) 60%, hsl(215 20% 28%) 100%);
-    --gradient-section: linear-gradient(180deg, hsl(30 25% 97%) 0%, hsl(30 20% 94%) 100%);
-    --shadow-soft: 0 4px 30px -8px hsl(220 25% 12% / 0.08);
-    --shadow-elevated: 0 12px 40px -12px hsl(220 25% 12% / 0.12);
-    --shadow-gold: 0 8px 30px -8px hsl(38 65% 52% / 0.3);
+    /* Gradients */
+    --gradient-summit: linear-gradient(135deg, hsl(35 90% 55%), hsl(25 85% 50%));
+    --gradient-sky: linear-gradient(180deg, hsl(215 30% 5%) 0%, hsl(215 28% 10%) 50%, hsl(215 22% 14%) 100%);
+    --gradient-dawn: linear-gradient(135deg, hsl(35 90% 55% / 0.15), hsl(15 80% 50% / 0.05));
+    --gradient-ridge: linear-gradient(180deg, hsl(215 22% 12%), hsl(215 28% 7%));
+
+    /* Shadows */
+    --shadow-summit: 0 0 60px -15px hsl(35 90% 55% / 0.25);
+    --shadow-mountain: 0 20px 60px -20px hsl(215 30% 5% / 0.7);
+    --shadow-card: 0 4px 30px -10px hsl(215 30% 5% / 0.5);
+    --shadow-glow: 0 0 40px -10px hsl(35 90% 55% / 0.2);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -80,69 +87,97 @@
     @apply max-w-6xl mx-auto px-5 sm:px-8;
   }
 
-  .btn-cta {
+  /* Summit CTA — the golden peak button */
+  .btn-summit {
     @apply inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-base transition-all duration-500 tracking-wide;
-    background: var(--gradient-warm);
-    color: hsl(0 0% 100%);
-    box-shadow: var(--shadow-gold);
+    background: var(--gradient-summit);
+    color: hsl(var(--primary-foreground));
+    box-shadow: var(--shadow-summit);
   }
-  .btn-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px -6px hsl(38 65% 52% / 0.45);
+  .btn-summit:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 80px -10px hsl(35 90% 55% / 0.4);
   }
-  .btn-cta:active {
+  .btn-summit:active {
     transform: translateY(0);
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-base transition-all duration-500 tracking-wide;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
+  /* Ridge button — translucent outline */
+  .btn-ridge {
+    @apply inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full font-medium text-sm transition-all duration-400;
+    border: 1px solid hsl(var(--snow-white) / 0.15);
+    color: hsl(var(--snow-white) / 0.7);
+    backdrop-filter: blur(4px);
   }
-  .btn-secondary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-elevated);
-  }
-
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all duration-300;
-    color: hsl(var(--primary));
-    border: 1.5px solid hsl(var(--border));
-  }
-  .btn-ghost:hover {
-    background: hsl(var(--primary) / 0.04);
-    border-color: hsl(var(--primary) / 0.2);
+  .btn-ridge:hover {
+    background: hsl(var(--snow-white) / 0.05);
+    border-color: hsl(var(--snow-white) / 0.25);
+    color: hsl(var(--snow-white) / 0.95);
   }
 
-  .premium-card {
+  /* Mountain card — frosted glass on dark */
+  .mountain-card {
     @apply rounded-2xl transition-all duration-500;
-    background: hsl(0 0% 100%);
-    border: 1px solid hsl(var(--border));
-    box-shadow: var(--shadow-soft);
+    background: hsl(var(--base-camp) / 0.6);
+    border: 1px solid hsl(var(--snow-white) / 0.06);
+    backdrop-filter: blur(12px);
+    box-shadow: var(--shadow-card);
   }
-  .premium-card:hover {
-    box-shadow: var(--shadow-elevated);
-    border-color: hsl(var(--border) / 0.6);
+  .mountain-card:hover {
+    border-color: hsl(var(--snow-white) / 0.1);
+    box-shadow: var(--shadow-mountain);
   }
 
-  .gold-text {
-    background: var(--gradient-warm);
+  /* Gold gradient text */
+  .summit-text {
+    background: var(--gradient-summit);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  .hero-dark {
-    background: var(--gradient-hero);
-    color: hsl(var(--primary-foreground));
-  }
-
-  .divider-elegant {
+  /* Divider — golden trail */
+  .trail-divider {
     @apply mx-auto;
     width: 48px;
     height: 2px;
-    background: var(--gradient-warm);
+    background: var(--gradient-summit);
     border-radius: 2px;
+    box-shadow: 0 0 12px hsl(35 90% 55% / 0.4);
+  }
+
+  /* Mountain SVG silhouette for section dividers */
+  .mountain-divider {
+    @apply w-full overflow-hidden leading-[0];
+  }
+  .mountain-divider svg {
+    @apply w-full;
+    display: block;
+  }
+
+  /* Fog overlay */
+  .fog-overlay {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      hsl(var(--night-sky) / 0.4) 40%,
+      hsl(var(--night-sky) / 0.8) 70%,
+      hsl(var(--night-sky)) 100%
+    );
+  }
+
+  /* Altitude marker — used for module numbering */
+  .altitude-marker {
+    @apply flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold;
+    background: hsl(var(--summit-gold) / 0.1);
+    color: hsl(var(--summit-gold));
+    border: 1px solid hsl(var(--summit-gold) / 0.2);
+  }
+
+  /* Trail line — vertical connector */
+  .trail-line {
+    width: 2px;
+    background: linear-gradient(180deg, hsl(var(--summit-gold) / 0.3), hsl(var(--summit-gold) / 0.05));
   }
 
   .text-balance {

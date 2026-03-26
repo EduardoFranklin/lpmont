@@ -49,10 +49,6 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        "warm-gold": "hsl(var(--warm-gold))",
-        "deep-navy": "hsl(var(--deep-navy))",
-        "warm-stone": "hsl(var(--warm-stone))",
-        "elegant-gray": "hsl(var(--elegant-gray))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -78,20 +74,20 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        "fade-up": {
-          "0%": { opacity: "0", transform: "translateY(24px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
+        "drift-clouds": {
+          "0%": { transform: "translateX(-5%)" },
+          "100%": { transform: "translateX(5%)" },
         },
-        "subtle-float": {
+        "float-up": {
           "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-6px)" },
+          "50%": { transform: "translateY(-8px)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-up": "fade-up 0.7s ease-out forwards",
-        "subtle-float": "subtle-float 5s ease-in-out infinite",
+        "drift-clouds": "drift-clouds 20s ease-in-out infinite alternate",
+        "float-up": "float-up 5s ease-in-out infinite",
       },
     },
   },
