@@ -1,43 +1,45 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
-
-const badges = [
-  "Mais de 2.000 dentistas formados",
-  "Doutor pela USP",
-  "+20 anos de clínica",
-];
+import MountainDivider from "./MountainDivider";
 
 const HeroSection = () => {
   return (
-    <section className="hero-dark relative overflow-hidden">
-      {/* Subtle texture overlay */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
+    <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
+      {/* Mountain background */}
+      <div className="absolute inset-0">
+        <img
+          src="/images/hero-mountain.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+          loading="eager"
+          width={1920}
+          height={1080}
+        />
+        {/* Atmospheric overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/40" />
+      </div>
 
-      {/* Warm glow accents */}
-      <div className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full bg-accent/5 blur-[120px]" />
-      <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] rounded-full bg-accent/3 blur-[100px]" />
+      {/* Drifting fog */}
+      <div className="absolute bottom-0 left-0 right-0 h-[40%] fog-overlay pointer-events-none" />
 
-      <div className="section-container relative z-10 pt-32 pb-24 lg:pt-40 lg:pb-32">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* Content — 7 cols */}
+      <div className="section-container relative z-10 pt-32 pb-12 lg:pt-40 lg:pb-16">
+        <div className="grid lg:grid-cols-12 gap-10 items-center">
           <motion.div
             className="lg:col-span-7"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 1, ease: "easeOut" }}
           >
-            {/* Trust badge */}
+            {/* Altitude badges */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-wrap items-center gap-3 mb-8"
+              transition={{ delay: 0.5 }}
+              className="flex flex-wrap gap-2.5 mb-8"
             >
-              {badges.map((b) => (
-                <span
-                  key={b}
-                  className="inline-flex items-center gap-1.5 text-[11px] tracking-widest uppercase font-medium px-3 py-1.5 rounded-full border border-white/10 text-white/50"
-                >
+              {["⛰️ +2.000 dentistas no cume", "🏔️ Doutor pela USP", "🧗 +20 anos de escalada clínica"].map((b) => (
+                <span key={b} className="text-[11px] tracking-wider uppercase font-medium px-3 py-1.5 rounded-full border border-foreground/10 text-foreground/40 bg-foreground/[0.03]">
                   {b}
                 </span>
               ))}
@@ -45,95 +47,94 @@ const HeroSection = () => {
 
             {/* Headline */}
             <h1 className="text-balance">
-              <span className="block font-serif text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl leading-[1.1] font-medium text-white/95 mb-3">
-                O sorriso perfeito começa
+              <span className="block font-serif text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[3.75rem] leading-[1.08] font-medium text-foreground/95 mb-2">
+                Cada restauração é
               </span>
-              <span className="block font-serif italic text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl leading-[1.1] font-medium gold-text mb-3">
-                nas mãos de quem domina
+              <span className="block font-serif text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[3.75rem] leading-[1.08] font-medium text-foreground/95 mb-2">
+                uma etapa da subida.
               </span>
-              <span className="block font-serif text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl leading-[1.1] font-medium text-white/95">
-                cada detalhe.
+              <span className="block font-serif italic text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-[3.75rem] leading-[1.08] font-medium summit-text">
+                Você já está pronto para o topo?
               </span>
             </h1>
 
-            {/* Subheadline */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="mt-8 text-lg sm:text-xl text-white/50 max-w-xl leading-relaxed font-light"
+              transition={{ delay: 0.6 }}
+              className="mt-8 text-lg sm:text-xl text-foreground/40 max-w-xl leading-relaxed font-light"
             >
-              Pare de improvisar com resina composta. Domine o método que já transformou mais de 2.000 dentistas em profissionais que entregam resultados <em className="text-white/70 not-italic font-medium">previsíveis, naturais e admirados</em> — caso após caso.
+              O método que guia dentistas do vale da insegurança até o cume da excelência clínica. Morfologia, cor, restauração — cada módulo é um acampamento rumo ao domínio total da resina composta.
             </motion.p>
 
-            {/* CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
+              transition={{ delay: 0.8 }}
               className="mt-10 flex flex-wrap items-center gap-4"
             >
-              <a href="#preco" className="btn-cta text-base">
-                Garantir minha vaga <ArrowRight className="w-4 h-4" />
+              <a href="#preco" className="btn-summit text-base">
+                Começar a escalada <ArrowRight className="w-4 h-4" />
               </a>
-              <a href="#modulos" className="inline-flex items-center gap-2.5 px-6 py-4 rounded-full text-sm font-medium text-white/60 hover:text-white/90 border border-white/10 hover:border-white/20 transition-all duration-300">
-                <Play className="w-4 h-4" /> Ver conteúdo completo
+              <a href="#modulos" className="btn-ridge">
+                <Play className="w-3.5 h-3.5" /> Ver a trilha completa
               </a>
             </motion.div>
 
-            {/* Social proof micro */}
+            {/* Micro social proof */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
+              transition={{ delay: 1 }}
               className="mt-10 flex items-center gap-3"
             >
               <div className="flex -space-x-2">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-deep-navy bg-accent/20 flex items-center justify-center text-[10px] font-bold text-white/60">
-                    {["B", "R", "C", "L"][i]}
+                {["B", "R", "C", "L"].map((l, i) => (
+                  <div key={i} className="w-8 h-8 rounded-full border-2 border-background bg-secondary flex items-center justify-center text-[10px] font-bold text-foreground/50">
+                    {l}
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-white/40 leading-tight">
-                <span className="text-white/60 font-medium">4.9 ★</span> — Avaliação dos alunos no Google
+              <p className="text-xs text-foreground/30">
+                <span className="text-primary font-semibold">4.9 ★</span> · Avaliação dos alunos
               </p>
             </motion.div>
           </motion.div>
 
-          {/* Image — 5 cols */}
+          {/* Prof image */}
           <motion.div
             className="lg:col-span-5 relative hidden lg:flex justify-center"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, delay: 0.3 }}
+            transition={{ duration: 1.2, delay: 0.3 }}
           >
             <div className="relative">
-              {/* Soft glow behind image */}
-              <div className="absolute -inset-8 bg-accent/8 rounded-[3rem] blur-3xl" />
+              <div className="absolute -inset-8 bg-primary/5 rounded-[3rem] blur-[60px]" />
               <img
                 src="/images/breno.png"
-                alt="Prof. Breno Montalverne — referência em odontologia restauradora"
-                className="relative w-full max-w-sm rounded-3xl"
+                alt="Prof. Breno Montalverne"
+                className="relative w-full max-w-[340px] rounded-3xl"
                 loading="eager"
               />
-              {/* Floating credential card */}
+              {/* Floating card */}
               <motion.div
-                className="absolute -bottom-4 -left-8 bg-white/10 backdrop-blur-xl rounded-2xl px-5 py-4 border border-white/10"
+                className="absolute -bottom-4 -left-6 mountain-card px-5 py-4"
                 animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
               >
-                <p className="text-[11px] uppercase tracking-widest text-white/40 mb-1">Professor</p>
-                <p className="text-sm font-semibold text-white/90">Dr. Breno Mont'Alverne</p>
-                <p className="text-xs text-white/40 mt-0.5">Doutor FOB-USP · UFMA</p>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-primary/60 mb-1">Seu guia</p>
+                <p className="text-sm font-semibold text-foreground/90">Dr. Breno Mont'Alverne</p>
+                <p className="text-[11px] text-foreground/35 mt-0.5">Doutor FOB-USP · Prof. UFMA</p>
               </motion.div>
             </div>
           </motion.div>
         </div>
       </div>
 
-      {/* Bottom fade transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
+      {/* Mountain silhouette transition */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 text-background">
+        <MountainDivider />
+      </div>
     </section>
   );
 };
