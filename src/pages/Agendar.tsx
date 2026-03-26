@@ -72,6 +72,46 @@ const benefits = [
   { icon: Tag, label: "Descontos em Cursos Presenciais" },
 ];
 
+const ADMIN_EMAIL = "mktmetodomont@gmail.com";
+
+// Generate Google Calendar URL with Meet
+const buildGoogleCalendarUrl = (
+  title: string,
+  description: string,
+  dateStr: string, // "dd/mm"
+  timeSlot: string, // "9h às 9h30"
+  guestEmail: string
+): string => {
+  const [dd, mm] = dateStr.split("/").map(Number);
+  const year = new Date().getFullYear();
+  const timeMatch = timeSlot.match(/^(\d+)h/);
+  const startHour = timeMatch ? parseInt(timeMatch[1]) : 9;
+
+  // Build start and end dates in local time (São Paulo = UTC-3)
+  const start = new Date(year, mm - 1, dd, startHour, 0, 0);
+  const end = new Date(year, mm - 1, dd, startHour, 30, 0);
+
+  const fmt = (d: Date) =>
+    d.getFullYear().toString() +
+    String(d.getMonth() + 1).padStart(2, "0") +
+    String(d.getDate()).padStart(2, "0") +
+    "T" +
+    String(d.getHours()).padStart(2, "0") +
+    String(d.getMinutes()).padStart(2, "0") +
+    "00";
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: title,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details: description,
+    add: `${guestEmail},${ADMIN_EMAIL}`,
+    ctz: "America/Sao_Paulo",
+  });
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+};
+
 const Agendar = () => {
   useTrackingScripts();
   const utmParams = useUtmCapture();
