@@ -10,7 +10,7 @@ const stats = [
 
 const InstructorSection = () => {
   return (
-    <section id="professor" className="py-28 sm:py-36 relative overflow-hidden">
+    <section id="guia" className="py-28 sm:py-36 relative overflow-hidden">
       <div className="glow-gold" style={{ width: 600, height: 600, top: "20%", right: "-20%", opacity: 0.3 }} />
 
       <div className="section-container relative z-10">
