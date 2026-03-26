@@ -62,70 +62,12 @@ const HeroSection = () => {
             da dentística restauradora do Brasil.
           </motion.p>
 
-          {/* VSL Video Player */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="max-w-3xl mx-auto mb-12"
-          >
-            <div className="gradient-card">
-              <div className="gradient-card-inner overflow-hidden">
-                <div className="relative aspect-video bg-background">
-                  {!playing ? (
-                    /* Thumbnail / Play state */
-                    <button
-                      onClick={() => setPlaying(true)}
-                      className="absolute inset-0 flex items-center justify-center group cursor-pointer"
-                    >
-                      {/* Thumbnail background */}
-                      <div className="absolute inset-0">
-                        <img
-                          src="/images/hero-mountain.jpg"
-                          alt=""
-                          className="w-full h-full object-cover opacity-40"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
-                      </div>
-
-                      {/* Play button */}
-                      <div className="relative z-10 flex flex-col items-center gap-4">
-                        <div className="w-20 h-20 rounded-full flex items-center justify-center border-2 border-foreground/10 group-hover:border-primary/40 transition-all duration-500 group-hover:scale-110"
-                          style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))" }}
-                        >
-                          <Play className="w-8 h-8 text-primary fill-primary ml-1" />
-                        </div>
-                        <span className="text-[13px] text-foreground/30 font-medium tracking-wide uppercase">
-                          Assistir apresentação
-                        </span>
-                      </div>
-
-                      {/* Floating duration badge */}
-                      <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground/30 bg-foreground/[0.05] border border-foreground/[0.06]">
-                        12:34
-                      </div>
-                    </button>
-                  ) : (
-                    /* Video embed placeholder — replace src with real VSL URL */
-                    <iframe
-                      src="about:blank"
-                      title="VSL - Método Mont'"
-                      className="w-full h-full"
-                      allow="autoplay; fullscreen"
-                      allowFullScreen
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
           {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
+            transition={{ delay: 0.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
           >
             <a href="#preco" className="btn-gradient">
               <div className="btn-gradient-wrapper">
@@ -140,6 +82,57 @@ const HeroSection = () => {
             <a href="#modulos" className="btn-secondary">
               Ver a trilha completa
             </a>
+          </motion.div>
+
+          {/* VSL Video Player */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className="max-w-3xl mx-auto mb-12"
+          >
+            <div className="gradient-card">
+              <div className="gradient-card-inner overflow-hidden">
+                <div className="relative aspect-video bg-background">
+                  {!playing ? (
+                    <button
+                      onClick={() => setPlaying(true)}
+                      className="absolute inset-0 flex items-center justify-center group cursor-pointer"
+                    >
+                      <div className="absolute inset-0">
+                        <img
+                          src="/images/hero-mountain.jpg"
+                          alt=""
+                          className="w-full h-full object-cover opacity-40"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
+                      </div>
+                      <div className="relative z-10 flex flex-col items-center gap-4">
+                        <div className="w-20 h-20 rounded-full flex items-center justify-center border-2 border-foreground/10 group-hover:border-primary/40 transition-all duration-500 group-hover:scale-110"
+                          style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))" }}
+                        >
+                          <Play className="w-8 h-8 text-primary fill-primary ml-1" />
+                        </div>
+                        <span className="text-[13px] text-foreground/30 font-medium tracking-wide uppercase">
+                          Assistir apresentação
+                        </span>
+                      </div>
+                      <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground/30 bg-foreground/[0.05] border border-foreground/[0.06]">
+                        12:34
+                      </div>
+                    </button>
+                  ) : (
+                    <iframe
+                      src="about:blank"
+                      title="VSL - Método Mont'"
+                      className="w-full h-full"
+                      allow="autoplay; fullscreen"
+                      allowFullScreen
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
           </motion.div>
 
           {/* Reassurance items */}
