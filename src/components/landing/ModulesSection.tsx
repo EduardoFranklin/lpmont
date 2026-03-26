@@ -55,6 +55,12 @@ const coverSlides = [
   "/images/capa5.webp",
   "/images/capa6.webp",
   "/images/capa7.webp",
+  "/images/capa8.webp",
+  "/images/capa9.webp",
+  "/images/capa10.webp",
+  "/images/capa11.webp",
+  "/images/capa12.webp",
+  "/images/capa13.webp",
 ];
 
 const CampsCarousel = () => {
