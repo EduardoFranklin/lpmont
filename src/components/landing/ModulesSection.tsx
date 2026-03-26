@@ -382,8 +382,8 @@ const ModulesSection = () => {
                 <div className="w-full sm:w-36 h-28 rounded-xl overflow-hidden border border-foreground/[0.06] flex-shrink-0 relative">
                   <motion.div
                     className="flex h-full"
-                    animate={{ x: ["0%", "-66.66%", "-33.33%", "0%"] }}
-                    transition={{ duration: 8, ease: "easeInOut", repeat: Infinity, repeatType: "loop", times: [0, 0.33, 0.66, 1] }}
+                    animate={{ x: ["0%", "0%", "-100%", "-100%", "-200%", "-200%", "0%"] }}
+                    transition={{ duration: 15, ease: "easeInOut", repeat: Infinity, times: [0, 0.15, 0.3, 0.48, 0.63, 0.85, 1] }}
                   >
                     {["/images/modelo-handson-1.webp", "/images/modelo-handson-2.webp", "/images/modelo-handson-3.webp"].map((src, i) => (
                       <img key={i} src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover flex-shrink-0" loading="lazy" />
