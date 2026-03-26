@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
+import { Mountain, Users, GraduationCap, BookOpen } from "lucide-react";
 
 const stats = [
-  { value: "20+", label: "anos de clínica", icon: "⛰️" },
-  { value: "2.000+", label: "dentistas formados", icon: "🧗" },
-  { value: "FOB-USP", label: "Doutor e Mestre", icon: "🎓" },
-  { value: "UFMA", label: "Professor universitário", icon: "📚" },
+  { value: "20+", label: "anos de clínica", icon: Mountain },
+  { value: "2.000+", label: "dentistas formados", icon: Users },
+  { value: "FOB-USP", label: "Doutor e Mestre", icon: GraduationCap },
+  { value: "UFMA", label: "Professor universitário", icon: BookOpen },
 ];
 
 const InstructorSection = () => {
