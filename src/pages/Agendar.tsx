@@ -10,10 +10,10 @@ const UFS = [
   "PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"
 ];
 
-const CAREERS = [
+const getCareers = (treatment: string) => [
   { label: "Sou Estudante", value: "estudante" },
   { label: "Sou Dentista", value: "dentista" },
-  { label: "Sou Dono de Clínica", value: "dono_clinica" },
+  { label: treatment === "Dra." ? "Sou Dona de Clínica" : "Sou Dono de Clínica", value: "dono_clinica" },
 ];
 
 const TIME_SLOTS = [
