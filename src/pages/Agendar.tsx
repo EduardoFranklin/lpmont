@@ -355,7 +355,7 @@ const Agendar = () => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
-                        const isUnavailable = day.unavailable?.includes(time) || (dynamicUnavailable?.day === day.day && dynamicUnavailable?.time === time);
+                        const isUnavailable = day.unavailable?.includes(time) || (dynamicUnavailable?.day === day.day && dynamicUnavailable?.time === time) || isSlotTooSoon(day.date, time);
                         const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
                           <button
