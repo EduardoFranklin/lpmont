@@ -64,38 +64,53 @@ const coverSlides = [
 ];
 
 const CampsCarousel = () => {
-  const [emblaRef] = useEmblaCarousel(
-    { loop: true, align: "start", dragFree: true },
-    [Autoplay({ delay: 3000, stopOnInteraction: false, stopOnMouseEnter: true })]
-  );
+  const doubled = [...coverSlides, ...coverSlides];
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
-      className="mb-16 -mx-4 sm:mx-0"
+      className="mb-16 overflow-hidden"
     >
-      <div ref={emblaRef} className="overflow-hidden cursor-grab active:cursor-grabbing">
-        <div className="flex gap-4 pl-4 sm:pl-0">
-          {coverSlides.map((src, i) => (
+      <div className="relative group">
+        {/* Fade edges */}
+        <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+        
+        <motion.div
+          className="flex gap-4 w-max"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{
+            x: {
+              repeat: Infinity,
+              repeatType: "loop",
+              duration: 40,
+              ease: "linear",
+            },
+          }}
+          whileHover={{ animationPlayState: "paused" }}
+          style={{ willChange: "transform" }}
+        >
+          {doubled.map((src, i) => (
             <div
               key={i}
-              className="flex-shrink-0 w-[200px] sm:w-[220px] rounded-xl overflow-hidden border border-foreground/[0.06]"
+              className="flex-shrink-0 w-[180px] sm:w-[200px] rounded-xl overflow-hidden border border-foreground/[0.06] hover:border-primary/20 transition-all duration-300 hover:scale-105"
             >
               <img
                 src={src}
-                alt={`Acampamento ${i + 1}`}
+                alt={`Acampamento ${(i % coverSlides.length) + 1}`}
                 className="w-full h-auto object-cover"
                 loading="lazy"
               />
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );
 };
+
 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
