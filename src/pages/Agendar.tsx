@@ -131,6 +131,9 @@ const Agendar = () => {
   const [loadingCities, setLoadingCities] = useState(false);
   const [citySearch, setCitySearch] = useState("");
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
+  const [meetLink, setMeetLink] = useState<string | null>(null);
+  const [calendarCreating, setCalendarCreating] = useState(false);
+  const [calendarCreated, setCalendarCreated] = useState(false);
   const cityRef = useRef<HTMLDivElement>(null);
 
   // Cache cities per UF to avoid repeated API calls
