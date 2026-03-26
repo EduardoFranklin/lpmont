@@ -109,9 +109,8 @@ const CampsCarousel = () => {
       </div>
     </motion.div>
   );
-    </motion.div>
-  );
 };
+
 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
