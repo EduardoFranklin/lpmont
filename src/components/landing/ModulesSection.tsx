@@ -214,44 +214,211 @@ const ModulesSection = () => {
                 onMouseLeave={() => setClinicalAutoPlay(true)}
               >
                 {clinicalImages.map((img, i) => (
-                <div
-                  className="flex h-full cursor-grab active:cursor-grabbing touch-pan-x"
-                  style={{ transition: "transform 0.4s ease" }}
-                  onPointerDown={(e) => {
-                    const container = e.currentTarget;
-                    const startX = e.clientX;
-                    const currentTransform = container.style.transform;
-                    const match = currentTransform.match(/translateX\((-?\d+(?:\.\d+)?)%\)/);
-                    const startOffset = match ? parseFloat(match[1]) : 0;
-                    const totalSlides = 3;
-                    container.style.transition = "none";
-                    container.setPointerCapture(e.pointerId);
+                  <div
+                    key={i}
+                    className="absolute inset-0 transition-opacity duration-700"
+                    style={{ opacity: i === clinicalCurrent ? 1 : 0 }}
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.caption}
+                      className="w-full h-full object-cover"
+                      loading={i === 0 ? "eager" : "lazy"}
+                    />
+                    <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
+                  </div>
+                ))}
 
-                    const onMove = (ev: PointerEvent) => {
-                      const dx = ev.clientX - startX;
-                      const pct = (dx / container.parentElement!.clientWidth) * 100;
-                      container.style.transform = `translateX(${startOffset + pct}%)`;
-                    };
+                <div className="absolute bottom-0 left-0 right-0 px-6 pb-5 flex items-end justify-between z-10">
+                  <div>
+                    <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block mb-1">
+                      Situações Clínicas · {String(clinicalCurrent + 1).padStart(2, "0")}/{String(clinicalImages.length).padStart(2, "0")}
+                    </span>
+                    <p className="text-foreground/80 text-sm font-medium">{clinicalImages[clinicalCurrent].caption}</p>
+                  </div>
 
-                    const onUp = (ev: PointerEvent) => {
-                      container.releasePointerCapture(ev.pointerId);
-                      container.removeEventListener("pointermove", onMove);
-                      container.removeEventListener("pointerup", onUp);
-                      const dx = ev.clientX - startX;
-                      const pct = (dx / container.parentElement!.clientWidth) * 100;
-                      let newSlide = Math.round(-(startOffset + pct) / 100);
-                      newSlide = Math.max(0, Math.min(totalSlides - 1, newSlide));
-                      container.style.transition = "transform 0.4s ease";
-                      container.style.transform = `translateX(${-newSlide * 100}%)`;
-                    };
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={clinicalPrev}
+                      className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={clinicalNext}
+                      className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
 
-                    container.addEventListener("pointermove", onMove);
-                    container.addEventListener("pointerup", onUp);
-                  }}
-                >
-                  {["/images/modelo-handson-1.webp", "/images/modelo-handson-2.webp", "/images/modelo-handson-3.webp"].map((src, i) => (
-                    <img key={i} src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover flex-shrink-0 pointer-events-none" loading="lazy" />
+                <div className="absolute bottom-0 left-0 right-0 flex gap-1 px-6 pb-1.5 z-10">
+                  {clinicalImages.map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setClinicalCurrent(i)}
+                      className="flex-1 h-[2px] rounded-full transition-all duration-500"
+                      style={{
+                        background: i === clinicalCurrent
+                          ? "linear-gradient(90deg, hsl(38 100% 55%), hsl(30 80% 45%))"
+                          : "rgba(255,255,255,0.1)",
+                      }}
+                    />
                   ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Hands-On */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mt-20 mb-10 max-w-3xl mx-auto"
+        >
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
+            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">Hands-On</span>
+            <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
+          </div>
+          <h3 className="text-2xl sm:text-3xl font-normal leading-[1.2] text-foreground mb-3">
+            Treino prático no terreno real
+          </h3>
+          <p className="text-foreground/30 text-base font-light">Imersões práticas com casos reais do Instituto Mont'Alverne.</p>
+        </motion.div>
+
+        <div className="max-w-3xl mx-auto relative">
+          <div className="space-y-2">
+            {handsOn.map((h, i) => {
+              const isOpen = openHandsOn === i;
+              const isExtra = i === handsOn.length - 1;
+              return (
+                <motion.div
+                  key={h.num}
+                  ref={(el) => { handsOnRefs.current[i] = el; }}
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  <button
+                    onClick={() => setOpenHandsOn(isOpen ? null : i)}
+                    className={`w-full rounded-2xl px-5 sm:px-6 py-5 flex items-center gap-4 sm:gap-5 text-left group transition-all duration-300
+                      ${isExtra ? "gradient-card" : "mountain-card"}
+                      ${isOpen ? "border-primary/15" : ""}`}
+                  >
+                    <div className={`altitude-marker ${isExtra ? "!bg-primary/20 !border-primary/40" : ""}`}>
+                      <span className="text-[11px]">{h.num}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/50">
+                          {isExtra ? "Bônus" : "Hands-On"}
+                        </span>
+                      </div>
+                      <h3 className={`font-medium text-[15px] truncate ${isExtra ? "summit-text" : "text-foreground/80"}`}>{h.title}</h3>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-foreground/20 transition-transform duration-300 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 sm:px-6 pb-5 pt-3 ml-0 sm:ml-[68px]">
+                          <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="w-full sm:w-32 h-44 sm:h-40 rounded-xl overflow-hidden flex-shrink-0 border border-foreground/[0.06]">
+                              <img
+                                src={h.img}
+                                alt={h.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <p className="text-foreground/30 text-[14px] leading-relaxed">
+                              {h.desc}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Modelo para Impressão */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-3xl mx-auto mt-14"
+        >
+          <div className="gradient-card">
+            <div className="gradient-card-inner p-6 sm:p-8">
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                      <Printer className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block">Incluso no curso</span>
+                      <h3 className="text-foreground/90 font-medium text-base">Arquivo para Impressão 3D do Modelo</h3>
+                    </div>
+                  </div>
+                  <p className="text-foreground/30 text-sm leading-relaxed sm:ml-[52px]">
+                    Você receberá o arquivo digital para imprimir o mesmo modelo utilizado nas aulas práticas (Hands-On). Treine no seu próprio ritmo, com o mesmo modelo usado pelo Prof. Breno Mont'Alverne.
+                  </p>
+                </div>
+                <div className="w-full sm:w-36 h-28 rounded-xl overflow-hidden border border-foreground/[0.06] flex-shrink-0 relative">
+                  <div
+                    className="flex h-full cursor-grab active:cursor-grabbing touch-pan-x"
+                    style={{ transition: "transform 0.4s ease" }}
+                    onPointerDown={(e) => {
+                      const container = e.currentTarget;
+                      const startX = e.clientX;
+                      const currentTransform = container.style.transform;
+                      const match = currentTransform.match(/translateX\((-?\d+(?:\.\d+)?)%\)/);
+                      const startOffset = match ? parseFloat(match[1]) : 0;
+                      const totalSlides = 3;
+                      container.style.transition = "none";
+                      container.setPointerCapture(e.pointerId);
+
+                      const onMove = (ev: PointerEvent) => {
+                        const dx = ev.clientX - startX;
+                        const pct = (dx / container.parentElement!.clientWidth) * 100;
+                        container.style.transform = `translateX(${startOffset + pct}%)`;
+                      };
+
+                      const onUp = (ev: PointerEvent) => {
+                        container.releasePointerCapture(ev.pointerId);
+                        container.removeEventListener("pointermove", onMove);
+                        container.removeEventListener("pointerup", onUp);
+                        const dx = ev.clientX - startX;
+                        const pct = (dx / container.parentElement!.clientWidth) * 100;
+                        let newSlide = Math.round(-(startOffset + pct) / 100);
+                        newSlide = Math.max(0, Math.min(totalSlides - 1, newSlide));
+                        container.style.transition = "transform 0.4s ease";
+                        container.style.transform = `translateX(${-newSlide * 100}%)`;
+                      };
+
+                      container.addEventListener("pointermove", onMove);
+                      container.addEventListener("pointerup", onUp);
+                    }}
+                  >
+                    {["/images/modelo-handson-1.webp", "/images/modelo-handson-2.webp", "/images/modelo-handson-3.webp"].map((src, i) => (
+                      <img key={i} src={src} alt={`Modelo Hands-On ${i + 1}`} className="w-full h-full object-cover flex-shrink-0 pointer-events-none" loading="lazy" />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
