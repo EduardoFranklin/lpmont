@@ -86,6 +86,25 @@ const ModulesSection = () => {
     return () => observers.forEach((o) => o.disconnect());
   }, []);
 
+  useEffect(() => {
+    const observers: IntersectionObserver[] = [];
+    handsOn.forEach((_, i) => {
+      const el = handsOnRefs.current[i];
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setOpenHandsOn(i);
+          }
+        },
+        { threshold: 0.5 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
+
   return (
     <section id="modulos" className="py-28 sm:py-36 relative">
       <div className="glow-gold" style={{ width: 600, height: 400, top: "10%", left: "-15%", opacity: 0.5 }} />
