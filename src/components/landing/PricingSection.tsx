@@ -10,9 +10,9 @@ const includes = [
 ];
 
 const bonuses = [
-  "Curso completo de Clareamento Dental",
-  "Fotografia Odontológica com Prof. Caio Calisto",
-  "Comunidade Exclusiva de expedicionários",
+  { text: "Curso completo de Clareamento Dental", image: "/images/capa-rayssa.png" },
+  { text: "Fotografia Odontológica com Prof. Caio Calisto", image: "/images/capa-caio.png" },
+  { text: "Comunidade Exclusiva de expedicionários", image: null },
 ];
 
 const PricingSection = () => {
