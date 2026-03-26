@@ -199,7 +199,7 @@ const Agendar = () => {
                 <div>
                   <Label className="text-[12px] text-foreground/60 font-medium mb-1.5 block">Carreira</Label>
                   <div className="flex gap-2">
-                    {CAREERS.map((c) => (
+                    {getCareers(form.treatment).map((c) => (
                       <button
                         key={c.value}
                         type="button"
