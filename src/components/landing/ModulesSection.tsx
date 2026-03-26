@@ -273,6 +273,8 @@ const ModulesSection = () => {
                                 src={mod.img}
                                 alt={mod.title}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
                               />
                             </div>
                             <p className="text-foreground/30 text-[14px] leading-relaxed">
@@ -429,6 +431,8 @@ const ModulesSection = () => {
                                 src={h.img}
                                 alt={h.title}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                decoding="async"
                               />
                             </div>
                             <p className="text-foreground/30 text-[14px] leading-relaxed">

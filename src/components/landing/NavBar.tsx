@@ -43,7 +43,7 @@ const NavBar = () => {
     >
       <div className="section-container flex items-center justify-between h-[72px]">
         <a href="#" className="flex items-center gap-2">
-          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" />
+          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" decoding="async" />
         </a>
 
         <div className="hidden md:flex items-center gap-10">
