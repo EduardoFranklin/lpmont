@@ -91,10 +91,10 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-3xl sm:text-5xl lg:text-[4.25rem] font-bold sm:font-semibold leading-[1.15] text-foreground/95 text-balance mb-4 sm:mb-6"
+            className="text-[2.1rem] sm:text-5xl lg:text-[4.25rem] font-extrabold sm:font-semibold leading-[1.12] text-foreground/95 text-balance mb-4 sm:mb-6"
           >
             Dentista, construa a reputação que{" "}
-            <span className="summit-text font-bold sm:font-medium">
+            <span className="summit-text font-extrabold sm:font-medium">
               lota sua agenda e faz sua clínica crescer.
             </span>
           </motion.h1>
