@@ -189,7 +189,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
                 <TableCell className="hidden lg:table-cell text-muted-foreground text-xs whitespace-nowrap">
                   {format(new Date(lead.created_at), "dd/MM/yyyy 'às' HH'h'mm", { locale: ptBR })}
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-emerald-400" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
                       <MessageCircle className="w-3.5 h-3.5" />
