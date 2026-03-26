@@ -34,6 +34,8 @@ const HeroSection = () => {
       </div>
       {/* Dark overlay to keep text readable */}
       <div className="absolute inset-0 bg-background/50 sm:bg-background/70" />
+      {/* Top fade to match system status bar */}
+      <div className="absolute top-0 left-0 right-0 h-32 sm:h-24 z-[1] bg-gradient-to-b from-background via-background/80 to-transparent" />
       {/* Existing glows on top */}
       <div className="glow-gold" style={{ width: 800, height: 800, top: "-20%", left: "50%", transform: "translateX(-50%)" }} />
       <div className="glow-gold" style={{ width: 500, height: 500, bottom: "0", right: "-10%", opacity: 0.5 }} />
