@@ -9,10 +9,21 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
-  Plus, Save, Thermometer, User, FileText, Globe
+  Plus, Save, Thermometer, User, FileText, Globe, CalendarCheck, Timer
 } from "lucide-react";
-import { format } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+const formatElapsed = (dateStr: string) => {
+  const mins = differenceInMinutes(new Date(), new Date(dateStr));
+  if (mins < 60) return `${mins}min`;
+  const hours = Math.floor(mins / 60);
+  const remMins = mins % 60;
+  if (hours < 48) return `${hours}h${remMins > 0 ? String(remMins).padStart(2, "0") + "m" : ""}`;
+  const days = Math.floor(hours / 24);
+  const remHours = hours % 24;
+  return `${days}d ${remHours}h`;
+};
 import type { Database } from "@/integrations/supabase/types";
 
 type LeadStatus = Database["public"]["Enums"]["lead_status"];
@@ -135,8 +146,14 @@ const LeadDetail = () => {
             </span>
             <Badge variant="outline" className={statusOpt?.color}>{statusOpt?.label}</Badge>
             <Badge variant="outline" className={tempOpt?.color}>{tempOpt?.label}</Badge>
+            {lead.scheduled_day && lead.scheduled_time && (
+              <CalendarCheck className="w-4 h-4 text-amber-400 flex-shrink-0" />
+            )}
+            <span className="text-xs text-muted-foreground flex items-center gap-1 flex-shrink-0">
+              <Timer className="w-3 h-3" /> há {formatElapsed(lead.updated_at)}
+            </span>
           </div>
-          <Button variant="ghost" size="icon" className="text-emerald-400" onClick={() => openWhatsApp(lead.phone)} title="WhatsApp">
+          <Button variant="ghost" size="icon" className="text-emerald-400" onClick={() => openWhatsApp(lead.phone)}>
             <MessageCircle className="w-4 h-4" />
           </Button>
         </div>
