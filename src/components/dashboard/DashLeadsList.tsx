@@ -7,10 +7,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Trash2, Edit2, RefreshCw, MessageCircle, Plus } from "lucide-react";
+import { Search, Trash2, Edit2, RefreshCw, MessageCircle, Plus, CalendarCheck } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
-import { format } from "date-fns";
+import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+const formatElapsed = (dateStr: string) => {
+  const mins = differenceInMinutes(new Date(), new Date(dateStr));
+  if (mins < 60) return `${mins}min`;
+  const hours = Math.floor(mins / 60);
+  const remMins = mins % 60;
+  if (hours < 48) return `${hours}h${remMins > 0 ? String(remMins).padStart(2, "0") + "m" : ""}`;
+  const days = Math.floor(hours / 24);
+  return `${days}d`;
+};
 
 type LeadStatus = Database["public"]["Enums"]["lead_status"];
 
@@ -244,7 +254,8 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+              );
+            })}
             {filtered.length === 0 && (
               <TableRow>
                 <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
