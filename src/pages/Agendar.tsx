@@ -382,7 +382,7 @@ const Agendar = () => {
                         return (
                           <button
                             key={`${day.day}-${time}`}
-                            onClick={() => !isUnavailable && setSelectedSlot({ day: day.day, time })}
+                            onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, time })}
                             disabled={isUnavailable}
                             className={`py-2.5 rounded-lg text-[13px] font-medium border transition-all duration-200 ${
                               isUnavailable
