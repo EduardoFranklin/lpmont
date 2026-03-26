@@ -5,7 +5,14 @@ import { ArrowRight, Play, Users, BookOpen, Radio } from "lucide-react";
 const HeroSection = () => {
   const [playing, setPlaying] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [activeToggle, setActiveToggle] = useState(1);
   const sectionRef = useRef<HTMLElement>(null);
+
+  const toggles = [
+    { id: 0, label: "Comunidade", icon: Users },
+    { id: 1, label: "Cursos", icon: BookOpen },
+    { id: 2, label: "Mentoria ao Vivo", icon: Radio },
+  ];
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
