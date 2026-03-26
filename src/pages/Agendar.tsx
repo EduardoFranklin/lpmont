@@ -536,14 +536,32 @@ const Agendar = () => {
               <p className="text-[14px] text-foreground/40 leading-relaxed max-w-xs mb-2">
                 {form.treatment} {form.name}, sua reunião está marcada para:
               </p>
-              <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-6 py-4 mb-6">
+              <div className="rounded-xl border border-primary/15 bg-primary/[0.04] px-6 py-4 mb-4">
                 <p className="text-base font-semibold text-foreground/70">
-                  {selectedSlot?.day} · {selectedSlot?.time}
+                  {selectedSlot?.day} · {selectedSlot?.date} · {selectedSlot?.time}
                 </p>
                 <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
               </div>
 
-              <p className="text-[13px] text-foreground/35 mb-6 max-w-xs">
+              {/* Google Calendar button */}
+              {selectedSlot && (
+                <a
+                  href={buildGoogleCalendarUrl(
+                    `Reunião Método Mont' - ${form.treatment} ${form.name}`,
+                    `Reunião online de 30 min com a equipe do Método Mont'.\n\nParticipantes:\n- ${form.treatment} ${form.name} (${form.email})\n- Equipe Método Mont' (${ADMIN_EMAIL})`,
+                    selectedSlot.date,
+                    selectedSlot.time,
+                    form.email
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full rounded-lg border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm font-medium text-foreground/60 hover:bg-foreground/[0.06] hover:text-foreground/80 transition-all mb-4"
+                >
+                  <Calendar className="w-4 h-4" /> Adicionar ao Google Calendar
+                </a>
+              )}
+
+              <p className="text-[13px] text-foreground/35 mb-4 max-w-xs">
                 Enquanto isso, entre no nosso grupo do WhatsApp para receber lembretes e conteúdos exclusivos.
               </p>
 
