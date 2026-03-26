@@ -26,7 +26,7 @@ const InstructorSection = () => {
               <div className="absolute -inset-10 rounded-full bg-primary/5 blur-[80px]" />
               <div className="gradient-card rounded-3xl overflow-hidden">
                 <img
-                  src="/images/foto-breno.png"
+                  src="/images/thumbs/breno-thumb.webp"
                   alt="Prof. Breno Montalverne"
                   className="relative w-full max-w-sm"
                   loading="lazy"
