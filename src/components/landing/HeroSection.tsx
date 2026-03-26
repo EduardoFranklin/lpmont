@@ -111,6 +111,25 @@ const HeroSection = () => {
             Tudo começa com o método.
           </motion.p>
 
+          {/* Author badge */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.55 }}
+            className="flex items-center justify-center gap-3 mb-10"
+          >
+            <img
+              src="/images/thumbs/breno-thumb.webp"
+              alt="Dr. Breno Mont'Alverne"
+              className="w-10 h-10 rounded-full object-cover border border-foreground/[0.08]"
+              decoding="async"
+            />
+            <div className="text-left">
+              <p className="text-[13px] font-medium text-foreground/60">Dr. Breno Mont'Alverne</p>
+              <p className="text-[11px] text-foreground/25">Fundador do Instituto Mont'Alverne</p>
+            </div>
+          </motion.div>
+
           {/* CTA */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
