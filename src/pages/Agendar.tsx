@@ -289,9 +289,11 @@ const Agendar = () => {
 
       <div className="flex-1 section-container py-5 pb-4 max-w-lg mx-auto w-full">
         {/* Progress */}
-        <div className="mb-4">
-          <Progress value={progress} className="h-1.5 bg-foreground/[0.06]" />
-        </div>
+        {step < 3 && (
+          <div className="mb-4">
+            <Progress value={progress} className="h-1.5 bg-foreground/[0.06]" />
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           {/* ===== STEP 1: FORM ===== */}
@@ -546,22 +548,23 @@ const Agendar = () => {
                 <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
               </div>
 
-              {/* Google Calendar button */}
+              {/* Google Calendar button - opens in modal popup */}
               {selectedSlot && (
-                <a
-                  href={buildGoogleCalendarUrl(
-                    `Reunião Método Mont' - ${form.treatment} ${form.name}`,
-                    `Reunião online de 30 min com a equipe do Método Mont'.\n\nParticipantes:\n- ${form.treatment} ${form.name} (${form.email})\n- Equipe Método Mont' (${ADMIN_EMAIL})`,
-                    selectedSlot.date,
-                    selectedSlot.time,
-                    form.email
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => {
+                    const url = buildGoogleCalendarUrl(
+                      `Reunião Método Mont' - ${form.treatment} ${form.name}`,
+                      `Reunião online de 30 min com a equipe do Método Mont'.\n\nParticipantes:\n- ${form.treatment} ${form.name} (${form.email})\n- Equipe Método Mont' (${ADMIN_EMAIL})`,
+                      selectedSlot.date,
+                      selectedSlot.time,
+                      form.email
+                    );
+                    window.open(url, "gcal_popup", "width=700,height=600,scrollbars=yes,resizable=yes");
+                  }}
                   className="btn-summit w-full justify-center text-sm py-3.5 gap-2"
                 >
                   <Calendar className="w-5 h-5" /> Adicionar ao Google Calendar
-                </a>
+                </button>
               )}
 
               <a href="/" className="text-[13px] text-foreground/30 hover:text-foreground/50 transition-colors mt-4">
