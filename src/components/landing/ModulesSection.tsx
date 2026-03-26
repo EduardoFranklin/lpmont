@@ -30,11 +30,11 @@ const camps = [
 ];
 
 const handsOn = [
-  "Anatomização de Pino + Provisório Direto",
-  "Classe IV — Concha Palatina e Estratificação",
-  "Faceta Clareada — Estratificação Completa",
-  "Morfologia Oclusal — 5 Pilares",
-  "Reconstrução Anterior com Guia de Enceramento",
+  { num: "H1", title: "Dente Extensamente Destruído Anterior", desc: "Reconstrução coronária com técnica direta — do pino à estratificação final.", img: "/images/handson-cover-1.webp" },
+  { num: "H2", title: "Facetas Clareadas", desc: "Estratificação completa de facetas em resina sobre dentes clareados.", img: "/images/handson-cover-2.webp" },
+  { num: "H3", title: "Restaurações de Dentes Anteriores", desc: "Técnica restauradora para dentes anteriores com naturalidade e previsibilidade.", img: "/images/handson-cover-3.webp" },
+  { num: "H4", title: "Caso Clínico: De Canino a Canino", desc: "Reabilitação anterior completa — planejamento, enceramento e execução.", img: "/images/handson-cover-4.webp" },
+  { num: "H5", title: "Clareamento Dental — Curso Extra", desc: "Módulo bônus com Dra. Rayssa Cavaleiro sobre clareamento dental.", img: "/images/handson-cover-5.webp" },
 ];
 
 const phaseColors: Record<string, string> = {
