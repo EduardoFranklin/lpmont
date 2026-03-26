@@ -279,14 +279,17 @@ const Agendar = () => {
                 </div>
               </div>
 
-              {/* CTA */}
+              {/* CTA - inline on desktop */}
               <button
                 onClick={goToStep2}
                 disabled={!isStep1Valid}
-                className="btn-summit w-full justify-center text-sm py-3.5 mt-5 disabled:opacity-40 disabled:pointer-events-none"
+                className="btn-summit w-full justify-center text-sm py-3.5 mt-5 disabled:opacity-40 disabled:pointer-events-none hidden sm:inline-flex"
               >
                 Escolher Horário <ArrowRight className="w-4 h-4" />
               </button>
+
+              {/* Spacer for floating button on mobile */}
+              <div className="h-20 sm:hidden" />
             </motion.div>
           )}
 
