@@ -129,6 +129,7 @@ const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => 
 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const clinicalTouchStart = useRef(0);
   const [openHandsOn, setOpenHandsOn] = useState<number | null>(0);
   const [synopsisModule, setSynopsisModule] = useState<number | null>(null);
   const handsOnRefs = useRef<(HTMLDivElement | null)[]>([]);
