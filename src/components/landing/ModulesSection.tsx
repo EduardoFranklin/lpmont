@@ -35,7 +35,7 @@ const phaseColors: Record<string, string> = {
 };
 
 const ModulesSection = () => {
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
     <section id="modulos" className="py-28 sm:py-36 relative">
