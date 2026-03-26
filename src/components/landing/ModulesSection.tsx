@@ -47,6 +47,8 @@ const phaseColors: Record<string, string> = {
 
 const ModulesSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const [openHandsOn, setOpenHandsOn] = useState<number | null>(0);
+  const handsOnRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [clinicalCurrent, setClinicalCurrent] = useState(0);
   const [clinicalAutoPlay, setClinicalAutoPlay] = useState(true);
 
@@ -256,32 +258,83 @@ const ModulesSection = () => {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto mt-14"
+          className="text-center mt-20 mb-10 max-w-3xl mx-auto"
         >
-          <div className="gradient-card">
-            <div className="gradient-card-inner p-8 sm:p-10">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="faq-icon">
-                  <div className="faq-icon-inner">
-                    <span className="text-lg">🧗</span>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-xl font-medium text-foreground">Hands-On no Terreno Real</h3>
-                  <p className="text-sm text-foreground/30 mt-0.5">Treino prático com casos do Instituto</p>
-                </div>
-              </div>
-              <div className="space-y-2.5">
-                {handsOn.map((h, i) => (
-                  <div key={i} className="flex items-center gap-4 py-3.5 px-4 rounded-xl bg-foreground/[0.02] border border-foreground/[0.04]">
-                    <span className="altitude-marker w-8 h-8 text-[10px]">{i + 1}</span>
-                    <p className="text-foreground/50 text-[14px]">{h}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
+            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">Hands-On</span>
+            <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
+          <h3 className="text-2xl sm:text-3xl font-normal leading-[1.2] text-foreground mb-3">
+            Treino prático no terreno real
+          </h3>
+          <p className="text-foreground/30 text-base font-light">Imersões práticas com casos reais do Instituto Mont'Alverne.</p>
         </motion.div>
+
+        <div className="max-w-3xl mx-auto relative">
+          <div className="space-y-2">
+            {handsOn.map((h, i) => {
+              const isOpen = openHandsOn === i;
+              const isExtra = i === handsOn.length - 1;
+              return (
+                <motion.div
+                  key={h.num}
+                  ref={(el) => { handsOnRefs.current[i] = el; }}
+                  initial={{ opacity: 0, x: -12 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  <button
+                    onClick={() => setOpenHandsOn(isOpen ? null : i)}
+                    className={`w-full rounded-2xl px-5 sm:px-6 py-5 flex items-center gap-4 sm:gap-5 text-left group transition-all duration-300
+                      ${isExtra ? "gradient-card" : "mountain-card"}
+                      ${isOpen ? "border-primary/15" : ""}`}
+                  >
+                    <div className={`altitude-marker ${isExtra ? "!bg-primary/20 !border-primary/40" : ""}`}>
+                      <span className="text-[11px]">{h.num}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/50">
+                          {isExtra ? "Bônus" : "Hands-On"}
+                        </span>
+                      </div>
+                      <h3 className={`font-medium text-[15px] truncate ${isExtra ? "summit-text" : "text-foreground/80"}`}>{h.title}</h3>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-foreground/20 transition-transform duration-300 flex-shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 sm:px-6 pb-5 pt-3 ml-0 sm:ml-[68px]">
+                          <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="w-full sm:w-32 h-44 sm:h-40 rounded-xl overflow-hidden flex-shrink-0 border border-foreground/[0.06]">
+                              <img
+                                src={h.img}
+                                alt={h.title}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <p className="text-foreground/30 text-[14px] leading-relaxed">
+                              {h.desc}
+                            </p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   );
