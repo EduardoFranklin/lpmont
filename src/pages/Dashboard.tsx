@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
@@ -8,7 +8,9 @@ import { LogOut, BarChart3, List, Columns3 } from "lucide-react";
 import DashReports from "@/components/dashboard/DashReports";
 import DashLeadsList from "@/components/dashboard/DashLeadsList";
 import DashKanban from "@/components/dashboard/DashKanban";
+import DashDateFilter, { type DatePreset, getDateRange } from "@/components/dashboard/DashDateFilter";
 import type { Session } from "@supabase/supabase-js";
+import { startOfDay, endOfDay } from "date-fns";
 
 export type Lead = Tables<"leads">;
 
@@ -16,6 +18,8 @@ const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [datePreset, setDatePreset] = useState<DatePreset>("mes");
+  const [customRange, setCustomRange] = useState<{ from?: Date; to?: Date }>({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,6 +45,16 @@ const Dashboard = () => {
     if (session) fetchLeads();
   }, [session]);
 
+  const filteredLeads = useMemo(() => {
+    const range = getDateRange(datePreset, customRange);
+    const from = startOfDay(range.from);
+    const to = endOfDay(range.to);
+    return leads.filter((lead) => {
+      const created = new Date(lead.created_at);
+      return created >= from && created <= to;
+    });
+  }, [leads, datePreset, customRange]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/dash/login");
@@ -64,6 +78,15 @@ const Dashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <div className="mb-6">
+          <DashDateFilter
+            preset={datePreset}
+            onPresetChange={setDatePreset}
+            customRange={customRange}
+            onCustomRangeChange={setCustomRange}
+          />
+        </div>
+
         <Tabs defaultValue="reports" className="space-y-6">
           <TabsList>
             <TabsTrigger value="reports" className="gap-1.5">
@@ -77,13 +100,13 @@ const Dashboard = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="reports">
-            <DashReports leads={leads} />
+            <DashReports leads={filteredLeads} />
           </TabsContent>
           <TabsContent value="leads">
-            <DashLeadsList leads={leads} onRefresh={fetchLeads} />
+            <DashLeadsList leads={filteredLeads} onRefresh={fetchLeads} />
           </TabsContent>
           <TabsContent value="kanban">
-            <DashKanban leads={leads} onRefresh={fetchLeads} />
+            <DashKanban leads={filteredLeads} onRefresh={fetchLeads} />
           </TabsContent>
         </Tabs>
       </main>
