@@ -94,7 +94,7 @@ const Agendar = () => {
             <motion.div key="step1" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
               {/* Intro text */}
               <div className="mb-5">
-                <h1 className="text-lg font-bold text-foreground/90 leading-snug mb-2">
+                <h1 className="text-[1.4rem] font-extrabold text-foreground/95 leading-[1.2] mb-2">
                   Você está há <span className="summit-text">1 passo</span> de falar com a nossa equipe.
                 </h1>
                 <p className="text-[13px] text-foreground/35 leading-relaxed">
