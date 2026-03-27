@@ -41,7 +41,7 @@ const ProblemSection = () => {
           </h2>
           <p className="text-foreground/30 text-lg leading-relaxed font-light">
             Resina, restauração e gestão exigem consciência, método e visão treinada. A maioria dos dentistas
-            está presa no vale — sem o método certo para construir reputação, lotar a agenda e fazer a clínica crescer.
+            está preso no vale — sem o método certo para construir reputação, lotar a agenda e fazer a clínica crescer.
           </p>
         </motion.div>
 
