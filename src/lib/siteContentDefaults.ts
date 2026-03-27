@@ -45,7 +45,7 @@ const defaults: AllContent = {
   modules: {
     caption: "A trilha completa",
     title_line1: "13 acampamentos",
-    title_line2: "até o cume",
+    title_line2: "até o topo",
     subtitle: "Cada módulo é uma etapa da escalada. Cada Hands-On, um treino no terreno real.",
     camps: JSON.stringify([
       { num: "01", altitude: "1.200m", title: "Início da Expedição", desc: "Boas-vindas e mapeamento da jornada. Entenda cada etapa que vai te levar do chão ao cume da odontologia restauradora.", phase: "Base", img: "/images/thumbs/freepik_1-thumb.webp" },
