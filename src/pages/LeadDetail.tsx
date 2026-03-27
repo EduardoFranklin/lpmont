@@ -54,7 +54,19 @@ const TEMP_BUTTONS = [
 
 const TREATMENT_OPTIONS = ["Dr.", "Dra.", "Sr.", "Sra."];
 const UF_OPTIONS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
-const CAREER_OPTIONS = ["medico","dentista","fisioterapeuta","nutricionista","psicologo","enfermeiro","veterinario","farmaceutico","outro"];
+const CAREER_OPTIONS = [
+  { label: "Dentista", value: "dentista" },
+  { label: "Dono(a) de Clínica", value: "dono_clinica" },
+  { label: "Estudante", value: "estudante" },
+  { label: "Médico(a)", value: "medico" },
+  { label: "Fisioterapeuta", value: "fisioterapeuta" },
+  { label: "Nutricionista", value: "nutricionista" },
+  { label: "Psicólogo(a)", value: "psicologo" },
+  { label: "Enfermeiro(a)", value: "enfermeiro" },
+  { label: "Veterinário(a)", value: "veterinario" },
+  { label: "Farmacêutico(a)", value: "farmaceutico" },
+  { label: "Outro", value: "outro" },
+];
 
 const LeadDetail = () => {
   const { id } = useParams<{ id: string }>();
