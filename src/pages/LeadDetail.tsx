@@ -66,9 +66,9 @@ const LeadDetail = () => {
   const [editStatus, setEditStatus] = useState<LeadStatus>("novo");
   const [editTemp, setEditTemp] = useState<LeadTemperature>("frio");
   const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  // Editable fields
-  const [editing, setEditing] = useState(false);
+  // Editable fields — always editable
   const [editFields, setEditFields] = useState({
     treatment: "", name: "", phone: "", email: "", city: "", uf: "", career: "",
     scheduled_day: "", scheduled_time: "", notes: "",
