@@ -79,6 +79,38 @@ export type Database = {
           },
         ]
       }
+      lead_tags: {
+        Row: {
+          created_at: string
+          id: string
+          lead_id: string
+          source: string
+          tag: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lead_id: string
+          source?: string
+          tag: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lead_id?: string
+          source?: string
+          tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_tags_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           career: string
@@ -90,6 +122,7 @@ export type Database = {
           name: string
           notes: string | null
           phone: string
+          revenue: number | null
           scheduled_day: string | null
           scheduled_time: string | null
           status: Database["public"]["Enums"]["lead_status"]
@@ -113,6 +146,7 @@ export type Database = {
           name: string
           notes?: string | null
           phone: string
+          revenue?: number | null
           scheduled_day?: string | null
           scheduled_time?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
@@ -136,6 +170,7 @@ export type Database = {
           name?: string
           notes?: string | null
           phone?: string
+          revenue?: number | null
           scheduled_day?: string | null
           scheduled_time?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
