@@ -265,19 +265,13 @@ const LeadDetail = () => {
               <CardTitle className="text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> Agendamento & Datas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {editing ? (
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
                 <div className="flex gap-2">
-                  <Input value={editFields.scheduled_day} onChange={e => setEditFields(f => ({...f, scheduled_day: e.target.value}))} placeholder="Dia (ex: segunda)" className="flex-1 h-9" />
-                  <Input value={editFields.scheduled_time} onChange={e => setEditFields(f => ({...f, scheduled_time: e.target.value}))} placeholder="Horário" className="w-28 h-9" />
+                  <Input value={editFields.scheduled_day} onChange={e => { setEditFields(f => ({...f, scheduled_day: e.target.value})); setHasChanges(true); }} placeholder="Dia (ex: Segunda)" className="flex-1 h-9" />
+                  <Input value={editFields.scheduled_time} onChange={e => { setEditFields(f => ({...f, scheduled_time: e.target.value})); setHasChanges(true); }} placeholder="Horário" className="w-32 h-9" />
                 </div>
-              ) : (
-                lead.scheduled_day && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{lead.scheduled_day} — {lead.scheduled_time}</span>
-                  </div>
-                )
-              )}
+              </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Clock className="w-3.5 h-3.5" />
                 <span>Criado em {format(new Date(lead.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
