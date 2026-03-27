@@ -4,6 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronDown, ChevronLeft, ChevronRight, Printer, BookOpen } from "lucide-react";
 import SynopsisModal from "./SynopsisModal";
+import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
 const clinicalImages = [
   { src: "/images/thumbs/clinicas-1-thumb.webp", caption: "Classe I — Visão oclusal isolada" },
@@ -125,6 +126,9 @@ const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => 
 
 
 const ModulesSection = () => {
+  const sc = useSection("modules");
+  const camps = parseJSON<{ num: string; altitude: string; title: string; desc: string; phase: string; img: string }[]>(sc.camps, []);
+  const handsOn = parseJSON<{ num: string; title: string; desc: string; img: string }[]>(sc.hands_on, []);
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const clinicalTouchStart = useRef(0);
   const [openHandsOn, setOpenHandsOn] = useState<number | null>(0);
@@ -214,15 +218,15 @@ const ModulesSection = () => {
         >
           <div className="flex items-center justify-center gap-3 mb-6">
             <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
-            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">A trilha completa</span>
+            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">{sc.caption}</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
           <h2 className="text-[2.1rem] sm:text-4xl lg:text-[3.25rem] font-extrabold sm:font-semibold leading-[1.12] sm:leading-[1.2] text-foreground mb-5">
-            <span className="block sm:inline">13 acampamentos</span>{" "}
-            <span className="block sm:inline">até o cume</span>
+            <span className="block sm:inline">{sc.title_line1}</span>{" "}
+            <span className="block sm:inline">{sc.title_line2}</span>
           </h2>
           <p className="text-foreground/30 text-lg font-light">
-            Cada módulo é uma etapa da escalada. Cada Hands-On, um treino no terreno real.
+            {sc.subtitle}
           </p>
         </motion.div>
 

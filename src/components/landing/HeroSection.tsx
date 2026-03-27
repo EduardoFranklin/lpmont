@@ -1,22 +1,23 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Users, BookOpen, Radio } from "lucide-react";
+import { useSection, parseJSON } from "@/hooks/useSiteContent";
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = { Users, BookOpen, Radio };
 
 const HeroSection = () => {
+  const c = useSection("hero");
   const [playing, setPlaying] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+
+  const toggles = parseJSON<{ label: string; icon: string }[]>(c.toggles, []);
+  const reassurance = parseJSON<string[]>(c.reassurance, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setPlaying(true), 3000);
     return () => clearTimeout(timer);
   }, []);
-  const [scrollY, setScrollY] = useState(0);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const toggles = [
-    { label: "Comunidade", icon: Users },
-    { label: "Cursos", icon: BookOpen },
-    { label: "Mentoria ao Vivo", icon: Radio },
-  ];
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -26,26 +27,14 @@ const HeroSection = () => {
 
   return (
     <section ref={sectionRef} className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-      {/* Background mountain image with parallax */}
       <div className="absolute inset-0">
-        <img
-          src="/images/thumbs/bg-montanha-thumb.webp"
-          alt=""
-          className="w-full h-full object-cover will-change-transform"
-          decoding="async"
-          fetchPriority="high"
-          style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.1)` }}
-        />
+        <img src="/images/thumbs/bg-montanha-thumb.webp" alt="" className="w-full h-full object-cover will-change-transform" decoding="async" fetchPriority="high" style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.1)` }} />
       </div>
-      {/* Dark overlay to keep text readable */}
       <div className="absolute inset-0 bg-background/50 sm:bg-background/70" />
-      {/* Top fade to match system status bar */}
       <div className="absolute top-0 left-0 right-0 h-32 sm:h-24 z-[1] bg-gradient-to-b from-background via-background/80 to-transparent" />
-      {/* Existing glows on top */}
       <div className="glow-gold" style={{ width: 800, height: 800, top: "-20%", left: "50%", transform: "translateX(-50%)" }} />
       <div className="glow-gold" style={{ width: 500, height: 500, bottom: "0", right: "-10%", opacity: 0.5 }} />
 
-      {/* Circular rotating SVG decoration */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] opacity-[0.04] animate-spin-slow pointer-events-none">
         <svg viewBox="0 0 700 700" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="350" cy="350" r="340" stroke="currentColor" strokeWidth="0.5" className="text-foreground" />
@@ -56,22 +45,11 @@ const HeroSection = () => {
 
       <div className="section-container relative z-10 pt-24 pb-20 lg:pt-40 lg:pb-24">
         <div className="max-w-4xl mx-auto text-center">
-
-
-          {/* Info pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             {toggles.map((t, i) => {
-              const Icon = t.icon;
+              const Icon = iconMap[t.icon] || BookOpen;
               return (
-                <div
-                  key={i}
-                  className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 px-4 sm:px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium text-foreground/45 bg-foreground/[0.06] border border-foreground/[0.10] min-h-[48px] sm:min-h-0 justify-center"
-                >
+                <div key={i} className="flex flex-col sm:flex-row items-center gap-1 sm:gap-1.5 px-4 sm:px-4 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-[10px] sm:text-[12px] tracking-wide uppercase font-medium text-foreground/45 bg-foreground/[0.06] border border-foreground/[0.10] min-h-[48px] sm:min-h-0 justify-center">
                   <Icon className="w-3.5 h-3.5 shrink-0" />
                   <span className="text-center leading-tight whitespace-nowrap">{t.label}</span>
                 </div>
@@ -79,128 +57,65 @@ const HeroSection = () => {
             })}
           </motion.div>
 
-          {/* Caption line + tag */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="flex items-center justify-center gap-3 mb-5 sm:mb-10"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="flex items-center justify-center gap-3 mb-5 sm:mb-10">
             <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
-            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-foreground/40">
-              Treinamento Online
-            </span>
+            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-foreground/40">{c.caption}</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </motion.div>
 
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-[2.1rem] sm:text-5xl lg:text-[4.25rem] font-extrabold sm:font-semibold leading-[1.12] text-foreground/95 text-balance mb-4 sm:mb-6"
-          >
-            Dentista, construa a reputação que{" "}
-            <span className="summit-text font-extrabold sm:font-medium">
-              faz lotar sua agenda e a clínica crescer.
-            </span>
+          <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} className="text-[2.1rem] sm:text-5xl lg:text-[4.25rem] font-extrabold sm:font-semibold leading-[1.12] text-foreground/95 text-balance mb-4 sm:mb-6">
+            {c.headline}{" "}
+            <span className="summit-text font-extrabold sm:font-medium">{c.headline_highlight}</span>
           </motion.h1>
 
-          {/* Subheadline - updated */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-base sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-5 sm:mb-10"
-          >
-            Reputação gera indicação e lota a agenda.
-            Agenda cheia constrói clínica e ergue instituto. Tudo nasce no método.
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-base sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-5 sm:mb-10">
+            {c.subheadline}
           </motion.p>
 
-          {/* Author badge */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.55 }}
-            className="flex items-center justify-center gap-3 mb-5 sm:mb-10"
-          >
-            <img
-              src="/images/foto-breno.png"
-              alt="Dr. Breno Mont'Alverne"
-              className="w-14 h-14 sm:w-11 sm:h-11 rounded-full object-cover border border-foreground/[0.08]"
-              decoding="async"
-            />
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }} className="flex items-center justify-center gap-3 mb-5 sm:mb-10">
+            <img src="/images/foto-breno.png" alt={c.author_name} className="w-14 h-14 sm:w-11 sm:h-11 rounded-full object-cover border border-foreground/[0.08]" decoding="async" />
             <div className="text-left">
-              <p className="text-[13px] font-medium text-foreground/60">Dr. Breno Mont'Alverne</p>
-              <p className="text-[11px] text-foreground/25">Fundador do Instituto Mont'Alverne</p>
+              <p className="text-[13px] font-medium text-foreground/60">{c.author_name}</p>
+              <p className="text-[11px] text-foreground/25">{c.author_role}</p>
             </div>
           </motion.div>
 
-          {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 sm:mb-12"
-          >
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 sm:mb-12">
             <a href="/agendar" className="btn-gradient w-full sm:w-auto active:scale-[0.97] transition-transform">
               <div className="btn-gradient-wrapper w-full sm:w-auto">
                 <div className="btn-gradient-inner w-full sm:w-auto">
                   <div className="btn-gradient-bg" />
                   <span className="btn-gradient-text text-base px-2 justify-center w-full sm:w-auto">
-                    Falar com a Equipe <ArrowRight className="w-4 h-4" />
+                    {c.cta_primary} <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
               </div>
             </a>
-            <a href="#modulos" className="btn-secondary hidden sm:inline-flex">
-              Ver a trilha completa
-            </a>
+            <a href="#modulos" className="btn-secondary hidden sm:inline-flex">{c.cta_secondary}</a>
           </motion.div>
 
-          {/* VSL Video Player */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8, duration: 0.8 }}
-            className="max-w-3xl mx-auto mb-12"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8, duration: 0.8 }} className="max-w-3xl mx-auto mb-12">
             <div className="gradient-card">
               <div className="gradient-card-inner overflow-hidden">
                 <div className="relative aspect-video bg-background">
                   {!playing ? (
-                    <button
-                      onClick={() => setPlaying(true)}
-                      className="absolute inset-0 flex items-center justify-center group cursor-pointer"
-                    >
+                    <button onClick={() => setPlaying(true)} className="absolute inset-0 flex items-center justify-center group cursor-pointer">
                       <div className="absolute inset-0">
-                        <img
-                          src="/images/thumbs/hero-mountain-thumb.webp"
-                          alt=""
-                          className="w-full h-full object-cover opacity-40"
-                          loading="lazy"
-                          decoding="async"
-                        />
+                        <img src="/images/thumbs/hero-mountain-thumb.webp" alt="" className="w-full h-full object-cover opacity-40" loading="lazy" decoding="async" />
                         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
                       </div>
                       <div className="relative z-10 flex flex-col items-center gap-4">
-                        <div className="w-20 h-20 rounded-full flex items-center justify-center border-2 border-foreground/10 group-hover:border-primary/40 transition-all duration-500 group-hover:scale-110"
-                          style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))" }}
-                        >
+                        <div className="w-20 h-20 rounded-full flex items-center justify-center border-2 border-foreground/10 group-hover:border-primary/40 transition-all duration-500 group-hover:scale-110" style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))" }}>
                           <Play className="w-8 h-8 text-primary fill-primary ml-1" />
                         </div>
-                        <span className="text-[13px] text-foreground/30 font-medium tracking-wide uppercase">
-                          Assistir apresentação
-                        </span>
+                        <span className="text-[13px] text-foreground/30 font-medium tracking-wide uppercase">{c.video_cta}</span>
                       </div>
-                      <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground/30 bg-foreground/[0.05] border border-foreground/[0.06]">
-                        12:34
-                      </div>
+                      <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground/30 bg-foreground/[0.05] border border-foreground/[0.06]">{c.video_duration}</div>
                     </button>
                   ) : (
                     <iframe
                       id="panda-d49c541c-010d-4a28-bdf6-80a535639867"
-                      src="https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=d49c541c-010d-4a28-bdf6-80a535639867&playOpensFullscreenNative=true"
+                      src={c.video_url}
                       title="VSL - Método Mont'"
                       className="w-full h-full"
                       style={{ border: "none" }}
@@ -215,30 +130,16 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* Reassurance items */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-            className="flex flex-wrap items-center justify-center gap-6 text-[13px] text-foreground/30"
-          >
-            <div className="flex items-center gap-2">
-              <span className="caption-dot-green" />
-              <span>+2.000 dentistas formados</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="caption-dot-green" />
-              <span>Garantia de 15 dias</span>
-            </div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="flex flex-wrap items-center justify-center gap-6 text-[13px] text-foreground/30">
+            {reassurance.map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="caption-dot-green" />
+                <span>{item}</span>
+              </div>
+            ))}
           </motion.div>
 
-          {/* Vertical caption line */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-            className="flex flex-col items-center mt-16"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="flex flex-col items-center mt-16">
             <div className="caption-line-v h-16"><div className="caption-line-v-inner" /></div>
             <div className="caption-dot" />
           </motion.div>
