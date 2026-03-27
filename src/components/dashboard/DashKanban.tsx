@@ -87,7 +87,10 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
                   >
                     <CardContent className="p-3 space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium leading-tight truncate">{lead.treatment} {lead.name}</p>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-[10px] font-mono text-muted-foreground flex-shrink-0">#{(lead as any).lead_number || '—'}</span>
+                          <p className="text-sm font-medium leading-tight truncate">{lead.treatment} {lead.name}</p>
+                        </div>
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${TEMP_COLORS[temp]}`} title={temp} />
                       </div>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
