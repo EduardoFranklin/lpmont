@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Save, RotateCcw, Check, Loader2, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import ImageUploader from "./ImageUploader";
 
 type ContentMap = Record<string, Record<string, string>>;
 
@@ -17,6 +18,15 @@ const sectionOrder = ["hero", "problem", "modules", "method", "instructor", "ben
 function isJsonField(key: string, value: string): boolean {
   const jsonKeys = ["toggles", "reassurance", "obstacles", "camps", "hands_on", "items", "bio", "stats", "includes", "bonuses", "theory_tags", "practice_tags", "instagram_links"];
   return jsonKeys.includes(key) || (value.startsWith("[") && value.endsWith("]"));
+}
+
+// Detect if a field is an image URL field
+function isImageField(key: string, value: string): boolean {
+  const imageKeys = ["img", "avatar", "image", "logo", "photo", "cover", "thumbnail", "banner"];
+  if (imageKeys.some(ik => key.toLowerCase().includes(ik))) return true;
+  if (value && value.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i)) return true;
+  if (key === "video_url") return false;
+  return false;
 }
 
 // JSON array editor for simple string arrays
@@ -95,7 +105,9 @@ function ObjectArrayEditor({ value, onChange }: { value: string; onChange: (v: s
           {keys.map(k => (
             <div key={k}>
               <label className="text-[11px] text-muted-foreground uppercase tracking-wider">{k}</label>
-              {(item[k] || "").length > 80 ? (
+              {isImageField(k, item[k] || "") ? (
+                <ImageUploader value={item[k] || ""} onChange={(v) => update(i, k, v)} />
+              ) : (item[k] || "").length > 80 ? (
                 <Textarea value={item[k] || ""} onChange={(e) => update(i, k, e.target.value)} rows={3} className="text-sm" />
               ) : (
                 <Input value={item[k] || ""} onChange={(e) => update(i, k, e.target.value)} className="text-sm" />
@@ -256,6 +268,8 @@ const DashContent = () => {
                         </div>
                         {isJson ? (
                           <JsonFieldEditor fieldKey={key} value={value} onChange={(v) => updateField(section, key, v)} />
+                        ) : isImageField(key, value) ? (
+                          <ImageUploader value={value} onChange={(v) => updateField(section, key, v)} />
                         ) : value.includes("\n") || value.length > 100 ? (
                           <Textarea
                             value={value}
