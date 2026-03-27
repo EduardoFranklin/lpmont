@@ -10,6 +10,7 @@ import DashLogin from "./pages/DashLogin.tsx";
 import LeadDetail from "./pages/LeadDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
+/* force-publish-v2 */
 const queryClient = new QueryClient();
 
 const App = () => (
