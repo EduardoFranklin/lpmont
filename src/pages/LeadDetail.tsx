@@ -306,7 +306,7 @@ const LeadDetail = () => {
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Status</label>
               <select
                 value={editStatus}
-                onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
+                onChange={(e) => { setEditStatus(e.target.value as LeadStatus); setHasChanges(true); }}
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
                 {STATUS_OPTIONS.map((s) => (
@@ -324,7 +324,7 @@ const LeadDetail = () => {
                     variant="outline"
                     size="sm"
                     className={`flex-1 gap-1.5 ${editTemp === t.value ? t.activeClass : "text-muted-foreground"}`}
-                    onClick={() => setEditTemp(t.value)}
+                    onClick={() => { setEditTemp(t.value); setHasChanges(true); }}
                   >
                     <t.icon className="w-3.5 h-3.5" />
                     {t.label}
