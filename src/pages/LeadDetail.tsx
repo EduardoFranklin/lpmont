@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
-  Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap, Pencil, X
+  Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap
 } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -54,7 +54,19 @@ const TEMP_BUTTONS = [
 
 const TREATMENT_OPTIONS = ["Dr.", "Dra.", "Sr.", "Sra."];
 const UF_OPTIONS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
-const CAREER_OPTIONS = ["medico","dentista","fisioterapeuta","nutricionista","psicologo","enfermeiro","veterinario","farmaceutico","outro"];
+const CAREER_OPTIONS = [
+  { label: "Dentista", value: "dentista" },
+  { label: "Dono(a) de Clínica", value: "dono_clinica" },
+  { label: "Estudante", value: "estudante" },
+  { label: "Médico(a)", value: "medico" },
+  { label: "Fisioterapeuta", value: "fisioterapeuta" },
+  { label: "Nutricionista", value: "nutricionista" },
+  { label: "Psicólogo(a)", value: "psicologo" },
+  { label: "Enfermeiro(a)", value: "enfermeiro" },
+  { label: "Veterinário(a)", value: "veterinario" },
+  { label: "Farmacêutico(a)", value: "farmaceutico" },
+  { label: "Outro", value: "outro" },
+];
 
 const LeadDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -66,9 +78,9 @@ const LeadDetail = () => {
   const [editStatus, setEditStatus] = useState<LeadStatus>("novo");
   const [editTemp, setEditTemp] = useState<LeadTemperature>("frio");
   const [saving, setSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
 
-  // Editable fields
-  const [editing, setEditing] = useState(false);
+  // Editable fields — always editable
   const [editFields, setEditFields] = useState({
     treatment: "", name: "", phone: "", email: "", city: "", uf: "", career: "",
     scheduled_day: "", scheduled_time: "", notes: "",
@@ -135,8 +147,8 @@ const LeadDetail = () => {
       notes: editFields.notes || null,
     }).eq("id", lead.id);
     await fetchLead();
+    setHasChanges(false);
     setSaving(false);
-    setEditing(false);
   };
 
   const handleAddNote = async () => {
@@ -189,9 +201,6 @@ const LeadDetail = () => {
               <Timer className="w-3 h-3" /> há {formatElapsed(lead.updated_at)}
             </span>
           </div>
-          <Button variant="ghost" size="icon" onClick={() => setEditing(!editing)}>
-            {editing ? <X className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
-          </Button>
           <Button variant="ghost" size="icon" className="text-emerald-400" onClick={() => openWhatsApp(lead.phone)}>
             <MessageCircle className="w-4 h-4" />
           </Button>
@@ -206,35 +215,40 @@ const LeadDetail = () => {
               <CardTitle className="text-sm flex items-center gap-2"><User className="w-4 h-4" /> Dados pessoais</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {editing ? (
-                <div className="space-y-2">
+              <div className="space-y-2">
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tratamento / Nome</label>
                   <div className="flex gap-2">
-                    <select value={editFields.treatment} onChange={e => setEditFields(f => ({...f, treatment: e.target.value}))} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                    <select value={editFields.treatment} onChange={e => { setEditFields(f => ({...f, treatment: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
                       {TREATMENT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
-                    <Input value={editFields.name} onChange={e => setEditFields(f => ({...f, name: e.target.value}))} placeholder="Nome" className="flex-1 h-9" />
+                    <Input value={editFields.name} onChange={e => { setEditFields(f => ({...f, name: e.target.value})); setHasChanges(true); }} placeholder="Nome completo" className="flex-1 h-9" />
                   </div>
-                  <Input value={editFields.phone} onChange={e => setEditFields(f => ({...f, phone: e.target.value}))} placeholder="Telefone" className="h-9" />
-                  <Input value={editFields.email} onChange={e => setEditFields(f => ({...f, email: e.target.value}))} placeholder="Email" className="h-9" />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Telefone</label>
+                  <Input value={editFields.phone} onChange={e => { setEditFields(f => ({...f, phone: e.target.value})); setHasChanges(true); }} placeholder="(00) 00000-0000" className="h-9" />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Email</label>
+                  <Input value={editFields.email} onChange={e => { setEditFields(f => ({...f, email: e.target.value.toLowerCase()})); setHasChanges(true); }} placeholder="seu@email.com" type="email" className="h-9" />
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Cidade / UF</label>
                   <div className="flex gap-2">
-                    <Input value={editFields.city} onChange={e => setEditFields(f => ({...f, city: e.target.value}))} placeholder="Cidade" className="flex-1 h-9" />
-                    <select value={editFields.uf} onChange={e => setEditFields(f => ({...f, uf: e.target.value}))} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                    <Input value={editFields.city} onChange={e => { setEditFields(f => ({...f, city: e.target.value})); setHasChanges(true); }} placeholder="Cidade" className="flex-1 h-9" />
+                    <select value={editFields.uf} onChange={e => { setEditFields(f => ({...f, uf: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
                       {UF_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
                     </select>
                   </div>
-                  <select value={editFields.career} onChange={e => setEditFields(f => ({...f, career: e.target.value}))} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
-                    {CAREER_OPTIONS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1).replace("_"," ")}</option>)}
+                </div>
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Carreira</label>
+                  <select value={editFields.career} onChange={e => { setEditFields(f => ({...f, career: e.target.value})); setHasChanges(true); }} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
+                    {CAREER_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                   </select>
                 </div>
-              ) : (
-                <>
-                  <div className="flex items-center gap-2 text-muted-foreground"><User className="w-3.5 h-3.5" /><span>{lead.treatment} {lead.name}</span></div>
-                  <div className="flex items-center gap-2 text-muted-foreground"><Phone className="w-3.5 h-3.5" /><span>{lead.phone}</span></div>
-                  <div className="flex items-center gap-2 text-muted-foreground"><Mail className="w-3.5 h-3.5" /><span>{lead.email}</span></div>
-                  <div className="flex items-center gap-2 text-muted-foreground"><MapPin className="w-3.5 h-3.5" /><span>{lead.city} - {lead.uf}</span></div>
-                  <div className="flex items-center gap-2 text-muted-foreground"><Briefcase className="w-3.5 h-3.5" /><span className="capitalize">{lead.career?.replace("_", " ")}</span></div>
-                </>
-              )}
+              </div>
             </CardContent>
           </Card>
 
@@ -263,19 +277,13 @@ const LeadDetail = () => {
               <CardTitle className="text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> Agendamento & Datas</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {editing ? (
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
                 <div className="flex gap-2">
-                  <Input value={editFields.scheduled_day} onChange={e => setEditFields(f => ({...f, scheduled_day: e.target.value}))} placeholder="Dia (ex: segunda)" className="flex-1 h-9" />
-                  <Input value={editFields.scheduled_time} onChange={e => setEditFields(f => ({...f, scheduled_time: e.target.value}))} placeholder="Horário" className="w-28 h-9" />
+                  <Input value={editFields.scheduled_day} onChange={e => { setEditFields(f => ({...f, scheduled_day: e.target.value})); setHasChanges(true); }} placeholder="Dia (ex: Segunda)" className="flex-1 h-9" />
+                  <Input value={editFields.scheduled_time} onChange={e => { setEditFields(f => ({...f, scheduled_time: e.target.value})); setHasChanges(true); }} placeholder="Horário" className="w-32 h-9" />
                 </div>
-              ) : (
-                lead.scheduled_day && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{lead.scheduled_day} — {lead.scheduled_time}</span>
-                  </div>
-                )
-              )}
+              </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Clock className="w-3.5 h-3.5" />
                 <span>Criado em {format(new Date(lead.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
@@ -298,7 +306,7 @@ const LeadDetail = () => {
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Status</label>
               <select
                 value={editStatus}
-                onChange={(e) => setEditStatus(e.target.value as LeadStatus)}
+                onChange={(e) => { setEditStatus(e.target.value as LeadStatus); setHasChanges(true); }}
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
                 {STATUS_OPTIONS.map((s) => (
@@ -316,7 +324,7 @@ const LeadDetail = () => {
                     variant="outline"
                     size="sm"
                     className={`flex-1 gap-1.5 ${editTemp === t.value ? t.activeClass : "text-muted-foreground"}`}
-                    onClick={() => setEditTemp(t.value)}
+                    onClick={() => { setEditTemp(t.value); setHasChanges(true); }}
                   >
                     <t.icon className="w-3.5 h-3.5" />
                     {t.label}
@@ -324,21 +332,19 @@ const LeadDetail = () => {
                 ))}
               </div>
             </div>
-            {editing && (
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Observação</label>
-                <textarea
-                  value={editFields.notes}
-                  onChange={(e) => setEditFields(f => ({...f, notes: e.target.value}))}
-                  rows={2}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  placeholder="Observação geral do lead..."
-                />
-              </div>
-            )}
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Observação</label>
+              <textarea
+                value={editFields.notes}
+                onChange={(e) => { setEditFields(f => ({...f, notes: e.target.value})); setHasChanges(true); }}
+                rows={2}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                placeholder="Observação geral do lead..."
+              />
+            </div>
             <div className="flex justify-end">
-              <Button onClick={handleSave} disabled={saving} size="sm">
-                <Save className="w-3.5 h-3.5 mr-1.5" /> {saving ? "Salvando..." : "Salvar alterações"}
+              <Button onClick={handleSave} disabled={saving || !hasChanges} size="sm">
+                <Save className="w-3.5 h-3.5 mr-1.5" /> {saving ? "Salvando..." : hasChanges ? "Salvar alterações" : "Salvo"}
               </Button>
             </div>
           </CardContent>
