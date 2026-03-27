@@ -218,7 +218,8 @@ const ModulesSection = () => {
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
           <h2 className="text-[2.1rem] sm:text-4xl lg:text-[3.25rem] font-extrabold sm:font-semibold leading-[1.12] sm:leading-[1.2] text-foreground mb-5">
-            13 acampamentos até o cume
+            <span className="block sm:inline">13 acampamentos</span>{" "}
+            <span className="block sm:inline">até o cume</span>
           </h2>
           <p className="text-foreground/30 text-lg font-light">
             Cada módulo é uma etapa da escalada. Cada Hands-On, um treino no terreno real.
