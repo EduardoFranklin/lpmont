@@ -24,7 +24,14 @@ const EVENT_TAG_MAP: Record<string, string> = {
   PURCHASE_OUT_OF_SHOPPING_CART: "abandonou_checkout",
   // Subscription
   SUBSCRIPTION_CANCELLATION: "assinatura_cancelada",
-  // Custom mapping for checkout entry (Hotmart pixel, handled client-side if needed)
+  // Club / Course access
+  CLUB_FIRST_ACCESS: "entrou_no_curso",
+  CLUB_MODULE_COMPLETED: "modulo_concluido",
+  // Checkout
+  PURCHASE_BILLET_PRINTED: "boleto_impresso",
+  PURCHASE_EXPIRED: "compra_expirada",
+  SWITCH_PLAN: "troca_plano",
+  UPDATE_SUBSCRIPTION_CHARGE_DATE: "atualizou_cobranca",
 };
 
 serve(async (req: Request) => {
@@ -51,8 +58,14 @@ serve(async (req: Request) => {
     console.log("Hotmart webhook received:", JSON.stringify(body));
 
     const event: string = body.event ?? body.data?.event ?? "";
+    // Hotmart sends email in different paths depending on event type
     const buyerEmail: string =
-      body.data?.buyer?.email ?? body.buyer?.email ?? "";
+      body.data?.buyer?.email ??
+      body.data?.subscriber?.email ??
+      body.data?.subscription?.user?.email ??
+      body.data?.user?.email ??
+      body.buyer?.email ??
+      "";
     const productPrice: number =
       body.data?.purchase?.price?.value ??
       body.data?.purchase?.original_offer_price?.value ??
