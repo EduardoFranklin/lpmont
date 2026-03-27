@@ -102,7 +102,7 @@ const HeroSection = () => {
           >
             Dentista, construa a reputação que{" "}
             <span className="summit-text font-extrabold sm:font-medium">
-              lota sua agenda e faz sua clínica crescer.
+              lota sua agenda e faz a clínica crescer.
             </span>
           </motion.h1>
 
@@ -113,8 +113,8 @@ const HeroSection = () => {
             transition={{ delay: 0.5 }}
             className="text-base sm:text-xl text-foreground/35 max-w-2xl mx-auto leading-relaxed font-light mb-5 sm:mb-10"
           >
-            Reputação vira indicação. Indicação vira agenda cheia.
-            Agenda cheia vira clínica e Instituto. Tudo vem do método.
+            Reputação gera indicação e lota a agenda.
+            Agenda cheia constrói clínica e ergue instituto. Tudo nasce no método.
           </motion.p>
 
           {/* Author badge */}
