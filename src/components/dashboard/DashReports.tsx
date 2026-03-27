@@ -3,9 +3,10 @@ import type { Lead } from "@/pages/Dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Users, CalendarCheck, UserCheck, TrendingUp, Globe, Megaphone, Target,
-  Snowflake, Flame, Zap, X
+  Snowflake, Flame, Zap, X, ArrowDownWideNarrow, ArrowUpWideNarrow
 } from "lucide-react";
 
 const statusLabels: Record<string, string> = {
@@ -18,13 +19,15 @@ const statusLabels: Record<string, string> = {
 };
 
 type Filter = {
-  type: "status" | "temperature" | "source" | "campaign" | "medium" | "career" | "uf";
+  type: "status" | "temperature" | "source" | "campaign" | "medium" | "career" | "uf" | "city";
   value: string;
   label: string;
 };
 
 const DashReports = ({ leads }: { leads: Lead[] }) => {
   const [filters, setFilters] = useState<Filter[]>([]);
+  const [showCity, setShowCity] = useState(true);
+  const [locationSortAsc, setLocationSortAsc] = useState(false);
 
   const toggleFilter = (f: Filter) => {
     setFilters((prev) => {
@@ -49,6 +52,7 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
         case "medium": return (l as any).utm_medium === f.value;
         case "career": return l.career === f.value;
         case "uf": return l.uf === f.value;
+        case "city": return l.city === f.value;
         default: return true;
       }
     });
@@ -89,7 +93,15 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
 
   const byUf: Record<string, number> = {};
   filtered.forEach((l) => { byUf[l.uf] = (byUf[l.uf] || 0) + 1; });
-  const topUfs = Object.entries(byUf).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const topUfs = Object.entries(byUf)
+    .sort((a, b) => locationSortAsc ? a[1] - b[1] : b[1] - a[1])
+    .slice(0, 10);
+
+  const byCity: Record<string, number> = {};
+  filtered.forEach((l) => { byCity[l.city] = (byCity[l.city] || 0) + 1; });
+  const topCities = Object.entries(byCity)
+    .sort((a, b) => locationSortAsc ? a[1] - b[1] : b[1] - a[1])
+    .slice(0, 10);
 
   const bySource: Record<string, { total: number; convertidos: number }> = {};
   const byCampaign: Record<string, { total: number; convertidos: number }> = {};
@@ -335,22 +347,61 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-sm">Top UFs</CardTitle></CardHeader>
-          <CardContent className="space-y-2">
-            {topUfs.map(([uf, count]) => {
-              const active = isActive("uf", uf);
-              return (
-                <div
-                  key={uf}
-                  className={`flex justify-between text-sm ${active ? activeRow : clickable}`}
-                  onClick={() => toggleFilter({ type: "uf", value: uf, label: `UF: ${uf}` })}
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm">Top {showCity ? "Cidades" : "UFs"}</CardTitle>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setLocationSortAsc(!locationSortAsc)}
+                  className="text-muted-foreground hover:text-foreground p-1 rounded transition-colors"
+                  title={locationSortAsc ? "Menor → Maior" : "Maior → Menor"}
                 >
-                  <span className="text-muted-foreground">{uf}</span>
-                  <span className="font-medium">{count}</span>
+                  {locationSortAsc ? <ArrowUpWideNarrow className="w-4 h-4" /> : <ArrowDownWideNarrow className="w-4 h-4" />}
+                </button>
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className={!showCity ? "text-foreground font-medium" : ""}>UF</span>
+                  <Switch checked={showCity} onCheckedChange={setShowCity} className="scale-75" />
+                  <span className={showCity ? "text-foreground font-medium" : ""}>Cidade</span>
                 </div>
-              );
-            })}
-            {topUfs.length === 0 && <p className="text-sm text-muted-foreground">Sem dados</p>}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {showCity ? (
+              <>
+                {topCities.map(([city, count]) => {
+                  const active = isActive("city", city);
+                  return (
+                    <div
+                      key={city}
+                      className={`flex justify-between text-sm ${active ? activeRow : clickable}`}
+                      onClick={() => toggleFilter({ type: "city", value: city, label: `Cidade: ${city}` })}
+                    >
+                      <span className="text-muted-foreground">{city}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  );
+                })}
+                {topCities.length === 0 && <p className="text-sm text-muted-foreground">Sem dados</p>}
+              </>
+            ) : (
+              <>
+                {topUfs.map(([uf, count]) => {
+                  const active = isActive("uf", uf);
+                  return (
+                    <div
+                      key={uf}
+                      className={`flex justify-between text-sm ${active ? activeRow : clickable}`}
+                      onClick={() => toggleFilter({ type: "uf", value: uf, label: `UF: ${uf}` })}
+                    >
+                      <span className="text-muted-foreground">{uf}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  );
+                })}
+                {topUfs.length === 0 && <p className="text-sm text-muted-foreground">Sem dados</p>}
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
