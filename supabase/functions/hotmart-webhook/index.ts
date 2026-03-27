@@ -51,8 +51,14 @@ serve(async (req: Request) => {
     console.log("Hotmart webhook received:", JSON.stringify(body));
 
     const event: string = body.event ?? body.data?.event ?? "";
+    // Hotmart sends email in different paths depending on event type
     const buyerEmail: string =
-      body.data?.buyer?.email ?? body.buyer?.email ?? "";
+      body.data?.buyer?.email ??
+      body.data?.subscriber?.email ??
+      body.data?.subscription?.user?.email ??
+      body.data?.user?.email ??
+      body.buyer?.email ??
+      "";
     const productPrice: number =
       body.data?.purchase?.price?.value ??
       body.data?.purchase?.original_offer_price?.value ??
