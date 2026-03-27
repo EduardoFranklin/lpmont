@@ -37,7 +37,7 @@ const ProblemSection = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-24 max-w-3xl mx-auto text-center">
           <div className="trail-divider mb-8" />
           <p className="text-xl sm:text-2xl text-foreground/50 italic leading-relaxed font-light">
-            "{c.quote.replace(/um guia experiente/, "")}"
+            "{c.quote}"
           </p>
           <p className="mt-6 text-sm text-foreground/25">{c.quote_author}</p>
         </motion.div>
