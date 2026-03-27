@@ -4,6 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronDown, ChevronLeft, ChevronRight, Printer, BookOpen } from "lucide-react";
 import SynopsisModal from "./SynopsisModal";
+import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
 const clinicalImages = [
   { src: "/images/thumbs/clinicas-1-thumb.webp", caption: "Classe I — Visão oclusal isolada" },
