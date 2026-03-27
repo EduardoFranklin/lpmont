@@ -7,7 +7,7 @@ const includes = [
   "5 Hands-On com casos reais do Instituto",
   "Aulas objetivas e materiais exclusivos",
   "Suporte próximo da equipe",
-  "12 encontros ao vivo com Breno Mont'Alverne no ano",
+  "12 encontros ao vivo com Breno Mont'Alverne (1 por mês)",
   "Atualização permanente de conteúdos",
   "Acesso disponível por 12 meses",
 ];
