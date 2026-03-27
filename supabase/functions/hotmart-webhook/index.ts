@@ -24,7 +24,14 @@ const EVENT_TAG_MAP: Record<string, string> = {
   PURCHASE_OUT_OF_SHOPPING_CART: "abandonou_checkout",
   // Subscription
   SUBSCRIPTION_CANCELLATION: "assinatura_cancelada",
-  // Custom mapping for checkout entry (Hotmart pixel, handled client-side if needed)
+  // Club / Course access
+  CLUB_FIRST_ACCESS: "entrou_no_curso",
+  CLUB_MODULE_COMPLETED: "modulo_concluido",
+  // Checkout
+  PURCHASE_BILLET_PRINTED: "boleto_impresso",
+  PURCHASE_EXPIRED: "compra_expirada",
+  SWITCH_PLAN: "troca_plano",
+  UPDATE_SUBSCRIPTION_CHARGE_DATE: "atualizou_cobranca",
 };
 
 serve(async (req: Request) => {
