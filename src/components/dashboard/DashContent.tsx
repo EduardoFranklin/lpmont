@@ -105,7 +105,9 @@ function ObjectArrayEditor({ value, onChange }: { value: string; onChange: (v: s
           {keys.map(k => (
             <div key={k}>
               <label className="text-[11px] text-muted-foreground uppercase tracking-wider">{k}</label>
-              {(item[k] || "").length > 80 ? (
+              {isImageField(k, item[k] || "") ? (
+                <ImageUploader value={item[k] || ""} onChange={(v) => update(i, k, v)} />
+              ) : (item[k] || "").length > 80 ? (
                 <Textarea value={item[k] || ""} onChange={(e) => update(i, k, e.target.value)} rows={3} className="text-sm" />
               ) : (
                 <Input value={item[k] || ""} onChange={(e) => update(i, k, e.target.value)} className="text-sm" />
