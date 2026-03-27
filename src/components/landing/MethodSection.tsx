@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion } from "framer-motion";
 import { BookOpen, Wrench, ChevronLeft, ChevronRight } from "lucide-react";
+import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
 const handsOnImages = [
   { src: "/images/thumbs/handson-1-thumb.webp", caption: "Inserção de resina com espátula" },
@@ -12,17 +13,15 @@ const handsOnImages = [
 ];
 
 const MethodSection = () => {
+  const c = useSection("method");
+  const theoryTags = parseJSON<string[]>(c.theory_tags, []);
+  const practiceTags = parseJSON<string[]>(c.practice_tags, []);
   const [current, setCurrent] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
   const touchStart = useRef(0);
 
-  const next = useCallback(() => {
-    setCurrent((c) => (c + 1) % handsOnImages.length);
-  }, []);
-
-  const prev = useCallback(() => {
-    setCurrent((c) => (c - 1 + handsOnImages.length) % handsOnImages.length);
-  }, []);
+  const next = useCallback(() => setCurrent((c) => (c + 1) % handsOnImages.length), []);
+  const prev = useCallback(() => setCurrent((c) => (c - 1 + handsOnImages.length) % handsOnImages.length), []);
 
   useEffect(() => {
     if (!autoPlay) return;
@@ -33,159 +32,70 @@ const MethodSection = () => {
   return (
     <section className="py-28 sm:py-36 relative overflow-hidden">
       <div className="glow-gold" style={{ width: 600, height: 400, bottom: "0", right: "-10%", opacity: 0.3 }} />
-
       <div className="section-container relative z-10">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-20 max-w-3xl mx-auto"
-        >
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20 max-w-3xl mx-auto">
           <div className="flex items-center justify-center gap-3 mb-6">
             <div className="caption-line-h"><div className="caption-line-h-inner" /></div>
-            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">Teoria + Prática</span>
+            <span className="text-[12px] tracking-[0.2em] uppercase font-medium text-primary/60">{c.caption}</span>
             <div className="caption-line-h" style={{ transform: "scaleX(-1)" }}><div className="caption-line-h-inner" /></div>
           </div>
           <h2 className="text-[2.1rem] sm:text-4xl lg:text-[3.25rem] font-extrabold sm:font-semibold leading-[1.12] sm:leading-[1.2] text-foreground mb-5">
-            Não é só teoria.{" "}
-            <span className="summit-text font-medium">É mão na massa.</span>
+            {c.title}{" "}
+            <span className="summit-text font-medium">{c.title_highlight}</span>
           </h2>
-          <p className="text-foreground/30 text-lg font-light max-w-2xl mx-auto">
-            Cada módulo combina embasamento científico com treino prático real.
-            Você aprende o porquê e pratica o como — até dominar.
-          </p>
+          <p className="text-foreground/30 text-lg font-light max-w-2xl mx-auto">{c.description}</p>
         </motion.div>
 
-        {/* Two pillars: Teoria + Prática */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="grid md:grid-cols-2 gap-4 mb-16 max-w-3xl mx-auto"
-        >
-          {/* Teoria */}
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid md:grid-cols-2 gap-4 mb-16 max-w-3xl mx-auto">
           <div className="gradient-card">
             <div className="gradient-card-inner p-7 flex flex-col items-center text-center h-full">
-              <div className="faq-icon mb-5">
-                <div className="faq-icon-inner">
-                  <BookOpen className="w-5 h-5 text-primary" />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-foreground/90 mb-2">Fundamento Teórico</h3>
-              <p className="text-foreground/30 text-[14px] leading-relaxed">
-                Aulas gravadas com Prof. Breno explicando cada conceito — morfologia, óptica, adesão, estratificação. Ciência aplicada à clínica real.
-              </p>
+              <div className="faq-icon mb-5"><div className="faq-icon-inner"><BookOpen className="w-5 h-5 text-primary" /></div></div>
+              <h3 className="text-lg font-medium text-foreground/90 mb-2">{c.theory_title}</h3>
+              <p className="text-foreground/30 text-[14px] leading-relaxed">{c.theory_desc}</p>
               <div className="mt-auto pt-5 flex flex-wrap items-center justify-center gap-2">
-                {["Morfologia", "Óptica", "Adesão", "Estratificação"].map((t) => (
-                  <span key={t} className="text-[11px] tracking-wider uppercase font-medium px-2.5 py-1 rounded-full border border-foreground/[0.06] text-foreground/25">
-                    {t}
-                  </span>
+                {theoryTags.map((t) => (
+                  <span key={t} className="text-[11px] tracking-wider uppercase font-medium px-2.5 py-1 rounded-full border border-foreground/[0.06] text-foreground/25">{t}</span>
                 ))}
               </div>
             </div>
           </div>
-
-          {/* Prática */}
           <div className="gradient-card">
             <div className="gradient-card-inner p-7 flex flex-col items-center text-center h-full">
-              <div className="faq-icon mb-5">
-                <div className="faq-icon-inner">
-                  <Wrench className="w-5 h-5 text-primary" />
-                </div>
-              </div>
-              <h3 className="text-lg font-medium text-foreground/90 mb-2">Hands-On Prático</h3>
-              <p className="text-foreground/30 text-[14px] leading-relaxed">
-                5 imersões práticas com casos reais do Instituto Mont'Alverne. Você opera, esculpe e restaura como se estivesse na bancada.
-              </p>
+              <div className="faq-icon mb-5"><div className="faq-icon-inner"><Wrench className="w-5 h-5 text-primary" /></div></div>
+              <h3 className="text-lg font-medium text-foreground/90 mb-2">{c.practice_title}</h3>
+              <p className="text-foreground/30 text-[14px] leading-relaxed">{c.practice_desc}</p>
               <div className="mt-auto pt-5 flex flex-wrap items-center justify-center gap-2">
-                {["Classe IV", "Facetas", "Polimento", "Enceramento", "Pinos"].map((t) => (
-                  <span key={t} className="text-[11px] tracking-wider uppercase font-medium px-2.5 py-1 rounded-full border border-primary/20 text-primary/50">
-                    {t}
-                  </span>
+                {practiceTags.map((t) => (
+                  <span key={t} className="text-[11px] tracking-wider uppercase font-medium px-2.5 py-1 rounded-full border border-primary/20 text-primary/50">{t}</span>
                 ))}
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Hands-On Image Slider */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="max-w-4xl mx-auto"
-        >
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="max-w-4xl mx-auto">
           <div className="gradient-card">
             <div className="gradient-card-inner overflow-hidden">
-              {/* Slider */}
-              <div
-                className="relative aspect-video bg-background overflow-hidden cursor-pointer"
-                onMouseEnter={() => setAutoPlay(false)}
-                onMouseLeave={() => setAutoPlay(true)}
-                onTouchStart={(e) => { touchStart.current = e.touches[0].clientX; }}
-                onTouchEnd={(e) => {
-                  const diff = touchStart.current - e.changedTouches[0].clientX;
-                  if (diff > 50) next();
-                  else if (diff < -50) prev();
-                }}
-              >
+              <div className="relative aspect-video bg-background overflow-hidden cursor-pointer" onMouseEnter={() => setAutoPlay(false)} onMouseLeave={() => setAutoPlay(true)} onTouchStart={(e) => { touchStart.current = e.touches[0].clientX; }} onTouchEnd={(e) => { const diff = touchStart.current - e.changedTouches[0].clientX; if (diff > 50) next(); else if (diff < -50) prev(); }}>
                 {handsOnImages.map((img, i) => (
-                  <div
-                    key={i}
-                    className="absolute inset-0 transition-opacity duration-700"
-                    style={{ opacity: i === current ? 1 : 0 }}
-                  >
-                    <img
-                      src={img.src}
-                      alt={img.caption}
-                      className="w-full h-full object-cover"
-                      loading={i === 0 ? "eager" : "lazy"}
-                    />
-                    {/* Bottom gradient overlay */}
+                  <div key={i} className="absolute inset-0 transition-opacity duration-700" style={{ opacity: i === current ? 1 : 0 }}>
+                    <img src={img.src} alt={img.caption} className="w-full h-full object-cover" loading={i === 0 ? "eager" : "lazy"} />
                     <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/70 to-transparent" />
                   </div>
                 ))}
-
-                {/* Caption */}
                 <div className="absolute bottom-0 left-0 right-0 px-6 pb-5 flex items-end justify-between z-10">
                   <div>
-                    <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block mb-1">
-                      Hands-On · {String(current + 1).padStart(2, "0")}/{String(handsOnImages.length).padStart(2, "0")}
-                    </span>
+                    <span className="text-[10px] tracking-[0.15em] uppercase font-bold text-primary/60 block mb-1">Hands-On · {String(current + 1).padStart(2, "0")}/{String(handsOnImages.length).padStart(2, "0")}</span>
                     <p className="text-foreground/80 text-sm font-medium">{handsOnImages[current].caption}</p>
                   </div>
-
-                  {/* Nav arrows */}
                   <div className="flex items-center gap-2">
-                    <button
-                      onClick={prev}
-                      className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={next}
-                      className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
+                    <button onClick={prev} className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"><ChevronLeft className="w-4 h-4" /></button>
+                    <button onClick={next} className="w-9 h-9 rounded-full flex items-center justify-center border border-foreground/10 text-foreground/40 hover:border-primary/30 hover:text-primary transition-colors"><ChevronRight className="w-4 h-4" /></button>
                   </div>
                 </div>
-
-                {/* Progress dots */}
                 <div className="absolute bottom-0 left-0 right-0 flex gap-1 px-6 pb-1.5 z-10">
                   {handsOnImages.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrent(i)}
-                      className="flex-1 h-[2px] rounded-full transition-all duration-500"
-                      style={{
-                        background: i === current
-                          ? "linear-gradient(90deg, hsl(38 100% 55%), hsl(30 80% 45%))"
-                          : "rgba(255,255,255,0.1)",
-                      }}
-                    />
+                    <button key={i} onClick={() => setCurrent(i)} className="flex-1 h-[2px] rounded-full transition-all duration-500" style={{ background: i === current ? "linear-gradient(90deg, hsl(38 100% 55%), hsl(30 80% 45%))" : "rgba(255,255,255,0.1)" }} />
                   ))}
                 </div>
               </div>
