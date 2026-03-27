@@ -206,7 +206,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[40px]">#</TableHead>
+              <TableHead className="w-[60px]">ID</TableHead>
               <TableHead>Nome</TableHead>
               <TableHead className="hidden md:table-cell">Email</TableHead>
               <TableHead className="hidden sm:table-cell">Telefone</TableHead>
@@ -222,7 +222,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
               const hasSchedule = lead.scheduled_day && lead.scheduled_time;
               return (
                 <TableRow key={lead.id} className="cursor-pointer hover:bg-muted/30" onClick={() => navigate(`/dash/lead/${lead.id}`)}>
-                  <TableCell className="text-muted-foreground text-xs">{idx + 1}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs font-mono">#{(lead as any).lead_number || '—'}</TableCell>
                   <TableCell className="font-medium">
                     <span className="flex items-center gap-1.5">
                       {lead.treatment} {lead.name}

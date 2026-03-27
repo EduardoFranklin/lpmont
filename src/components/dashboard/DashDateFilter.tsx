@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export type DatePreset = "hoje" | "7dias" | "semana" | "mes" | "ano" | "periodo";
+export type DatePreset = "tudo" | "hoje" | "7dias" | "semana" | "mes" | "ano" | "periodo";
 
 const PRESETS: { value: DatePreset; label: string }[] = [
+  { value: "tudo", label: "Tudo" },
   { value: "hoje", label: "Hoje" },
   { value: "7dias", label: "Últimos 7 dias" },
   { value: "semana", label: "Esta semana" },
@@ -28,6 +29,8 @@ export const getDateRange = (preset: DatePreset, customRange?: { from?: Date; to
   const todayStart = startOfDay(now);
 
   switch (preset) {
+    case "tudo":
+      return { from: new Date(2020, 0, 1), to: now };
     case "hoje":
       return { from: todayStart, to: now };
     case "7dias":
