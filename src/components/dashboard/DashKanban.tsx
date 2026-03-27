@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Lead } from "@/pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Phone, Mail, MessageCircle } from "lucide-react";
+import { Phone, Mail, MessageCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import type { Database } from "@/integrations/supabase/types";
+import { toast } from "sonner";
 
 type LeadStatus = Database["public"]["Enums"]["lead_status"];
 
@@ -25,6 +28,19 @@ const TEMP_COLORS: Record<string, string> = {
 
 const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void }) => {
   const navigate = useNavigate();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+    setDeleting(true);
+    const { error } = await supabase.from("leads").delete().eq("id", deleteId);
+    if (error) toast.error("Erro ao deletar lead");
+    else { toast.success("Lead deletado"); onRefresh(); }
+    setDeleting(false);
+    setDeleteId(null);
+  };
+
   const handleDrop = async (e: React.DragEvent, newStatus: LeadStatus) => {
     e.preventDefault();
     const leadId = e.dataTransfer.getData("leadId");
@@ -88,15 +104,26 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
                             {lead.career.replace("_", " ")}
                           </span>
                         )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-emerald-400"
-                          onClick={(e) => { e.stopPropagation(); openWhatsApp(lead.phone); }}
-                          title="WhatsApp"
-                        >
-                          <MessageCircle className="w-3.5 h-3.5" />
-                        </Button>
+                        <div className="flex items-center gap-0.5">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-destructive/60 hover:text-destructive"
+                            onClick={(e) => { e.stopPropagation(); setDeleteId(lead.id); }}
+                            title="Deletar lead"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-emerald-400"
+                            onClick={(e) => { e.stopPropagation(); openWhatsApp(lead.phone); }}
+                            title="WhatsApp"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -106,6 +133,22 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
           </div>
         );
       })}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deletar lead?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O lead e suas notas serão removidos permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? "Deletando..." : "Deletar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
