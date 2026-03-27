@@ -102,7 +102,7 @@ const HeroSection = () => {
           >
             Dentista, construa a reputação que{" "}
             <span className="summit-text font-extrabold sm:font-medium">
-              lota sua agenda e faz a clínica crescer.
+              faz lotar sua agenda e a clínica crescer.
             </span>
           </motion.h1>
 
