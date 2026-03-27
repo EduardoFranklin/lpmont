@@ -106,7 +106,7 @@ const HeroSection = () => {
             </span>
           </motion.h1>
 
-          {/* Subheadline */}
+          {/* Subheadline - updated */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
