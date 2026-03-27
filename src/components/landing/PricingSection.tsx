@@ -3,7 +3,7 @@ import { Check, Shield, ArrowRight, Gift, Users, Video, RefreshCw, Clock } from 
 
 
 const includes = [
-  "13 módulos — do vale ao cume",
+  "13 módulos — do vale ao topo",
   "5 Hands-On com casos reais do Instituto",
   "Aulas objetivas e materiais exclusivos",
   "Suporte próximo da equipe",
