@@ -5,29 +5,28 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import {
   Save, MessageCircle, Mail, Bold, Italic, Link2, Image, Type,
   Variable, Strikethrough, Code, Plus, Trash2, Clock, Bell, Trophy, Phone,
+  Zap, Users, ShoppingCart, GraduationCap, ChevronDown, ChevronUp,
+  Send, CheckCircle2, XCircle, Loader2, History, RefreshCw,
 } from "lucide-react";
 import {
   Popover, PopoverContent, PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+} from "@/components/ui/accordion";
 import { toast } from "sonner";
 
 /* ─── constants ─── */
 
-const TRIGGERS = [
-  { value: "novo", label: "Novo lead (boas-vindas)" },
-  { value: "agendado", label: "Agendamento confirmado" },
-  { value: "compareceu", label: "Em negociação" },
-  { value: "nao_compareceu", label: "Não compareceu" },
-  { value: "convertido", label: "Convertido" },
-  { value: "perdido", label: "Perdido" },
-];
-
-const CHANNELS: { value: string; label: string; icon: any }[] = [
-  { value: "whatsapp", label: "WhatsApp", icon: MessageCircle },
-  { value: "email", label: "E-mail", icon: Mail },
+const FUNNELS = [
+  { value: "F1", label: "F1 — Reunião com Consultor", icon: Users, color: "text-blue-500", description: "Confirmação, lembretes e follow-up pós-reunião" },
+  { value: "F2", label: "F2 — Quiz de Diagnóstico", icon: Zap, color: "text-amber-500", description: "Diagnósticos A/B/C + recuperação de abandono" },
+  { value: "F3", label: "F3 — Tráfego Direto", icon: ShoppingCart, color: "text-emerald-500", description: "Retargeting, abandono de checkout, objeções" },
+  { value: "F4", label: "F4 — Pós-Compra (Onboarding)", icon: GraduationCap, color: "text-purple-500", description: "Boas-vindas, engajamento, reengajamento" },
 ];
 
 const VARIABLES = [
@@ -36,32 +35,43 @@ const VARIABLES = [
   { key: "{{telefone}}", desc: "Telefone" },
   { key: "{{tratamento}}", desc: "Dr. / Dra." },
   { key: "{{cidade}}", desc: "Cidade" },
-  { key: "{{data_agendamento}}", desc: "Data do agendamento" },
-  { key: "{{horario_agendamento}}", desc: "Horário do agendamento" },
+  { key: "{{score}}", desc: "Pontuação do quiz" },
+  { key: "{{data}}", desc: "Data da reunião (extenso)" },
+  { key: "{{hora}}", desc: "Horário da reunião (extenso)" },
+  { key: "{{reuniao_link_google_meet}}", desc: "Link do Google Meet" },
+  { key: "{{id_lead}}", desc: "ID do lead" },
 ];
 
 /* ─── types ─── */
 
-interface Template {
-  id?: string;
+interface Sequence {
+  id: string;
+  funnel: string;
+  step_order: number;
+  step_key: string;
+  title: string;
   channel: string;
-  trigger: string;
-  subject: string;
+  delay_minutes: number;
+  delay_description: string;
+  subject: string | null;
   body: string;
+  conditions: any;
   active: boolean;
 }
 
-interface Reminder {
-  id?: string;
+interface QueueItem {
+  id: string;
+  lead_id: string;
+  funnel: string;
+  step_key: string;
   channel: string;
-  timing_value: number;
-  timing_unit: string;
-  subject: string;
-  body: string;
-  active: boolean;
+  status: string;
+  scheduled_for: string;
+  sent_at: string | null;
+  lead_name?: string;
 }
 
-/* ─── toolbar helper ─── */
+/* ─── toolbar helpers ─── */
 
 function insertAtCursor(ref: React.RefObject<HTMLTextAreaElement>, text: string) {
   const el = ref.current;
@@ -70,11 +80,9 @@ function insertAtCursor(ref: React.RefObject<HTMLTextAreaElement>, text: string)
   const end = el.selectionEnd;
   const before = el.value.slice(0, start);
   const after = el.value.slice(end);
-  const newVal = before + text + after;
-  el.value = newVal;
+  el.value = before + text + after;
   el.focus();
   el.setSelectionRange(start + text.length, start + text.length);
-  // trigger react state
   el.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
@@ -86,12 +94,9 @@ function wrapSelection(ref: React.RefObject<HTMLTextAreaElement>, before: string
   const selected = el.value.slice(start, end) || "texto";
   const pre = el.value.slice(0, start);
   const post = el.value.slice(end);
-  const newVal = pre + before + selected + after + post;
-  el.value = newVal;
+  el.value = pre + before + selected + after + post;
   el.focus();
-  const newStart = start + before.length;
-  const newEnd = newStart + selected.length;
-  el.setSelectionRange(newStart, newEnd);
+  el.setSelectionRange(start + before.length, start + before.length + selected.length);
   el.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
@@ -104,7 +109,7 @@ const VariablesPopover = ({ textareaRef }: { textareaRef: React.RefObject<HTMLTe
         <Variable className="w-3.5 h-3.5" />
       </Button>
     </PopoverTrigger>
-    <PopoverContent className="w-56 p-2" align="start">
+    <PopoverContent className="w-64 p-2" align="start">
       <p className="text-[10px] text-muted-foreground font-medium mb-1.5 uppercase tracking-wider">
         Clique para inserir
       </p>
@@ -122,428 +127,271 @@ const VariablesPopover = ({ textareaRef }: { textareaRef: React.RefObject<HTMLTe
   </Popover>
 );
 
-/* ─── Email toolbar ─── */
+/* ─── Toolbar ─── */
 
-const EmailToolbar = ({ textareaRef }: { textareaRef: React.RefObject<HTMLTextAreaElement> }) => (
+const MessageToolbar = ({ textareaRef, isEmail }: { textareaRef: React.RefObject<HTMLTextAreaElement>; isEmail: boolean }) => (
   <div className="flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-muted/20">
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="Negrito"
-      onClick={() => wrapSelection(textareaRef, "<b>", "</b>")}>
-      <Bold className="w-3.5 h-3.5" />
-    </Button>
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="Itálico"
-      onClick={() => wrapSelection(textareaRef, "<i>", "</i>")}>
-      <Italic className="w-3.5 h-3.5" />
-    </Button>
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="Título grande"
-      onClick={() => wrapSelection(textareaRef, '<h2 style="font-size:20px">', "</h2>")}>
-      <Type className="w-3.5 h-3.5" />
-    </Button>
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="Inserir link"
-      onClick={() => {
-        const url = prompt("URL do link:");
-        if (url) wrapSelection(textareaRef, `<a href="${url}" style="color:#c8a97e">`, "</a>");
-      }}>
-      <Link2 className="w-3.5 h-3.5" />
-    </Button>
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="Inserir imagem"
-      onClick={() => {
-        const url = prompt("URL da imagem:");
-        if (url) {
-          const w = prompt("Largura (px):", "300");
-          insertAtCursor(textareaRef, `<img src="${url}" width="${w || 300}" style="border-radius:8px;max-width:100%" />`);
-        }
-      }}>
-      <Image className="w-3.5 h-3.5" />
-    </Button>
+    {isEmail ? (
+      <>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="Negrito" onClick={() => wrapSelection(textareaRef, "<b>", "</b>")}><Bold className="w-3.5 h-3.5" /></Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="Itálico" onClick={() => wrapSelection(textareaRef, "<i>", "</i>")}><Italic className="w-3.5 h-3.5" /></Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="Título" onClick={() => wrapSelection(textareaRef, '<h2 style="font-size:20px">', "</h2>")}><Type className="w-3.5 h-3.5" /></Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="Link" onClick={() => { const url = prompt("URL:"); if (url) wrapSelection(textareaRef, `<a href="${url}" style="color:#c8a97e">`, "</a>"); }}><Link2 className="w-3.5 h-3.5" /></Button>
+      </>
+    ) : (
+      <>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="*Negrito*" onClick={() => wrapSelection(textareaRef, "*", "*")}><Bold className="w-3.5 h-3.5" /></Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="_Itálico_" onClick={() => wrapSelection(textareaRef, "_", "_")}><Italic className="w-3.5 h-3.5" /></Button>
+        <Button variant="ghost" size="icon" className="h-7 w-7" title="~Tachado~" onClick={() => wrapSelection(textareaRef, "~", "~")}><Strikethrough className="w-3.5 h-3.5" /></Button>
+      </>
+    )}
     <div className="w-px h-5 bg-border mx-0.5" />
     <VariablesPopover textareaRef={textareaRef} />
   </div>
 );
 
-/* ─── WhatsApp toolbar ─── */
+/* ─── Sequence card ─── */
 
-const WhatsAppToolbar = ({ textareaRef }: { textareaRef: React.RefObject<HTMLTextAreaElement> }) => (
-  <div className="flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-muted/20">
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="*Negrito*"
-      onClick={() => wrapSelection(textareaRef, "*", "*")}>
-      <Bold className="w-3.5 h-3.5" />
-    </Button>
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="_Itálico_"
-      onClick={() => wrapSelection(textareaRef, "_", "_")}>
-      <Italic className="w-3.5 h-3.5" />
-    </Button>
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="~Tachado~"
-      onClick={() => wrapSelection(textareaRef, "~", "~")}>
-      <Strikethrough className="w-3.5 h-3.5" />
-    </Button>
-    <Button variant="ghost" size="icon" className="h-7 w-7" title="```Monoespaçado```"
-      onClick={() => wrapSelection(textareaRef, "```", "```")}>
-      <Code className="w-3.5 h-3.5" />
-    </Button>
-    <div className="w-px h-5 bg-border mx-0.5" />
-    <VariablesPopover textareaRef={textareaRef} />
-  </div>
-);
-
-/* ─── Template editor row ─── */
-
-const TemplateRow = ({ tmpl, onChange, onSave }: {
-  tmpl: Template;
-  onChange: (field: keyof Template, value: any) => void;
-  onSave: () => void;
-}) => {
+const SequenceCard = ({ seq, onUpdate }: { seq: Sequence; onUpdate: () => void }) => {
+  const [editing, setEditing] = useState(false);
+  const [body, setBody] = useState(seq.body);
+  const [subject, setSubject] = useState(seq.subject || "");
+  const [active, setActive] = useState(seq.active);
+  const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const ChannelIcon = CHANNELS.find((c) => c.value === tmpl.channel)?.icon || Mail;
-  const isEmail = tmpl.channel === "email";
+  const isEmail = seq.channel === "email";
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { error } = await supabase.from("automation_sequences" as any).update({
+      body,
+      subject: isEmail ? subject : null,
+      active,
+    } as any).eq("id", seq.id);
+    setSaving(false);
+    if (error) { toast.error("Erro ao salvar"); return; }
+    toast.success("Mensagem salva!");
+    setEditing(false);
+    onUpdate();
+  };
+
+  const handleToggle = async (val: boolean) => {
+    setActive(val);
+    await supabase.from("automation_sequences" as any).update({ active: val } as any).eq("id", seq.id);
+    toast.success(val ? "Ativado" : "Desativado");
+    onUpdate();
+  };
 
   return (
-    <div className="rounded-lg border border-border p-3 space-y-3">
+    <div className={`rounded-lg border p-3 space-y-2 transition-opacity ${!active ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ChannelIcon className="w-4 h-4 text-muted-foreground" />
-          <span className="text-sm font-medium">{isEmail ? "E-mail" : "WhatsApp"}</span>
+          {isEmail ? <Mail className="w-4 h-4 text-blue-400" /> : <MessageCircle className="w-4 h-4 text-green-400" />}
+          <span className="text-sm font-medium">{seq.title}</span>
+          <Badge variant="outline" className="text-[10px] h-5">
+            <Clock className="w-3 h-3 mr-1" /> {seq.delay_description}
+          </Badge>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Ativo</span>
-          <Switch checked={tmpl.active} onCheckedChange={(v) => onChange("active", v)} />
+          <Switch checked={active} onCheckedChange={handleToggle} />
         </div>
       </div>
 
-      {isEmail && (
-        <Input
-          placeholder="Assunto do e-mail"
-          value={tmpl.subject}
-          onChange={(e) => onChange("subject", e.target.value)}
-          className="text-sm"
-        />
+      {!editing ? (
+        <div className="cursor-pointer" onClick={() => setEditing(true)}>
+          {isEmail && seq.subject && (
+            <p className="text-xs text-muted-foreground mb-1">
+              <strong>Assunto:</strong> {seq.subject}
+            </p>
+          )}
+          <pre className="text-xs text-muted-foreground whitespace-pre-wrap line-clamp-3 font-mono bg-muted/30 rounded p-2">
+            {seq.body.slice(0, 200)}{seq.body.length > 200 ? "..." : ""}
+          </pre>
+          <p className="text-[10px] text-muted-foreground mt-1">Clique para editar</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {isEmail && (
+            <Input
+              placeholder="Assunto do e-mail"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="text-sm"
+            />
+          )}
+          <MessageToolbar textareaRef={textareaRef} isEmail={isEmail} />
+          <textarea
+            ref={textareaRef}
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={8}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setEditing(false); setBody(seq.body); setSubject(seq.subject || ""); }}>
+              Cancelar
+            </Button>
+            <Button size="sm" className="h-7 text-xs gap-1" onClick={handleSave} disabled={saving}>
+              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Salvar
+            </Button>
+          </div>
+        </div>
       )}
-
-      {isEmail ? <EmailToolbar textareaRef={textareaRef} /> : <WhatsAppToolbar textareaRef={textareaRef} />}
-
-      <textarea
-        ref={textareaRef}
-        value={tmpl.body}
-        onChange={(e) => onChange("body", e.target.value)}
-        onInput={(e) => onChange("body", (e.target as HTMLTextAreaElement).value)}
-        rows={4}
-        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
-        placeholder={isEmail ? "Corpo do e-mail (HTML suportado)..." : "Mensagem do WhatsApp..."}
-      />
-
-      <div className="flex justify-end">
-        <Button size="sm" className="h-7 text-xs gap-1" onClick={onSave}>
-          <Save className="w-3 h-3" /> Salvar
-        </Button>
-      </div>
     </div>
   );
 };
 
-/* ─── Reminders tab ─── */
+/* ─── Funnel Section ─── */
 
-const TIMING_PRESETS = [
-  { label: "7 dias antes", value: 7, unit: "dias" },
-  { label: "3 dias antes", value: 3, unit: "dias" },
-  { label: "1 dia antes", value: 1, unit: "dias" },
-  { label: "2 horas antes", value: 2, unit: "horas" },
-  { label: "1 hora antes", value: 1, unit: "horas" },
-];
+const FunnelSection = ({ funnel, sequences, onUpdate }: {
+  funnel: typeof FUNNELS[number];
+  sequences: Sequence[];
+  onUpdate: () => void;
+}) => {
+  const Icon = funnel.icon;
+  const activeCount = sequences.filter(s => s.active).length;
 
-const RemindersTab = () => {
-  const [reminders, setReminders] = useState<Reminder[]>([]);
+  // Group by step_key to show WA + Email side by side
+  const stepGroups: { key: string; items: Sequence[] }[] = [];
+  const seen = new Set<string>();
+  for (const s of sequences) {
+    if (!seen.has(s.step_key)) {
+      seen.add(s.step_key);
+      stepGroups.push({ key: s.step_key, items: sequences.filter(x => x.step_key === s.step_key) });
+    }
+  }
+
+  return (
+    <AccordionItem value={funnel.value} className="border rounded-lg px-4">
+      <AccordionTrigger className="hover:no-underline py-3">
+        <div className="flex items-center gap-3">
+          <Icon className={`w-5 h-5 ${funnel.color}`} />
+          <div className="text-left">
+            <p className="text-sm font-semibold">{funnel.label}</p>
+            <p className="text-xs text-muted-foreground font-normal">{funnel.description}</p>
+          </div>
+          <Badge variant="secondary" className="ml-2 text-[10px]">
+            {activeCount}/{sequences.length} ativos
+          </Badge>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent className="pb-4 space-y-4">
+        {stepGroups.map((group) => (
+          <div key={group.key} className="space-y-2">
+            {group.items.length > 1 && (
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider pl-1">
+                {group.items[0].title}
+              </p>
+            )}
+            {group.items.map((seq) => (
+              <SequenceCard key={seq.id} seq={seq} onUpdate={onUpdate} />
+            ))}
+          </div>
+        ))}
+      </AccordionContent>
+    </AccordionItem>
+  );
+};
+
+/* ─── Queue Monitor ─── */
+
+const QueueMonitor = () => {
+  const [queue, setQueue] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>("pending");
 
-  const fetch = useCallback(async () => {
-    const { data } = await supabase.from("reminder_templates").select("*").order("timing_value", { ascending: false });
-    setReminders((data as any[]) || []);
+  const fetchQueue = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("message_queue" as any)
+      .select("*, leads!inner(name, phone)")
+      .eq("status", filter)
+      .order("scheduled_for", { ascending: filter === "pending" })
+      .limit(50) as any;
+    setQueue(data || []);
     setLoading(false);
-  }, []);
+  }, [filter]);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
-  const handleAdd = (channel: string) => {
-    setReminders((prev) => [
-      ...prev,
-      { channel, timing_value: 1, timing_unit: "dias", subject: "", body: "", active: true },
-    ]);
+  // Realtime subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel("queue-monitor")
+      .on("postgres_changes", { event: "*", schema: "public", table: "message_queue" }, () => fetchQueue())
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [fetchQueue]);
+
+  const handleCancel = async (id: string) => {
+    await supabase.from("message_queue" as any).update({ status: "cancelled" } as any).eq("id", id);
+    toast.success("Mensagem cancelada");
+    fetchQueue();
   };
 
-  const handleChange = (idx: number, field: keyof Reminder, value: any) => {
-    setReminders((prev) => prev.map((r, i) => (i === idx ? { ...r, [field]: value } : r)));
-  };
-
-  const handleSave = async (reminder: Reminder) => {
-    const payload = {
-      channel: reminder.channel,
-      timing_value: reminder.timing_value,
-      timing_unit: reminder.timing_unit,
-      subject: reminder.subject || null,
-      body: reminder.body,
-      active: reminder.active,
-    };
-    if (reminder.id) {
-      await supabase.from("reminder_templates").update(payload).eq("id", reminder.id);
-    } else {
-      await supabase.from("reminder_templates").insert(payload);
+  const statusIcon = (status: string) => {
+    switch (status) {
+      case "pending": return <Clock className="w-3.5 h-3.5 text-amber-500" />;
+      case "sent": return <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />;
+      case "failed": return <XCircle className="w-3.5 h-3.5 text-red-500" />;
+      case "cancelled": return <XCircle className="w-3.5 h-3.5 text-muted-foreground" />;
+      default: return null;
     }
-    toast.success("Lembrete salvo!");
-    fetch();
   };
-
-  const handleDelete = async (reminder: Reminder) => {
-    if (!reminder.id) {
-      setReminders((prev) => prev.filter((r) => r !== reminder));
-      return;
-    }
-    if (!confirm("Excluir este lembrete?")) return;
-    await supabase.from("reminder_templates").delete().eq("id", reminder.id);
-    toast.success("Lembrete excluído");
-    fetch();
-  };
-
-  if (loading) return <p className="text-muted-foreground text-sm">Carregando...</p>;
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Configure lembretes automáticos para leads que agendaram. Defina o canal, tempo antes e a mensagem.
-      </p>
-
-      <div className="flex gap-2">
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={() => handleAdd("email")}>
-          <Mail className="w-3.5 h-3.5" /> <Plus className="w-3 h-3" /> E-mail
-        </Button>
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={() => handleAdd("whatsapp")}>
-          <MessageCircle className="w-3.5 h-3.5" /> <Plus className="w-3 h-3" /> WhatsApp
+      <div className="flex items-center justify-between">
+        <div className="flex gap-1">
+          {["pending", "sent", "failed", "cancelled"].map((s) => (
+            <Button
+              key={s}
+              variant={filter === s ? "default" : "outline"}
+              size="sm"
+              className="h-7 text-xs capitalize"
+              onClick={() => setFilter(s)}
+            >
+              {s === "pending" ? "Pendentes" : s === "sent" ? "Enviadas" : s === "failed" ? "Falhas" : "Canceladas"}
+            </Button>
+          ))}
+        </div>
+        <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={fetchQueue}>
+          <RefreshCw className="w-3 h-3" /> Atualizar
         </Button>
       </div>
 
-      {reminders.length === 0 && (
+      {loading ? (
+        <div className="text-center py-8"><Loader2 className="w-5 h-5 animate-spin mx-auto text-muted-foreground" /></div>
+      ) : queue.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground text-sm">
-            Nenhum lembrete configurado. Clique acima para adicionar.
+            Nenhuma mensagem {filter === "pending" ? "pendente" : filter === "sent" ? "enviada" : filter === "failed" ? "com falha" : "cancelada"}.
           </CardContent>
         </Card>
+      ) : (
+        <div className="space-y-2">
+          {queue.map((item: any) => (
+            <div key={item.id} className="flex items-center justify-between rounded-lg border p-3">
+              <div className="flex items-center gap-3">
+                {statusIcon(item.status)}
+                {item.channel === "email" ? <Mail className="w-4 h-4 text-blue-400" /> : <MessageCircle className="w-4 h-4 text-green-400" />}
+                <div>
+                  <p className="text-sm font-medium">{item.leads?.name || "Lead"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.funnel} · {item.step_key} · {new Date(item.scheduled_for).toLocaleString("pt-BR")}
+                  </p>
+                </div>
+              </div>
+              {item.status === "pending" && (
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive" onClick={() => handleCancel(item.id)}>
+                  Cancelar
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
       )}
-
-      {reminders.map((reminder, idx) => (
-        <ReminderCard
-          key={reminder.id || `new-${idx}`}
-          reminder={reminder}
-          onChange={(field, value) => handleChange(idx, field, value)}
-          onSave={() => handleSave(reminder)}
-          onDelete={() => handleDelete(reminder)}
-        />
-      ))}
     </div>
-  );
-};
-
-const ReminderCard = ({ reminder, onChange, onSave, onDelete }: {
-  reminder: Reminder;
-  onChange: (field: keyof Reminder, value: any) => void;
-  onSave: () => void;
-  onDelete: () => void;
-}) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isEmail = reminder.channel === "email";
-  const ChannelIcon = isEmail ? Mail : MessageCircle;
-
-  return (
-    <Card>
-      <CardContent className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ChannelIcon className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm font-medium">{isEmail ? "E-mail" : "WhatsApp"}</span>
-            <Clock className="w-3.5 h-3.5 text-muted-foreground ml-2" />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Ativo</span>
-            <Switch checked={reminder.active} onCheckedChange={(v) => onChange("active", v)} />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Input
-            type="number"
-            min={1}
-            value={reminder.timing_value}
-            onChange={(e) => onChange("timing_value", parseInt(e.target.value) || 1)}
-            className="w-20 h-8 text-sm"
-          />
-          <select
-            value={reminder.timing_unit}
-            onChange={(e) => onChange("timing_unit", e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2 text-sm"
-          >
-            <option value="dias">dia(s) antes</option>
-            <option value="horas">hora(s) antes</option>
-          </select>
-          <div className="flex-1" />
-          <div className="flex gap-1 flex-wrap">
-            {TIMING_PRESETS.map((p) => (
-              <button
-                key={`${p.value}-${p.unit}`}
-                onClick={() => {
-                  onChange("timing_value", p.value);
-                  onChange("timing_unit", p.unit);
-                }}
-                className={`text-[10px] px-2 py-1 rounded border transition-colors ${
-                  reminder.timing_value === p.value && reminder.timing_unit === p.unit
-                    ? "border-primary/50 bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:border-primary/30"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {isEmail && (
-          <Input
-            placeholder="Assunto do e-mail"
-            value={reminder.subject}
-            onChange={(e) => onChange("subject", e.target.value)}
-            className="text-sm"
-          />
-        )}
-
-        {isEmail ? <EmailToolbar textareaRef={textareaRef} /> : <WhatsAppToolbar textareaRef={textareaRef} />}
-
-        <textarea
-          ref={textareaRef}
-          value={reminder.body}
-          onChange={(e) => onChange("body", e.target.value)}
-          onInput={(e) => onChange("body", (e.target as HTMLTextAreaElement).value)}
-          rows={3}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
-          placeholder={isEmail
-            ? "Olá {{nome}}, lembramos que seu agendamento é em breve..."
-            : "Olá {{nome}}, lembrete: seu agendamento é amanhã!"}
-        />
-
-        <div className="flex justify-between">
-          <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive gap-1" onClick={onDelete}>
-            <Trash2 className="w-3 h-3" /> Excluir
-          </Button>
-          <Button size="sm" className="h-7 text-xs gap-1" onClick={onSave}>
-            <Save className="w-3 h-3" /> Salvar
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-/* ─── Main component ─── */
-
-const DashMessaging = () => {
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchTemplates();
-  }, []);
-
-  const fetchTemplates = async () => {
-    const { data } = await supabase.from("messaging_templates").select("*").order("trigger");
-    const all: Template[] = [];
-    for (const trigger of TRIGGERS) {
-      for (const channel of CHANNELS) {
-        const existing = (data as any[])?.find(
-          (t: any) => t.trigger === trigger.value && t.channel === channel.value
-        );
-        all.push({
-          id: existing?.id,
-          channel: channel.value,
-          trigger: trigger.value,
-          subject: existing?.subject || "",
-          body: existing?.body || "",
-          active: existing?.active ?? false,
-        });
-      }
-    }
-    setTemplates(all);
-    setLoading(false);
-  };
-
-  const handleChange = (idx: number, field: keyof Template, value: any) => {
-    setTemplates((prev) => prev.map((t, i) => (i === idx ? { ...t, [field]: value } : t)));
-  };
-
-  const handleSave = async (template: Template) => {
-    const payload = {
-      channel: template.channel,
-      trigger: template.trigger,
-      subject: template.subject || null,
-      body: template.body,
-      active: template.active,
-    };
-    if (template.id) {
-      await supabase.from("messaging_templates").update(payload as any).eq("id", template.id);
-    } else {
-      await supabase.from("messaging_templates").insert(payload as any);
-    }
-    toast.success("Template salvo!");
-    fetchTemplates();
-  };
-
-  if (loading) return <p className="text-muted-foreground">Carregando...</p>;
-
-  return (
-    <Tabs defaultValue="geral" className="space-y-4">
-      <TabsList>
-        <TabsTrigger value="geral" className="gap-1.5">
-          <Mail className="w-4 h-4" /> Geral
-        </TabsTrigger>
-        <TabsTrigger value="lembretes" className="gap-1.5">
-          <Bell className="w-4 h-4" /> Lembretes
-        </TabsTrigger>
-        <TabsTrigger value="vendas" className="gap-1.5">
-          <Trophy className="w-4 h-4" /> Vendas
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="geral" className="space-y-6">
-        <p className="text-sm text-muted-foreground">
-          Configure mensagens automáticas para cada etapa do funil.
-        </p>
-
-        {TRIGGERS.map((trigger) => {
-          const triggerTemplates = templates.filter((t) => t.trigger === trigger.value);
-          return (
-            <Card key={trigger.value}>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">{trigger.label}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {triggerTemplates.map((tmpl) => {
-                  const idx = templates.indexOf(tmpl);
-                  return (
-                    <TemplateRow
-                      key={`${tmpl.channel}-${tmpl.trigger}`}
-                      tmpl={tmpl}
-                      onChange={(field, value) => handleChange(idx, field, value)}
-                      onSave={() => handleSave(tmpl)}
-                    />
-                  );
-                })}
-              </CardContent>
-            </Card>
-          );
-        })}
-      </TabsContent>
-
-      <TabsContent value="lembretes">
-        <RemindersTab />
-      </TabsContent>
-
-      <TabsContent value="vendas">
-        <SaleNotificationsTab />
-      </TabsContent>
-    </Tabs>
   );
 };
 
@@ -579,13 +427,8 @@ const SaleNotificationsTab = () => {
 
   const handleAdd = async () => {
     if (!newPhone.trim()) return;
-    await supabase.from("sale_notification_contacts").insert({
-      name: newName.trim() || "Sem nome",
-      phone: newPhone.trim(),
-      active: true,
-    });
-    setNewName("");
-    setNewPhone("");
+    await supabase.from("sale_notification_contacts").insert({ name: newName.trim() || "Sem nome", phone: newPhone.trim(), active: true });
+    setNewName(""); setNewPhone("");
     toast.success("Contato adicionado!");
     fetchContacts();
   };
@@ -608,69 +451,35 @@ const SaleNotificationsTab = () => {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Cadastre os números que devem receber uma notificação via WhatsApp quando um lead for convertido (venda realizada).
+        Cadastre os números que devem receber uma notificação via WhatsApp quando um lead for convertido.
       </p>
-
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Adicionar contato
-          </CardTitle>
+          <CardTitle className="text-sm flex items-center gap-2"><Plus className="w-4 h-4" /> Adicionar contato</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-2">
-            <Input
-              placeholder="Nome (opcional)"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="sm:w-48"
-            />
-            <Input
-              placeholder="(00) 00000-0000"
-              value={newPhone}
-              onChange={(e) => setNewPhone(formatPhone(e.target.value))}
-              className="sm:w-48"
-              maxLength={15}
-              type="tel"
-            />
-            <Button onClick={handleAdd} disabled={!newPhone.trim()} size="sm" className="gap-1.5">
-              <Plus className="w-3.5 h-3.5" /> Adicionar
-            </Button>
+            <Input placeholder="Nome (opcional)" value={newName} onChange={(e) => setNewName(e.target.value)} className="sm:w-48" />
+            <Input placeholder="(00) 00000-0000" value={newPhone} onChange={(e) => setNewPhone(formatPhone(e.target.value))} className="sm:w-48" maxLength={15} type="tel" />
+            <Button onClick={handleAdd} disabled={!newPhone.trim()} size="sm" className="gap-1.5"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
           </div>
         </CardContent>
       </Card>
-
       {contacts.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-muted-foreground text-sm">
-            Nenhum contato cadastrado. Adicione números acima para receber alertas de vendas.
-          </CardContent>
-        </Card>
+        <Card><CardContent className="py-8 text-center text-muted-foreground text-sm">Nenhum contato cadastrado.</CardContent></Card>
       ) : (
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Contatos cadastrados ({contacts.length})</CardTitle>
-          </CardHeader>
+          <CardHeader className="pb-3"><CardTitle className="text-sm">Contatos ({contacts.length})</CardTitle></CardHeader>
           <CardContent className="space-y-2">
-            {contacts.map((contact) => (
-              <div
-                key={contact.id}
-                className={`flex items-center justify-between rounded-lg border border-border p-3 transition-opacity ${
-                  !contact.active ? "opacity-50" : ""
-                }`}
-              >
+            {contacts.map((c) => (
+              <div key={c.id} className={`flex items-center justify-between rounded-lg border p-3 ${!c.active ? "opacity-50" : ""}`}>
                 <div className="flex items-center gap-3">
                   <Phone className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">{contact.name}</p>
-                    <p className="text-xs text-muted-foreground">{contact.phone}</p>
-                  </div>
+                  <div><p className="text-sm font-medium">{c.name}</p><p className="text-xs text-muted-foreground">{c.phone}</p></div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Switch checked={contact.active} onCheckedChange={() => handleToggle(contact)} />
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(contact)}>
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                  <Switch checked={c.active} onCheckedChange={() => handleToggle(c)} />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(c)}><Trash2 className="w-3.5 h-3.5" /></Button>
                 </div>
               </div>
             ))}
@@ -678,6 +487,83 @@ const SaleNotificationsTab = () => {
         </Card>
       )}
     </div>
+  );
+};
+
+/* ─── Main component ─── */
+
+const DashMessaging = () => {
+  const [sequences, setSequences] = useState<Sequence[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSequences = useCallback(async () => {
+    const { data } = await supabase
+      .from("automation_sequences" as any)
+      .select("*")
+      .order("funnel")
+      .order("step_order") as any;
+    setSequences(data || []);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchSequences(); }, [fetchSequences]);
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+    </div>
+  );
+
+  return (
+    <Tabs defaultValue="automacoes" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="automacoes" className="gap-1.5">
+          <Zap className="w-4 h-4" /> Automações
+        </TabsTrigger>
+        <TabsTrigger value="fila" className="gap-1.5">
+          <Send className="w-4 h-4" /> Fila de Envio
+        </TabsTrigger>
+        <TabsTrigger value="vendas" className="gap-1.5">
+          <Trophy className="w-4 h-4" /> Notif. Vendas
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="automacoes" className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              Réguas de comunicação automáticas. Cada funil dispara mensagens por WhatsApp e E-mail baseadas nos eventos do lead.
+            </p>
+          </div>
+          <Badge variant="outline" className="text-xs">
+            {sequences.filter(s => s.active).length}/{sequences.length} ativos
+          </Badge>
+        </div>
+
+        <Accordion type="multiple" className="space-y-2">
+          {FUNNELS.map((funnel) => {
+            const funnelSeqs = sequences.filter(s => s.funnel === funnel.value);
+            if (funnelSeqs.length === 0) return null;
+            return (
+              <FunnelSection
+                key={funnel.value}
+                funnel={funnel}
+                sequences={funnelSeqs}
+                onUpdate={fetchSequences}
+              />
+            );
+          })}
+        </Accordion>
+      </TabsContent>
+
+      <TabsContent value="fila">
+        <QueueMonitor />
+      </TabsContent>
+
+      <TabsContent value="vendas">
+        <SaleNotificationsTab />
+      </TabsContent>
+    </Tabs>
   );
 };
 
