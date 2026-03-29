@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Plus, Trash2, Save, Loader2, ExternalLink, ChevronUp, ChevronDown, Copy, Eye } from "lucide-react";
 import { toast } from "sonner";
+import ImageUploadCrop from "./ImageUploadCrop";
+import RichTextEditor from "./RichTextEditor";
 
 interface QuizPage {
   id: string;
@@ -397,8 +399,17 @@ const DashQuizPages = () => {
                 <Field label="Descrição" value={editPage.lesson_desc} onChange={(v) => updateField("lesson_desc", v)} multi />
                 <Field label="Duração" value={editPage.lesson_duration} onChange={(v) => updateField("lesson_duration", v)} />
                 <Field label="Fase" value={editPage.lesson_phase} onChange={(v) => updateField("lesson_phase", v)} />
-                <Field label="URL do Vídeo" value={editPage.lesson_video_url} onChange={(v) => updateField("lesson_video_url", v)} />
-                <Field label="Thumbnail URL" value={editPage.lesson_thumbnail} onChange={(v) => updateField("lesson_thumbnail", v)} />
+                <Field label="URL do Vídeo (Embed)" value={editPage.lesson_video_url} onChange={(v) => updateField("lesson_video_url", v)} placeholder="https://player-vz-....pandavideo.com.br/embed/?v=..." />
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Thumbnail</label>
+                  <ImageUploadCrop
+                    value={editPage.lesson_thumbnail}
+                    onChange={(v) => updateField("lesson_thumbnail", v)}
+                    friendlyName={`aula-thumb-${editPage.slug}`}
+                    maxWidth={800}
+                    maxHeight={450}
+                  />
+                </div>
               </AccordionContent>
             </AccordionItem>
 
@@ -485,7 +496,16 @@ const DashQuizPages = () => {
                       </div>
                     </div>
                     <Field label="Explicação" value={q.explanation} onChange={(v) => updateQuestion(qi, "explanation", v)} multi />
-                    <Field label="URL da Imagem" value={q.image_url || ""} onChange={(v) => updateQuestion(qi, "image_url", v)} placeholder="https://... ou /images/quiz/..." />
+                    <div>
+                      <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Imagem da Questão</label>
+                      <ImageUploadCrop
+                        value={q.image_url || ""}
+                        onChange={(v) => updateQuestion(qi, "image_url", v)}
+                        friendlyName={`quiz-q${qi + 1}`}
+                        maxWidth={800}
+                        maxHeight={500}
+                      />
+                    </div>
 
                     <div className="space-y-2">
                       <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Opções</span>
