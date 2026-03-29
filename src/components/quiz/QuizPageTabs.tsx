@@ -57,6 +57,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
               className="absolute inset-0 w-full h-full"
               allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
               allowFullScreen
+              // @ts-ignore
               fetchPriority="high"
             />
           </div>
