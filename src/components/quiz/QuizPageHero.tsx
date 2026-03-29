@@ -34,21 +34,10 @@ const QuizPageHero = ({ page }: Props) => {
       <div className="glow-gold" style={{ width: 600, height: 600, top: "-10%", left: "50%", transform: "translateX(-50%)" }} />
 
       <div className="relative z-10 max-w-[860px] mx-auto px-5 sm:px-10 pt-10 sm:pt-24 pb-12 sm:pb-20">
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="inline-flex items-center gap-2.5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-primary mb-4 sm:mb-5"
-        >
-          <span className="block w-7 h-px bg-primary/50" />
-          {page.hero_label}
-          <span className="block w-7 h-px bg-primary/50" />
-        </motion.div>
-
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
+          transition={{ delay: 0.3 }}
           className="font-['Bebas_Neue',sans-serif] text-[clamp(2.6rem,7vw,5.2rem)] leading-[0.95] tracking-wide mb-3 sm:mb-4 flex items-center gap-3 sm:gap-4 flex-wrap"
         >
           <LockOpen className="w-8 h-8 sm:w-10 sm:h-10 text-primary" strokeWidth={1.5} />
