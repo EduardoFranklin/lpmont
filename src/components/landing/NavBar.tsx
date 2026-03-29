@@ -36,10 +36,17 @@ const NavBar = () => {
     e.preventDefault();
     setMenuOpen(false);
     const id = href.replace("#", "");
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    const scrollToTarget = () => {
+      const el = document.getElementById(id);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    };
+    scrollToTarget();
+    // Re-scroll after accordions finish expanding/collapsing
+    setTimeout(scrollToTarget, 600);
+    setTimeout(scrollToTarget, 1200);
   };
 
   return (
