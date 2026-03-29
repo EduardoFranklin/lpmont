@@ -81,7 +81,7 @@ const HeroSection = () => {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 sm:mb-12">
-            <a href="/agendar" className="btn-gradient w-full sm:w-auto active:scale-[0.97] transition-transform">
+            <a href="#falar-equipe" className="btn-gradient w-full sm:w-auto active:scale-[0.97] transition-transform">
               <div className="btn-gradient-wrapper w-full sm:w-auto">
                 <div className="btn-gradient-inner w-full sm:w-auto">
                   <div className="btn-gradient-bg" />

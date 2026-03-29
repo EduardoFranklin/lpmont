@@ -21,7 +21,7 @@ const FloatingCTA = () => {
           className="fixed bottom-0 left-0 right-0 z-50 p-3 backdrop-blur-2xl border-t border-foreground/[0.04] sm:hidden"
           style={{ backgroundColor: "hsl(var(--background) / 0.85)" }}
         >
-          <a href="/agendar" className="btn-summit w-full justify-center text-sm py-3">
+          <a href="#falar-equipe" className="btn-summit w-full justify-center text-sm py-3">
             Falar com a Equipe <ArrowRight className="w-4 h-4" />
           </a>
         </motion.div>
