@@ -118,6 +118,16 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
     setTimeout(() => {
       if (qi >= questions.length - 1) {
         setPhase("result");
+        // Save quiz score to the lead
+        const allScores = [...scores, pts];
+        const rawTotal = allScores.reduce((a, b) => a + b, 0);
+        const finalTotal = (travaTrigger || (q.is_critical && !isIdeal)) ? Math.min(rawTotal, 70) : rawTotal;
+        try {
+          supabase.from("leads")
+            .update({ quiz_score: finalTotal, quiz_slug: page.slug } as any)
+            .eq("email", leadEmail.trim())
+            .then(() => {});
+        } catch {}
       } else {
         setQi((i) => i + 1);
         setSelected(null);
