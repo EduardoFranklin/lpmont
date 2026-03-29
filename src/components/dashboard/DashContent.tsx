@@ -12,7 +12,7 @@ import ImageUploader from "./ImageUploader";
 
 type ContentMap = Record<string, Record<string, string>>;
 
-const sectionOrder = ["hero", "problem", "modules", "method", "instructor", "benefits", "testimonials", "pricing", "faq", "footer"];
+const sectionOrder = ["hero", "problem", "modules", "synopses", "method", "instructor", "benefits", "testimonials", "pricing", "faq", "footer"];
 
 // Detect if a field value looks like JSON
 function isJsonField(key: string, value: string): boolean {

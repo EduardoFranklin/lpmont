@@ -304,4 +304,10 @@ export const fieldLabels: Record<string, Record<string, string>> = {
     tagline: "Tagline",
     instagram_links: "Links do Instagram (JSON)",
   },
+  synopses: Object.fromEntries(
+    Object.entries(moduleSynopsis).map(([num]) => [
+      `synopsis_${num}`,
+      `Sinopse do Módulo ${num} (JSON)`,
+    ])
+  ),
 };
