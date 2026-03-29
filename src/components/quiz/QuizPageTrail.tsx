@@ -24,8 +24,16 @@ interface Camp {
   img?: string;
 }
 
+interface HandsOn {
+  num: string;
+  title: string;
+  desc?: string;
+  img?: string;
+}
+
 const QuizPageTrail = ({ content, ctaUrl }: Props) => {
   const camps = parseJSON<Camp[]>(content.modules?.camps ?? "[]", []);
+  const handsOn = parseJSON<HandsOn[]>(content.modules?.hands_on ?? "[]", []);
 
   // Group camps by phase
   const grouped: Record<string, Camp[]> = {};
@@ -113,6 +121,50 @@ const QuizPageTrail = ({ content, ctaUrl }: Props) => {
             </div>
           );
         })}
+
+        {/* Hands-On */}
+        {handsOn.length > 0 && (
+          <div className="mb-2.5 mt-6">
+            <div className="flex items-center gap-2.5 mb-2 px-1">
+              <span className="text-[0.6rem] font-extrabold tracking-[0.16em] uppercase px-2 py-0.5 rounded border bg-rose-500/10 text-rose-400 border-rose-500/20">
+                Hands-On
+              </span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+            {handsOn.map((h) => {
+              const imgSrc = h.img || "/images/handson-cover-1.webp";
+              return (
+                <div
+                  key={h.num}
+                  className="flex items-center border border-border bg-card rounded-xl overflow-hidden mb-1 hover:border-foreground/12 transition-colors"
+                >
+                  <div className="w-[72px] h-[52px] flex-shrink-0 relative overflow-hidden border-r border-border">
+                    <img
+                      src={imgSrc}
+                      alt={h.title}
+                      className="w-full h-full object-cover brightness-[0.35] saturate-[0.3]"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Lock className="w-3.5 h-3.5 text-foreground/30" />
+                    </div>
+                  </div>
+                  <div className="hidden sm:flex w-[68px] flex-shrink-0 items-center justify-center text-[0.62rem] font-bold text-muted-foreground border-r border-border">
+                    {h.num}
+                  </div>
+                  <div className="flex-1 flex flex-col justify-center px-5 py-3.5 gap-0.5">
+                    <div className="text-sm font-medium text-foreground/60">{h.title}</div>
+                    {h.desc && (
+                      <div className="text-[0.74rem] text-muted-foreground font-light leading-snug line-clamp-1">
+                        {h.desc}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* CTA */}
         <div className="mt-8 bg-gradient-to-br from-primary/8 to-primary/4 border border-primary/20 rounded-2xl p-8 flex items-center justify-between gap-6 flex-wrap">
