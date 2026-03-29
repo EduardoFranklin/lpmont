@@ -217,12 +217,13 @@ const ResultPhase = ({
           Garantir acesso com {page.coupon_discount} off <ArrowRight className="w-3.5 h-3.5" />
         </a>
 
-        <button
-          onClick={onReset}
-          className="text-[0.72rem] text-muted-foreground underline underline-offset-[3px] hover:text-foreground/60 transition-colors"
+        <a
+          href="/#falar-equipe"
+          onClick={onClose}
+          className="text-[0.78rem] text-muted-foreground hover:text-foreground/60 transition-colors font-medium flex items-center justify-center gap-1.5"
         >
-          Refazer o diagnóstico
-        </button>
+          Falar com a Equipe <ArrowRight className="w-3 h-3" />
+        </a>
       </motion.div>
     </div>
   );
