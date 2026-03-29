@@ -48,26 +48,14 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       {/* Panel 1: Lesson */}
       {activeTab === 1 && (
         <div className="bg-card border border-border/60 rounded-b-2xl rounded-tr-xl overflow-hidden">
-          {/* Thumbnail */}
-          <div
-            className="relative w-full aspect-[16/7] bg-black overflow-hidden cursor-pointer group"
-            onClick={onOpenVideo}
-          >
-            {page.lesson_thumbnail ? (
-              <img
-                src={page.lesson_thumbnail}
-                alt=""
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-              />
-            ) : (
-              <div className="w-full h-full bg-muted" />
-            )}
-
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <div className="w-[68px] h-[68px] rounded-full bg-primary/95 flex items-center justify-center shadow-[0_6px_32px_rgba(232,160,32,0.5)] group-hover:scale-110 transition-transform">
-                <Play className="w-6 h-6 text-primary-foreground fill-current" />
-              </div>
-            </div>
+          {/* Embedded Video */}
+          <div className="relative w-full bg-black" style={{ paddingBottom: "56.25%" }}>
+            <iframe
+              src={page.lesson_video_url + (page.lesson_video_url.includes("?") ? "&" : "?") + "playOpensFullscreenNative=false"}
+              className="absolute inset-0 w-full h-full border-0"
+              allowFullScreen
+              allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
+            />
           </div>
 
           {/* Info */}
@@ -82,14 +70,6 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
             </div>
             <h2 className="text-xl font-semibold leading-tight mb-2.5">{page.lesson_title}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed font-light mb-4">{page.lesson_desc}</p>
-            <div className="flex items-center gap-4 pt-4 border-t border-border">
-              <button
-                onClick={onOpenVideo}
-                className="ml-auto flex items-center gap-1.5 text-[0.72rem] font-semibold tracking-wide uppercase px-3.5 py-1.5 rounded-lg border transition-all text-primary bg-primary/8 border-primary/20 hover:bg-primary/15 hover:border-primary/40"
-              >
-                Assistir <ArrowRight className="w-3 h-3" />
-              </button>
-            </div>
           </div>
         </div>
       )}
