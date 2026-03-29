@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      automation_sequences: {
+        Row: {
+          active: boolean
+          body: string
+          channel: string
+          conditions: Json | null
+          created_at: string
+          delay_description: string
+          delay_minutes: number
+          funnel: string
+          id: string
+          step_key: string
+          step_order: number
+          subject: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string
+          channel: string
+          conditions?: Json | null
+          created_at?: string
+          delay_description?: string
+          delay_minutes?: number
+          funnel: string
+          id?: string
+          step_key: string
+          step_order?: number
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          channel?: string
+          conditions?: Json | null
+          created_at?: string
+          delay_description?: string
+          delay_minutes?: number
+          funnel?: string
+          id?: string
+          step_key?: string
+          step_order?: number
+          subject?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       google_oauth_tokens: {
         Row: {
           access_token: string
@@ -116,14 +167,33 @@ export type Database = {
           career: string
           city: string
           created_at: string
+          cupom_usado_compra: string | null
+          data_compra: string | null
           email: string
+          forma_pagamento: string | null
+          funnel_origin: string | null
+          hotmart_offer_code: string | null
+          hotmart_status: string | null
+          hotmart_transaction_id: string | null
           id: string
           lead_number: number
+          link_onboarding: string | null
           name: string
           notes: string | null
           phone: string
+          quiz_concluido: boolean | null
+          quiz_diagnostico: string | null
           quiz_score: number | null
           quiz_slug: string | null
+          quiz_started_at: string | null
+          reuniao_consultor: string | null
+          reuniao_data_extenso: string | null
+          reuniao_data_hora_iso: string | null
+          reuniao_hora_extenso: string | null
+          reuniao_link_google_calendar: string | null
+          reuniao_link_google_meet: string | null
+          reuniao_notas: string | null
+          reuniao_status: string | null
           revenue: number | null
           scheduled_day: string | null
           scheduled_time: string | null
@@ -137,19 +207,39 @@ export type Database = {
           utm_medium: string | null
           utm_source: string | null
           utm_term: string | null
+          valor_pago: number | null
         }
         Insert: {
           career: string
           city: string
           created_at?: string
+          cupom_usado_compra?: string | null
+          data_compra?: string | null
           email: string
+          forma_pagamento?: string | null
+          funnel_origin?: string | null
+          hotmart_offer_code?: string | null
+          hotmart_status?: string | null
+          hotmart_transaction_id?: string | null
           id?: string
           lead_number?: number
+          link_onboarding?: string | null
           name: string
           notes?: string | null
           phone: string
+          quiz_concluido?: boolean | null
+          quiz_diagnostico?: string | null
           quiz_score?: number | null
           quiz_slug?: string | null
+          quiz_started_at?: string | null
+          reuniao_consultor?: string | null
+          reuniao_data_extenso?: string | null
+          reuniao_data_hora_iso?: string | null
+          reuniao_hora_extenso?: string | null
+          reuniao_link_google_calendar?: string | null
+          reuniao_link_google_meet?: string | null
+          reuniao_notas?: string | null
+          reuniao_status?: string | null
           revenue?: number | null
           scheduled_day?: string | null
           scheduled_time?: string | null
@@ -163,19 +253,39 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          valor_pago?: number | null
         }
         Update: {
           career?: string
           city?: string
           created_at?: string
+          cupom_usado_compra?: string | null
+          data_compra?: string | null
           email?: string
+          forma_pagamento?: string | null
+          funnel_origin?: string | null
+          hotmart_offer_code?: string | null
+          hotmart_status?: string | null
+          hotmart_transaction_id?: string | null
           id?: string
           lead_number?: number
+          link_onboarding?: string | null
           name?: string
           notes?: string | null
           phone?: string
+          quiz_concluido?: boolean | null
+          quiz_diagnostico?: string | null
           quiz_score?: number | null
           quiz_slug?: string | null
+          quiz_started_at?: string | null
+          reuniao_consultor?: string | null
+          reuniao_data_extenso?: string | null
+          reuniao_data_hora_iso?: string | null
+          reuniao_hora_extenso?: string | null
+          reuniao_link_google_calendar?: string | null
+          reuniao_link_google_meet?: string | null
+          reuniao_notas?: string | null
+          reuniao_status?: string | null
           revenue?: number | null
           scheduled_day?: string | null
           scheduled_time?: string | null
@@ -189,8 +299,122 @@ export type Database = {
           utm_medium?: string | null
           utm_source?: string | null
           utm_term?: string | null
+          valor_pago?: number | null
         }
         Relationships: []
+      }
+      message_history: {
+        Row: {
+          body_preview: string | null
+          channel: string
+          created_at: string
+          external_id: string | null
+          funnel: string | null
+          id: string
+          lead_id: string
+          status: string
+          step_key: string | null
+          subject: string | null
+        }
+        Insert: {
+          body_preview?: string | null
+          channel: string
+          created_at?: string
+          external_id?: string | null
+          funnel?: string | null
+          id?: string
+          lead_id: string
+          status?: string
+          step_key?: string | null
+          subject?: string | null
+        }
+        Update: {
+          body_preview?: string | null
+          channel?: string
+          created_at?: string
+          external_id?: string | null
+          funnel?: string | null
+          id?: string
+          lead_id?: string
+          status?: string
+          step_key?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_history_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      message_queue: {
+        Row: {
+          attempts: number
+          body: string
+          channel: string
+          created_at: string
+          funnel: string
+          id: string
+          last_error: string | null
+          lead_id: string
+          scheduled_for: string
+          sent_at: string | null
+          sequence_id: string | null
+          status: string
+          step_key: string
+          subject: string | null
+        }
+        Insert: {
+          attempts?: number
+          body?: string
+          channel: string
+          created_at?: string
+          funnel: string
+          id?: string
+          last_error?: string | null
+          lead_id: string
+          scheduled_for?: string
+          sent_at?: string | null
+          sequence_id?: string | null
+          status?: string
+          step_key: string
+          subject?: string | null
+        }
+        Update: {
+          attempts?: number
+          body?: string
+          channel?: string
+          created_at?: string
+          funnel?: string
+          id?: string
+          last_error?: string | null
+          lead_id?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          sequence_id?: string | null
+          status?: string
+          step_key?: string
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_queue_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_queue_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "automation_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       messaging_templates: {
         Row: {
