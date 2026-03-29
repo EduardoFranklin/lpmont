@@ -83,7 +83,7 @@ const QuizPage = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [showCoupon, setShowCoupon] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -133,12 +133,8 @@ const QuizPage = () => {
   };
 
   const handleOpenVideo = useCallback(() => {
-    if (!unlocked) {
-      setShowUnlock(true);
-    } else {
-      setShowVideo(true);
-    }
-  }, [unlocked]);
+    setShowVideo(true);
+  }, []);
 
   const handleOpenQuiz = useCallback(() => {
     setShowQuiz(true);

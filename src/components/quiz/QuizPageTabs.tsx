@@ -51,38 +51,23 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
           {/* Thumbnail */}
           <div
             className="relative w-full aspect-[16/7] bg-black overflow-hidden cursor-pointer group"
-            onClick={unlocked ? onOpenVideo : onUnlock}
+            onClick={onOpenVideo}
           >
             {page.lesson_thumbnail ? (
               <img
                 src={page.lesson_thumbnail}
                 alt=""
-                className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03] ${
-                  !unlocked ? "blur-sm brightness-[0.3] saturate-[0.4]" : ""
-                }`}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
               />
             ) : (
               <div className="w-full h-full bg-muted" />
             )}
 
-            {!unlocked && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 bg-black/55 backdrop-blur-sm hover:bg-black/35 transition-colors">
-                <div className="w-14 h-14 rounded-full border border-foreground/15 bg-foreground/5 flex items-center justify-center hover:border-primary/55 hover:bg-primary/10 transition-colors">
-                  <Lock className="w-5 h-5 text-foreground/40" />
-                </div>
-                <span className="text-[0.63rem] font-semibold tracking-[0.14em] uppercase text-foreground/35">
-                  Bloqueado
-                </span>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              <div className="w-[68px] h-[68px] rounded-full bg-primary/95 flex items-center justify-center shadow-[0_6px_32px_rgba(232,160,32,0.5)] group-hover:scale-110 transition-transform">
+                <Play className="w-6 h-6 text-primary-foreground fill-current" />
               </div>
-            )}
-
-            {unlocked && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                <div className="w-[68px] h-[68px] rounded-full bg-primary/95 flex items-center justify-center shadow-[0_6px_32px_rgba(232,160,32,0.5)] group-hover:scale-110 transition-transform">
-                  <Play className="w-6 h-6 text-primary-foreground fill-current" />
-                </div>
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Info */}
@@ -91,30 +76,18 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
               <span className="text-[0.63rem] font-bold tracking-[0.12em] uppercase px-2 py-0.5 rounded border border-primary/30 bg-primary/7 text-primary">
                 Vídeo
               </span>
-              <span className={`ml-auto text-[0.63rem] font-semibold tracking-[0.1em] uppercase px-2.5 py-0.5 rounded-full ${
-                unlocked
-                  ? "bg-green-500/12 text-green-400"
-                  : "bg-foreground/5 text-muted-foreground"
-              }`}>
-                {unlocked ? "Disponível" : "Bloqueado"}
+              <span className="ml-auto text-[0.63rem] font-semibold tracking-[0.1em] uppercase px-2.5 py-0.5 rounded-full bg-green-500/12 text-green-400">
+                Disponível
               </span>
             </div>
             <h2 className="text-xl font-semibold leading-tight mb-2.5">{page.lesson_title}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed font-light mb-4">{page.lesson_desc}</p>
             <div className="flex items-center gap-4 pt-4 border-t border-border">
               <button
-                onClick={unlocked ? onOpenVideo : onUnlock}
-                className={`ml-auto flex items-center gap-1.5 text-[0.72rem] font-semibold tracking-wide uppercase px-3.5 py-1.5 rounded-lg border transition-all ${
-                  unlocked
-                    ? "text-primary bg-primary/8 border-primary/20 hover:bg-primary/15 hover:border-primary/40"
-                    : "text-muted-foreground bg-foreground/[0.03] border-border"
-                }`}
+                onClick={onOpenVideo}
+                className="ml-auto flex items-center gap-1.5 text-[0.72rem] font-semibold tracking-wide uppercase px-3.5 py-1.5 rounded-lg border transition-all text-primary bg-primary/8 border-primary/20 hover:bg-primary/15 hover:border-primary/40"
               >
-                {unlocked ? (
-                  <>Assistir <ArrowRight className="w-3 h-3" /></>
-                ) : (
-                  <><Lock className="w-3 h-3" /> Bloqueado</>
-                )}
+                Assistir <ArrowRight className="w-3 h-3" />
               </button>
             </div>
           </div>
