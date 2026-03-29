@@ -168,6 +168,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
                 </button>
               </div>
             </div>
+            </div>
           </div>
         </div>
       )}
