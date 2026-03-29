@@ -147,8 +147,10 @@ const DashSettings = () => {
       const value = values[setting.key] || "";
       await supabase
         .from("site_settings")
-        .update({ value, updated_at: new Date().toISOString() })
-        .eq("key", setting.key);
+        .upsert(
+          { key: setting.key, value, updated_at: new Date().toISOString() },
+          { onConflict: "key" }
+        );
     }
     setSaving(false);
     toast.success("Configurações salvas! As alterações serão aplicadas no site.");

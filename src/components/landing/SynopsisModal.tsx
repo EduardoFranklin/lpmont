@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { moduleSynopsis } from "./moduleSynopsis";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
 interface SynopsisModalProps {
   moduleNum: number | null;
@@ -11,7 +11,14 @@ interface SynopsisModalProps {
 
 const SynopsisModal = ({ moduleNum, open, onOpenChange }: SynopsisModalProps) => {
   if (!moduleNum) return null;
-  const data = moduleSynopsis[moduleNum];
+
+  const synopsesContent = useSection("synopses");
+  const cmsRaw = synopsesContent[`synopsis_${moduleNum}`];
+  const fallback = moduleSynopsis[moduleNum];
+  const data = cmsRaw
+    ? parseJSON<{ title: string; tagline: string; content: string[] }>(cmsRaw, fallback)
+    : fallback;
+
   if (!data) return null;
 
   const coverSrc = `/images/capa${moduleNum}.webp`;
