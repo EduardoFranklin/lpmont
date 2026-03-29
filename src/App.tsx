@@ -13,6 +13,7 @@ import LeadDetail from "./pages/LeadDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import QuizPage from "./pages/QuizPage.tsx";
 import Checkout from "./pages/Checkout.tsx";
+import FalarEquipe from "./pages/FalarEquipe.tsx";
 
 /* force-publish-v3 */
 const queryClient = new QueryClient();
