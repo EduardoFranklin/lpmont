@@ -50,16 +50,21 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
         <div className="bg-card border border-border/60 rounded-b-2xl rounded-tr-xl overflow-hidden">
           {/* Panda Video Embed */}
           <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-            <iframe
-              id="panda-7e77bfe0-d52a-46a0-a868-b27391b245ed"
-              src="https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=7e77bfe0-d52a-46a0-a868-b27391b245ed&playOpensFullscreenNative=true"
-              style={{ border: "none" }}
-              className="absolute inset-0 w-full h-full"
-              allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-              allowFullScreen
-              // @ts-ignore
-              fetchPriority="high"
-            />
+            {page.lesson_video_url ? (
+              <iframe
+                src={page.lesson_video_url}
+                style={{ border: "none" }}
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
+                allowFullScreen
+                // @ts-ignore
+                fetchPriority="high"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-foreground/5 text-muted-foreground text-sm">
+                Vídeo não configurado
+              </div>
+            )}
           </div>
 
           {/* Info */}

@@ -68,6 +68,7 @@ export interface QuizQuestion {
   is_critical: boolean;
   weight: number;
   explanation: string;
+  image_url: string;
   options: { text: string; points: number }[];
 }
 
