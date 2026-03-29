@@ -168,6 +168,8 @@ export type Database = {
           city: string
           created_at: string
           cupom_usado_compra: string | null
+          daily_wa_count: number | null
+          daily_wa_date: string | null
           data_compra: string | null
           email: string
           forma_pagamento: string | null
@@ -176,6 +178,7 @@ export type Database = {
           hotmart_status: string | null
           hotmart_transaction_id: string | null
           id: string
+          last_wa_sent_at: string | null
           lead_number: number
           link_onboarding: string | null
           name: string
@@ -208,12 +211,15 @@ export type Database = {
           utm_source: string | null
           utm_term: string | null
           valor_pago: number | null
+          wa_sem_resposta_count: number | null
         }
         Insert: {
           career: string
           city: string
           created_at?: string
           cupom_usado_compra?: string | null
+          daily_wa_count?: number | null
+          daily_wa_date?: string | null
           data_compra?: string | null
           email: string
           forma_pagamento?: string | null
@@ -222,6 +228,7 @@ export type Database = {
           hotmart_status?: string | null
           hotmart_transaction_id?: string | null
           id?: string
+          last_wa_sent_at?: string | null
           lead_number?: number
           link_onboarding?: string | null
           name: string
@@ -254,12 +261,15 @@ export type Database = {
           utm_source?: string | null
           utm_term?: string | null
           valor_pago?: number | null
+          wa_sem_resposta_count?: number | null
         }
         Update: {
           career?: string
           city?: string
           created_at?: string
           cupom_usado_compra?: string | null
+          daily_wa_count?: number | null
+          daily_wa_date?: string | null
           data_compra?: string | null
           email?: string
           forma_pagamento?: string | null
@@ -268,6 +278,7 @@ export type Database = {
           hotmart_status?: string | null
           hotmart_transaction_id?: string | null
           id?: string
+          last_wa_sent_at?: string | null
           lead_number?: number
           link_onboarding?: string | null
           name?: string
@@ -300,6 +311,7 @@ export type Database = {
           utm_source?: string | null
           utm_term?: string | null
           valor_pago?: number | null
+          wa_sem_resposta_count?: number | null
         }
         Relationships: []
       }
