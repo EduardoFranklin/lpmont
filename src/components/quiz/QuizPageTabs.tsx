@@ -28,7 +28,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
           <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
             {page.lesson_tag}
           </span>
-          {page.lesson_number} — {page.lesson_title.split(" ").slice(0, 2).join(" ")}
+          Aula 01
         </button>
         <button
           onClick={() => setActiveTab(2)}
