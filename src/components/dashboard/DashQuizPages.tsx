@@ -446,6 +446,7 @@ const DashQuizPages = () => {
                       </div>
                     </div>
                     <Field label="Explicação" value={q.explanation} onChange={(v) => updateQuestion(qi, "explanation", v)} multi />
+                    <Field label="URL da Imagem" value={q.image_url || ""} onChange={(v) => updateQuestion(qi, "image_url", v)} placeholder="https://... ou /images/quiz/..." />
 
                     <div className="space-y-2">
                       <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Opções</span>
