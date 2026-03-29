@@ -133,27 +133,32 @@ const QuizPageTrail = ({ content, ctaUrl }: Props) => {
             </div>
             {handsOn.map((h) => {
               const imgSrc = h.img || "/images/handson-cover-1.webp";
+              const isUnlocked = h.num === "H1";
               return (
                 <div
                   key={h.num}
-                  className="flex items-center border border-border bg-card rounded-xl overflow-hidden mb-1 hover:border-foreground/12 transition-colors"
+                  className={`flex items-center border bg-card rounded-xl overflow-hidden mb-1 transition-colors ${
+                    isUnlocked ? "border-primary/30 hover:border-primary/50" : "border-border hover:border-foreground/12"
+                  }`}
                 >
                   <div className="w-[72px] h-[52px] flex-shrink-0 relative overflow-hidden border-r border-border">
                     <img
                       src={imgSrc}
                       alt={h.title}
-                      className="w-full h-full object-cover brightness-[0.35] saturate-[0.3]"
+                      className={`w-full h-full object-cover ${isUnlocked ? "" : "brightness-[0.35] saturate-[0.3]"}`}
                       loading="lazy"
                     />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Lock className="w-3.5 h-3.5 text-foreground/30" />
-                    </div>
+                    {!isUnlocked && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Lock className="w-3.5 h-3.5 text-foreground/30" />
+                      </div>
+                    )}
                   </div>
                   <div className="hidden sm:flex w-[68px] flex-shrink-0 items-center justify-center text-[0.62rem] font-bold text-muted-foreground border-r border-border">
                     {h.num}
                   </div>
                   <div className="flex-1 flex flex-col justify-center px-5 py-3.5 gap-0.5">
-                    <div className="text-sm font-medium text-foreground/60">{h.title}</div>
+                    <div className={`text-sm font-medium ${isUnlocked ? "text-foreground" : "text-foreground/60"}`}>{h.title}</div>
                     {h.desc && (
                       <div className="text-[0.74rem] text-muted-foreground font-light leading-snug line-clamp-1">
                         {h.desc}
