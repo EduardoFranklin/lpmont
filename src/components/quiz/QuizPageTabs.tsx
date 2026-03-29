@@ -48,13 +48,16 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       {/* Panel 1: Lesson */}
       {activeTab === 1 && (
         <div className="bg-card border border-border/60 rounded-b-2xl rounded-tr-xl overflow-hidden">
-          {/* Embedded Video */}
-          <div className="relative w-full bg-black" style={{ paddingBottom: "56.25%" }}>
+          {/* Panda Video Embed */}
+          <div className="relative w-full" style={{ paddingBottom: "50%" }}>
             <iframe
-              src={page.lesson_video_url + (page.lesson_video_url.includes("?") ? "&" : "?") + "playOpensFullscreenNative=false"}
-              className="absolute inset-0 w-full h-full border-0"
-              allowFullScreen
+              id="panda-7e77bfe0-d52a-46a0-a868-b27391b245ed"
+              src="https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=7e77bfe0-d52a-46a0-a868-b27391b245ed&playOpensFullscreenNative=true"
+              style={{ border: "none" }}
+              className="absolute inset-0 w-full h-full"
               allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
+              allowFullScreen
+              fetchPriority="high"
             />
           </div>
 
