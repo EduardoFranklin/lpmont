@@ -36,17 +36,23 @@ const NavBar = () => {
     e.preventDefault();
     setMenuOpen(false);
     const id = href.replace("#", "");
-    const scrollToTarget = () => {
+
+    window.dispatchEvent(new CustomEvent("nav-scroll-lock"));
+
+    const scrollToTarget = (behavior: ScrollBehavior = "smooth") => {
       const el = document.getElementById(id);
-      if (el) {
-        const top = el.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top, behavior: "smooth" });
-      }
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior });
     };
-    scrollToTarget();
-    // Re-scroll after accordions finish expanding/collapsing
-    setTimeout(scrollToTarget, 600);
-    setTimeout(scrollToTarget, 1200);
+
+    requestAnimationFrame(() => scrollToTarget());
+    setTimeout(() => scrollToTarget(), 80);
+    setTimeout(() => scrollToTarget(), 420);
+    setTimeout(() => {
+      scrollToTarget("auto");
+      window.dispatchEvent(new CustomEvent("nav-scroll-unlock"));
+    }, 900);
   };
 
   return (
