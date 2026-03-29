@@ -27,10 +27,20 @@ const NavBar = () => {
   }, []);
 
   const links = [
-    { label: "A Trilha", href: "https://metodomont.com.br/#modulos" },
-    { label: "O Guia", href: "https://metodomont.com.br/#guia" },
-    { label: "Investimento", href: "https://metodomont.com.br/#preco" },
+    { label: "A Trilha", href: "#modulos" },
+    { label: "O Guia", href: "#guia" },
+    { label: "Investimento", href: "#preco" },
   ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    const id = href.replace("#", "");
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <motion.nav
