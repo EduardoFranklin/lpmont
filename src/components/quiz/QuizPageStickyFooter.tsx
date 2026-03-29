@@ -20,12 +20,14 @@ const QuizPageStickyFooter = ({ ctaUrl }: Props) => {
         visible ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <a
-        href={ctaUrl}
-        className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-full text-[0.82rem] font-bold tracking-wide uppercase shadow-[0_4px_20px_hsl(var(--brand-gold)/0.35)] hover:shadow-[0_6px_28px_hsl(var(--brand-gold)/0.5)] transition-all"
-      >
-        Quero Acesso Completo <ArrowRight className="w-3.5 h-3.5" />
-      </a>
+      <div className="max-w-[860px] mx-auto flex justify-center">
+        <a
+          href={ctaUrl}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-primary-foreground px-8 py-3 sm:py-2.5 rounded-full text-[0.82rem] sm:text-[0.75rem] font-bold tracking-wide uppercase shadow-[0_4px_20px_hsl(var(--brand-gold)/0.35)] hover:shadow-[0_6px_28px_hsl(var(--brand-gold)/0.5)] transition-all"
+        >
+          Quero Acesso Completo <ArrowRight className="w-3.5 h-3.5" />
+        </a>
+      </div>
     </div>
   );
 };
