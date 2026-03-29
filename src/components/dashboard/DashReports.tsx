@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
   Users, CalendarCheck, UserCheck, TrendingUp, Globe, Megaphone, Target,
-  Snowflake, Flame, Zap, X, ArrowDownWideNarrow, ArrowUpWideNarrow
+  Snowflake, Flame, Zap, X, ArrowDownWideNarrow, ArrowUpWideNarrow, DollarSign, Trophy
 } from "lucide-react";
 
 const statusLabels: Record<string, string> = {
@@ -62,6 +62,7 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
   const agendados = filtered.filter((l) => l.status !== "novo").length;
   const compareceram = filtered.filter((l) => ["compareceu", "convertido"].includes(l.status)).length;
   const convertidos = filtered.filter((l) => l.status === "convertido").length;
+  const totalRevenue = filtered.reduce((sum, l) => sum + (l.revenue || 0), 0);
 
   const taxaAgendamento = total > 0 ? ((agendados / total) * 100).toFixed(1) : "0";
   const taxaComparecimento = agendados > 0 ? ((compareceram / agendados) * 100).toFixed(1) : "0";
