@@ -206,6 +206,7 @@ export const sectionLabels: Record<string, string> = {
   pricing: "Investimento (Preço)",
   faq: "Perguntas Frequentes",
   footer: "Rodapé",
+  synopses: "Sinopses dos Módulos",
 };
 
 // Helper: labels for each key within a section
