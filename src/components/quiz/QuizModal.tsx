@@ -92,6 +92,12 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
           city: "N/A",
           career: "N/A",
           notes: `Quiz: ${page.slug}`,
+          quiz_slug: page.slug,
+        } as any).then(async (res) => {
+          if (res.data && (res.data as any)[0]?.id) {
+            const leadId = (res.data as any)[0].id;
+            await supabase.from("lead_tags").insert({ lead_id: leadId, tag: "quiz", source: "quiz" } as any);
+          }
         });
       } catch {}
       setPhase("quiz");
