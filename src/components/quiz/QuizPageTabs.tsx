@@ -19,7 +19,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       <div className="flex gap-2">
         <button
           onClick={() => setActiveTab(1)}
-          className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
             activeTab === 1
               ? "bg-card text-foreground border-border/60 z-[2] relative"
               : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
