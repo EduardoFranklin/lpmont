@@ -16,11 +16,12 @@ const phases = [
 ];
 
 interface Camp {
-  number: string;
+  num: string;
   title: string;
-  teaser?: string;
+  desc?: string;
   altitude?: string;
   phase?: string;
+  img?: string;
 }
 
 const QuizPageTrail = ({ content, ctaUrl }: Props) => {
