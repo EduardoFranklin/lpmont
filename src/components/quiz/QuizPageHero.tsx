@@ -76,22 +76,6 @@ const QuizPageHero = ({ page }: Props) => {
             </div>
           </motion.div>
         )}
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center"
-        >
-          <motion.div
-            animate={{ y: [0, 12, 0], opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <div className="caption-line-v h-12"><div className="caption-line-v-inner" /></div>
-            <div className="caption-dot" />
-          </motion.div>
-        </motion.div>
       </div>
     </section>
   );
