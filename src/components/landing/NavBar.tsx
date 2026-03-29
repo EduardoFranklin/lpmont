@@ -19,7 +19,6 @@ const NavBar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const footerContent = useSection("footer");
   const instagramLinks = parseJSON<{ label: string; url: string }[]>(footerContent.instagram_links, []);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
