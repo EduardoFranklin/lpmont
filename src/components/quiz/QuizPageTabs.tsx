@@ -30,16 +30,14 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
         </button>
         <button
           onClick={() => setActiveTab(2)}
-          className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
+          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
             activeTab === 2
               ? "bg-card text-foreground border-border/60 z-[2] relative"
               : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
           }`}
         >
-          <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-blue-500/12 text-blue-400 border border-blue-500/20">
-            {page.quiz_tag}
-          </span>
-          Checkpoint
+          <Brain className="w-4 h-4" />
+          <span className="text-[0.8rem]">Checkpoint</span>
         </button>
       </div>
 
