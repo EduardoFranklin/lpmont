@@ -305,9 +305,14 @@ const Agendar = () => {
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-foreground/[0.04]">
         <div className="section-container flex items-center justify-between h-14">
-          <a href="/" className="flex items-center gap-2">
-            <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-7" decoding="async" />
-          </a>
+          <div className="flex items-center gap-3">
+            <a href="/" className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-foreground/[0.06] border border-foreground/[0.08] text-foreground/50 hover:text-foreground/80 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+            </a>
+            <a href="/" className="flex items-center gap-2">
+              <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-7" decoding="async" />
+            </a>
+          </div>
           {step < 3 && (
             <span className="text-[11px] tracking-[0.15em] uppercase font-medium text-foreground/30">
               Passo {step} de 2
