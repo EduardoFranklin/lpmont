@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { LockOpen } from "lucide-react";
 import type { QuizPageData } from "@/pages/QuizPage";
 
 interface Props {
@@ -32,12 +33,12 @@ const QuizPageHero = ({ page }: Props) => {
       <div className="absolute bottom-0 left-0 right-0 h-40 z-[1] bg-gradient-to-t from-background via-background/60 to-transparent" />
       <div className="glow-gold" style={{ width: 600, height: 600, top: "-10%", left: "50%", transform: "translateX(-50%)" }} />
 
-      <div className="relative z-10 max-w-[860px] mx-auto px-5 sm:px-10 pt-24 pb-20">
+      <div className="relative z-10 max-w-[860px] mx-auto px-5 sm:px-10 pt-10 sm:pt-24 pb-12 sm:pb-20">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center gap-2.5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-primary mb-5"
+          className="inline-flex items-center gap-2.5 text-[0.7rem] font-semibold tracking-[0.14em] uppercase text-primary mb-4 sm:mb-5"
         >
           <span className="block w-7 h-px bg-primary/50" />
           {page.hero_label}
@@ -48,14 +49,11 @@ const QuizPageHero = ({ page }: Props) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="font-['Bebas_Neue',sans-serif] text-[clamp(3rem,7vw,5.2rem)] leading-[0.95] tracking-wide mb-4"
-          dangerouslySetInnerHTML={{
-            __html: page.hero_title.replace(
-              /\*(.*?)\*/g,
-              '<em class="not-italic text-primary">$1</em>'
-            ),
-          }}
-        />
+          className="font-['Bebas_Neue',sans-serif] text-[clamp(2.6rem,7vw,5.2rem)] leading-[0.95] tracking-wide mb-3 sm:mb-4 flex items-center gap-3 sm:gap-4 flex-wrap"
+        >
+          <LockOpen className="w-8 h-8 sm:w-10 sm:h-10 text-primary" strokeWidth={1.5} />
+          <span>Aula Liberada</span>
+        </motion.h1>
 
         {page.hero_message && (
           <motion.div
