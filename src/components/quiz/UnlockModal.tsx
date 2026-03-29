@@ -35,7 +35,8 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
         city: "N/A",
         career: "N/A",
         notes: `Quiz page: ${page.slug}`,
-      });
+        quiz_slug: page.slug,
+      } as any);
     } catch {}
 
     setSuccess(true);

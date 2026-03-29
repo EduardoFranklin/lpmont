@@ -1,0 +1,2 @@
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS quiz_score integer DEFAULT NULL;
+ALTER TABLE public.leads ADD COLUMN IF NOT EXISTS quiz_slug text DEFAULT NULL;

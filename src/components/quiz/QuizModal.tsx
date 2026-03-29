@@ -92,6 +92,12 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
           city: "N/A",
           career: "N/A",
           notes: `Quiz: ${page.slug}`,
+          quiz_slug: page.slug,
+        } as any).then(async (res) => {
+          if (res.data && (res.data as any)[0]?.id) {
+            const leadId = (res.data as any)[0].id;
+            await supabase.from("lead_tags").insert({ lead_id: leadId, tag: "quiz", source: "quiz" } as any);
+          }
         });
       } catch {}
       setPhase("quiz");
@@ -112,6 +118,16 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
     setTimeout(() => {
       if (qi >= questions.length - 1) {
         setPhase("result");
+        // Save quiz score to the lead
+        const allScores = [...scores, pts];
+        const rawTotal = allScores.reduce((a, b) => a + b, 0);
+        const finalTotal = (travaTrigger || (q.is_critical && !isIdeal)) ? Math.min(rawTotal, 70) : rawTotal;
+        try {
+          supabase.from("leads")
+            .update({ quiz_score: finalTotal, quiz_slug: page.slug } as any)
+            .eq("email", leadEmail.trim())
+            .then(() => {});
+        } catch {}
       } else {
         setQi((i) => i + 1);
         setSelected(null);

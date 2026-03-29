@@ -122,6 +122,8 @@ export type Database = {
           name: string
           notes: string | null
           phone: string
+          quiz_score: number | null
+          quiz_slug: string | null
           revenue: number | null
           scheduled_day: string | null
           scheduled_time: string | null
@@ -146,6 +148,8 @@ export type Database = {
           name: string
           notes?: string | null
           phone: string
+          quiz_score?: number | null
+          quiz_slug?: string | null
           revenue?: number | null
           scheduled_day?: string | null
           scheduled_time?: string | null
@@ -170,6 +174,8 @@ export type Database = {
           name?: string
           notes?: string | null
           phone?: string
+          quiz_score?: number | null
+          quiz_slug?: string | null
           revenue?: number | null
           scheduled_day?: string | null
           scheduled_time?: string | null

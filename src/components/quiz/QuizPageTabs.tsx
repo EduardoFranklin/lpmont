@@ -14,7 +14,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
   const [activeTab, setActiveTab] = useState(1);
 
   return (
-    <div className="max-w-[860px] mx-auto px-5 sm:px-10 z-[1] relative">
+    <div className="max-w-[860px] mx-auto px-0 sm:px-10 z-[1] relative">
       {/* Tab Bar */}
       <div className="flex gap-2">
         <button
@@ -49,7 +49,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       {activeTab === 1 && (
         <div className="bg-card border border-border/60 rounded-b-2xl rounded-tr-xl overflow-hidden">
           {/* Panda Video Embed */}
-          <div className="relative w-full" style={{ paddingBottom: "50%" }}>
+          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
             <iframe
               id="panda-7e77bfe0-d52a-46a0-a868-b27391b245ed"
               src="https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=7e77bfe0-d52a-46a0-a868-b27391b245ed&playOpensFullscreenNative=true"

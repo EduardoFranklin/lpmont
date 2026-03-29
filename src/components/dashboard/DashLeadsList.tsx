@@ -212,6 +212,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
               <TableHead className="hidden sm:table-cell">Telefone</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Temp.</TableHead>
+              <TableHead className="hidden lg:table-cell">Quiz</TableHead>
               <TableHead className="hidden lg:table-cell">No estágio</TableHead>
               <TableHead className="hidden lg:table-cell">Criado</TableHead>
               <TableHead className="w-[120px]">Ações</TableHead>
@@ -235,6 +236,18 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
                   <TableCell className="hidden sm:table-cell text-muted-foreground">{lead.phone}</TableCell>
                   <TableCell>{getStatusBadge(lead.status)}</TableCell>
                   <TableCell>{getTempBadge((lead as any).temperature)}</TableCell>
+                  <TableCell className="hidden lg:table-cell">
+                    {(lead as any).quiz_slug ? (
+                      <div className="flex items-center gap-1.5">
+                        <Badge variant="outline" className="bg-purple-500/15 text-purple-400 border-purple-500/25 text-[10px]">Quiz</Badge>
+                        {(lead as any).quiz_score != null && (
+                          <span className="text-[10px] font-mono text-muted-foreground">{(lead as any).quiz_score}pts</span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">—</span>
+                    )}
+                  </TableCell>
                   <TableCell className="hidden lg:table-cell text-muted-foreground text-xs whitespace-nowrap">
                     há {formatElapsed(lead.updated_at)}
                   </TableCell>
@@ -259,7 +272,7 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
             })}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
                   Nenhum lead encontrado.
                 </TableCell>
               </TableRow>
