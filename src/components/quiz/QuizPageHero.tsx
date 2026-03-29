@@ -40,7 +40,7 @@ const QuizPageHero = ({ page }: Props) => {
           transition={{ delay: 0.3 }}
           className="font-['Bebas_Neue',sans-serif] text-[clamp(2.6rem,7vw,5.2rem)] leading-[0.95] tracking-wide mb-3 sm:mb-4 flex items-center gap-3 sm:gap-4 flex-wrap"
         >
-          <LockOpen className="w-8 h-8 sm:w-10 sm:h-10 text-primary" strokeWidth={1.5} />
+          <LockOpen className="w-8 h-8 sm:w-10 sm:h-10 text-primary -scale-x-100" strokeWidth={1.5} />
           <span>Aula Liberada</span>
         </motion.h1>
 
@@ -57,7 +57,7 @@ const QuizPageHero = ({ page }: Props) => {
                 "{page.hero_message}"
               </p>
               <div className="flex items-center gap-3">
-                <div className="w-[42px] h-[42px] rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0">
+                <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0">
                   <img
                     src="/images/avatar-breno.webp"
                     alt={page.hero_author_name}
