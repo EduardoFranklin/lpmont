@@ -75,32 +75,43 @@ const QuizPageTrail = ({ content, ctaUrl }: Props) => {
                 </span>
                 <div className="flex-1 h-px bg-border" />
               </div>
-              {phaseCamps.map((camp) => (
-                <div
-                  key={camp.number}
-                  className="flex items-center border border-border bg-card rounded-xl overflow-hidden mb-1 hover:border-foreground/12 transition-colors"
-                >
-                  <div className="w-[52px] flex-shrink-0 flex flex-col items-center justify-center py-3.5 border-r border-border bg-foreground/[0.02]">
-                    <span className="font-['Bebas_Neue',sans-serif] text-xl text-muted-foreground leading-none">
-                      {camp.number}
-                    </span>
-                  </div>
-                  {camp.altitude && (
-                    <div className="hidden sm:flex w-[68px] flex-shrink-0 items-center justify-center text-[0.62rem] font-semibold text-muted-foreground border-r border-border">
-                      {camp.altitude}
+              {phaseCamps.map((camp) => {
+                const imgIndex = parseInt(camp.number, 10);
+                const imgSrc = imgIndex <= 12
+                  ? `/images/thumbs/freepik_${imgIndex}-thumb.webp`
+                  : `/images/thumbs/freepik_12-thumb.webp`;
+                return (
+                  <div
+                    key={camp.number}
+                    className="flex items-center border border-border bg-card rounded-xl overflow-hidden mb-1 hover:border-foreground/12 transition-colors"
+                  >
+                    <div className="w-[72px] h-[52px] flex-shrink-0 relative overflow-hidden border-r border-border">
+                      <img
+                        src={imgSrc}
+                        alt={camp.title}
+                        className="w-full h-full object-cover brightness-[0.35] saturate-[0.3]"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Lock className="w-3.5 h-3.5 text-foreground/30" />
+                      </div>
                     </div>
-                  )}
-                  <div className="flex-1 flex flex-col justify-center px-5 py-3.5 gap-0.5">
-                    <div className="text-sm font-medium text-foreground/60">{camp.title}</div>
-                    {camp.teaser && (
-                      <div className="text-[0.74rem] text-muted-foreground font-light leading-snug">
-                        {camp.teaser}
+                    {camp.altitude && (
+                      <div className="hidden sm:flex w-[68px] flex-shrink-0 items-center justify-center text-[0.62rem] font-semibold text-muted-foreground border-r border-border">
+                        {camp.altitude}
                       </div>
                     )}
+                    <div className="flex-1 flex flex-col justify-center px-5 py-3.5 gap-0.5">
+                      <div className="text-sm font-medium text-foreground/60">{camp.title}</div>
+                      {camp.teaser && (
+                        <div className="text-[0.74rem] text-muted-foreground font-light leading-snug">
+                          {camp.teaser}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-shrink-0 px-4 text-foreground/10">🔒</div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           );
         })}
