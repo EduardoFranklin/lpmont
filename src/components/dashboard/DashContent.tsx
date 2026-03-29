@@ -17,7 +17,9 @@ const sectionOrder = ["hero", "problem", "modules", "synopses", "method", "instr
 // Detect if a field value looks like JSON
 function isJsonField(key: string, value: string): boolean {
   const jsonKeys = ["toggles", "reassurance", "obstacles", "camps", "hands_on", "items", "bio", "stats", "includes", "bonuses", "theory_tags", "practice_tags", "instagram_links"];
-  return jsonKeys.includes(key) || (value.startsWith("[") && value.endsWith("]"));
+  if (jsonKeys.includes(key)) return true;
+  if (key.startsWith("synopsis_")) return true;
+  return value.startsWith("[") && value.endsWith("]") || value.startsWith("{") && value.endsWith("}");
 }
 
 // Detect if a field is an image URL field
