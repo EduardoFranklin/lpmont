@@ -16,11 +16,12 @@ const phases = [
 ];
 
 interface Camp {
-  number: string;
+  num: string;
   title: string;
-  teaser?: string;
+  desc?: string;
   altitude?: string;
   phase?: string;
+  img?: string;
 }
 
 const QuizPageTrail = ({ content, ctaUrl }: Props) => {
@@ -76,25 +77,10 @@ const QuizPageTrail = ({ content, ctaUrl }: Props) => {
                 <div className="flex-1 h-px bg-border" />
               </div>
               {phaseCamps.map((camp) => {
-                const campImgMap: Record<string, string> = {
-                  "01": "/images/thumbs/freepik_1-thumb.webp",
-                  "02": "/images/thumbs/freepik_2-thumb.webp",
-                  "03": "/images/thumbs/freepik_3-thumb.webp",
-                  "04": "/images/thumbs/freepik_4-thumb.webp",
-                  "05": "/images/thumbs/freepik_5-thumb.webp",
-                  "06": "/images/thumbs/freepik_6-thumb.webp",
-                  "07": "/images/thumbs/freepik_7-thumb.webp",
-                  "08": "/images/thumbs/freepik_8-thumb.webp",
-                  "09": "/images/thumbs/freepik_9-thumb.webp",
-                  "10": "/images/thumbs/freepik_10-thumb.webp",
-                  "11": "/images/thumbs/freepik_11-thumb.webp",
-                  "12": "/images/thumbs/freepik_11-thumb.webp",
-                  "13": "/images/thumbs/freepik_12-thumb.webp",
-                };
-                const imgSrc = campImgMap[camp.number] || "/images/thumbs/freepik_1-thumb.webp";
+                const imgSrc = camp.img || "/images/thumbs/freepik_1-thumb.webp";
                 return (
                   <div
-                    key={camp.number}
+                    key={camp.num}
                     className="flex items-center border border-border bg-card rounded-xl overflow-hidden mb-1 hover:border-foreground/12 transition-colors"
                   >
                     <div className="w-[72px] h-[52px] flex-shrink-0 relative overflow-hidden border-r border-border">
@@ -115,9 +101,9 @@ const QuizPageTrail = ({ content, ctaUrl }: Props) => {
                     )}
                     <div className="flex-1 flex flex-col justify-center px-5 py-3.5 gap-0.5">
                       <div className="text-sm font-medium text-foreground/60">{camp.title}</div>
-                      {camp.teaser && (
-                        <div className="text-[0.74rem] text-muted-foreground font-light leading-snug">
-                          {camp.teaser}
+                      {camp.desc && (
+                        <div className="text-[0.74rem] text-muted-foreground font-light leading-snug line-clamp-1">
+                          {camp.desc}
                         </div>
                       )}
                     </div>
