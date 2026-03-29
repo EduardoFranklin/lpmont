@@ -25,10 +25,8 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
               : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
           }`}
         >
-          <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
-            {page.lesson_tag}
-          </span>
-          Aula 01
+          <BookOpen className="w-4 h-4" />
+          <span className="text-[0.8rem]">Aula 01</span>
         </button>
         <button
           onClick={() => setActiveTab(2)}
