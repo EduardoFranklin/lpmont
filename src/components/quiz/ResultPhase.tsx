@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ArrowRight, Clock, Flame } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { ArrowRight, Clock, Flame, Copy, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import type { QuizPageData } from "@/pages/QuizPage";
 
@@ -25,6 +25,14 @@ const ResultPhase = ({
 }: Props) => {
   const totalSeconds = (page.coupon_timer_minutes || 10) * 60;
   const [secondsLeft, setSecondsLeft] = useState(totalSeconds);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(page.coupon_code).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [page.coupon_code]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -140,10 +148,26 @@ const ResultPhase = ({
             <Flame className={`w-4 h-4 ${urgent ? "text-red-400 animate-pulse" : "text-primary"}`} />
           </div>
 
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <span className="font-['Bebas_Neue',sans-serif] text-3xl tracking-wider text-primary border-2 border-dashed border-primary/40 rounded-lg px-4 py-1">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <button
+              onClick={handleCopy}
+              className="group relative flex items-center gap-2 font-['Bebas_Neue',sans-serif] text-3xl tracking-wider text-primary border-2 border-dashed border-primary/40 rounded-lg px-4 py-1 hover:border-primary/60 hover:bg-primary/5 transition-all cursor-pointer"
+            >
               {page.coupon_code}
-            </span>
+              <span className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5 text-primary" />}
+              </span>
+              {copied && (
+                <motion.span
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[0.6rem] text-green-400 font-sans font-medium whitespace-nowrap"
+                >
+                  Copiado!
+                </motion.span>
+              )}
+            </button>
             <span className="text-lg font-bold text-foreground">
               {page.coupon_discount} OFF
             </span>
