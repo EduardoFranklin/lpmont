@@ -6,6 +6,7 @@ import MethodSection from "@/components/landing/MethodSection";
 import InstructorSection from "@/components/landing/InstructorSection";
 import BenefitsSection from "@/components/landing/BenefitsSection";
 import PricingSection from "@/components/landing/PricingSection";
+import ContactFormSection from "@/components/landing/ContactFormSection";
 import FAQSection from "@/components/landing/FAQSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FooterSection from "@/components/landing/FooterSection";
@@ -27,6 +28,7 @@ const Index = () => {
       <BenefitsSection />
       <TestimonialsSection />
       <PricingSection />
+      <ContactFormSection />
       <FAQSection />
       <FooterSection />
       <WhatsAppButton />
