@@ -146,20 +146,20 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
               </div>
               <h2 className="text-xl font-semibold leading-tight mb-1.5">{page.quiz_title}</h2>
               <p className="text-sm text-muted-foreground leading-relaxed font-light mb-4">{page.quiz_desc}</p>
-              <div className="flex items-center gap-4 pt-4 border-t border-border">
+              <div className="flex items-center gap-4 pt-4 border-t border-border mb-4">
                 <span className="flex items-center gap-1.5 text-[0.73rem] text-muted-foreground">
                   <CheckSquare className="w-3.5 h-3.5" /> {page.quiz_question_count} questões
                 </span>
                 <span className="flex items-center gap-1.5 text-[0.73rem] text-muted-foreground">
                   <Clock className="w-3.5 h-3.5" /> {page.quiz_duration}
                 </span>
-                <button
-                  onClick={onOpenQuiz}
-                  className="ml-auto flex items-center gap-1.5 text-[0.72rem] font-semibold tracking-wide uppercase px-3.5 py-1.5 rounded-lg border text-blue-400 bg-blue-500/8 border-blue-500/20 hover:bg-blue-500/15 hover:border-blue-500/40 transition-all"
-                >
-                  Iniciar quiz <ArrowRight className="w-3 h-3" />
-                </button>
               </div>
+              <button
+                onClick={onOpenQuiz}
+                className="w-full flex items-center justify-center gap-2 text-sm font-semibold tracking-wide uppercase py-3 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-[0_4px_20px_hsl(var(--brand-gold)/0.35)]"
+              >
+                Iniciar Quiz <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
             </div>
           </div>
