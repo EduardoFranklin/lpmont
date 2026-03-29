@@ -1,0 +1,1 @@
+UPDATE quiz_pages SET lesson_video_url = 'https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=7e77bfe0-d52a-46a0-a868-b27391b245ed' WHERE slug = 'aula1'
