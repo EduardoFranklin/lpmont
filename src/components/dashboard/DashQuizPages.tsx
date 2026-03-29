@@ -398,8 +398,17 @@ const DashQuizPages = () => {
                 <Field label="Descrição" value={editPage.lesson_desc} onChange={(v) => updateField("lesson_desc", v)} multi />
                 <Field label="Duração" value={editPage.lesson_duration} onChange={(v) => updateField("lesson_duration", v)} />
                 <Field label="Fase" value={editPage.lesson_phase} onChange={(v) => updateField("lesson_phase", v)} />
-                <Field label="URL do Vídeo" value={editPage.lesson_video_url} onChange={(v) => updateField("lesson_video_url", v)} />
-                <Field label="Thumbnail URL" value={editPage.lesson_thumbnail} onChange={(v) => updateField("lesson_thumbnail", v)} />
+                <Field label="URL do Vídeo (Embed)" value={editPage.lesson_video_url} onChange={(v) => updateField("lesson_video_url", v)} placeholder="https://player-vz-....pandavideo.com.br/embed/?v=..." />
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Thumbnail</label>
+                  <ImageUploadCrop
+                    value={editPage.lesson_thumbnail}
+                    onChange={(v) => updateField("lesson_thumbnail", v)}
+                    friendlyName={`aula-thumb-${editPage.slug}`}
+                    maxWidth={800}
+                    maxHeight={450}
+                  />
+                </div>
               </AccordionContent>
             </AccordionItem>
 
