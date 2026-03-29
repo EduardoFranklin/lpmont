@@ -86,8 +86,13 @@ const NavBar = () => {
               <a href="https://pay.hotmart.com/F97566234Y" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="btn-summit w-full justify-center py-3 text-sm mt-2">
                 Comprar Agora <ArrowRight className="w-3.5 h-3.5" />
               </a>
-              <a href="#falar-equipe" onClick={() => setMenuOpen(false)} className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium py-3 rounded-xl border border-foreground/10 text-foreground/50 hover:text-foreground/70 transition-colors">
-                Falar com a Equipe
+              <a href="#falar-equipe" onClick={() => setMenuOpen(false)} className="btn-gradient w-full">
+                <div className="btn-gradient-wrapper w-full">
+                  <div className="btn-gradient-inner w-full">
+                    <div className="btn-gradient-bg" />
+                    <span className="btn-gradient-text justify-center w-full">Falar com a Equipe</span>
+                  </div>
+                </div>
               </a>
             </div>
           </motion.div>
