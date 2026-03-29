@@ -10,7 +10,11 @@ interface Props {
 const VideoModal = ({ open, onClose, page }: Props) => {
   if (!open) return null;
 
-  const embedUrl = page.lesson_video_url.includes("youtube.com/watch")
+  // Support Panda Video embed URLs
+  const isPanda = page.lesson_video_url.includes("pandavideo.com");
+  const embedUrl = isPanda
+    ? page.lesson_video_url + (page.lesson_video_url.includes("?") ? "&" : "?") + "playOpensFullscreenNative=true"
+    : page.lesson_video_url.includes("youtube.com/watch")
     ? page.lesson_video_url.replace("watch?v=", "embed/") + "?autoplay=1"
     : page.lesson_video_url.includes("youtu.be/")
     ? `https://www.youtube.com/embed/${page.lesson_video_url.split("youtu.be/")[1]}?autoplay=1`
@@ -36,7 +40,7 @@ const VideoModal = ({ open, onClose, page }: Props) => {
             src={embedUrl}
             className="absolute inset-0 w-full h-full border-0"
             allowFullScreen
-            allow="autoplay"
+            allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
           />
         </div>
         <div className="p-6">
