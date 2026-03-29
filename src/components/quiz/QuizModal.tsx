@@ -23,11 +23,18 @@ const maskPhone = (value: string) => {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 };
 
-// Map question index to an image (some questions get clinical photos)
+// Map question index (0-based) to clinical image
 const questionImages: Record<number, string> = {
-  0: "/images/quiz/dea-diagnostico.jpg",
-  2: "/images/quiz/pino-fibra.jpg",
-  5: "/images/quiz/selecao-cor.jpg",
+  0: "/images/quiz/pino1.jpg",   // Função do pino
+  1: "/images/quiz/pino5.jpg",   // Espessura de cimento
+  2: "/images/quiz/pino4.jpg",   // Anatomização do pino
+  3: "/images/quiz/pino7.jpg",   // Adesão intrarradicular
+  4: "/images/quiz/pino7.jpg",   // Controle de umidade
+  5: "/images/quiz/pino4.jpg",   // Silanização
+  6: "/images/quiz/pino4.jpg",   // Escolha da resina
+  7: "/images/quiz/pino5.jpg",   // Fator C
+  8: "/images/quiz/pino2.jpg",   // Concha palatina
+  9: "/images/quiz/pino1.jpg",   // Sobrecontorno cervical
 };
 
 const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
