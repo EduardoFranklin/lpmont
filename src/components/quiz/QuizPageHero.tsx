@@ -72,7 +72,7 @@ const QuizPageHero = ({ page }: Props) => {
               <div className="flex items-center gap-3">
                 <div className="w-[42px] h-[42px] rounded-full overflow-hidden border-2 border-primary/30 flex-shrink-0">
                   <img
-                    src="/images/thumbs/breno-thumb.webp"
+                    src="/images/avatar-breno.webp"
                     alt={page.hero_author_name}
                     className="w-full h-full object-cover"
                   />
