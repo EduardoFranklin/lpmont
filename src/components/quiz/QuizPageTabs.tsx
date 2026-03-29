@@ -127,8 +127,18 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       {/* Panel 2: Quiz */}
       {activeTab === 2 && (
         <div className="bg-card border border-border/60 rounded-b-2xl rounded-tl-xl overflow-hidden">
-          <div className="relative p-8 sm:p-10 bg-gradient-to-br from-blue-500/5 to-transparent flex items-center gap-7 flex-wrap min-h-[260px]">
-            <div className="text-6xl flex-shrink-0">{page.quiz_icon}</div>
+          <div className="relative overflow-hidden">
+            {/* Cover image */}
+            <div className="relative w-full aspect-[16/7] bg-black overflow-hidden">
+              <img
+                src="/images/quiz/pino1.jpg"
+                alt="Quiz"
+                className="w-full h-full object-cover opacity-60"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
+            </div>
+            <div className="relative -mt-16 px-8 sm:px-10 pb-8 sm:pb-10">
             <div className="flex-1 min-w-[200px]">
               <div className="flex items-center gap-2.5 mb-1.5">
                 <span className="text-[0.63rem] font-bold tracking-[0.12em] uppercase px-2 py-0.5 rounded border border-blue-500/30 bg-blue-500/7 text-blue-400">
@@ -157,6 +167,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
                   Iniciar quiz <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
+            </div>
             </div>
           </div>
         </div>
