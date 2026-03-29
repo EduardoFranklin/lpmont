@@ -64,6 +64,7 @@ const NavBar = () => {
             <a
               key={l.href}
               href={l.href}
+              onClick={(e) => handleNavClick(e, l.href)}
               className="text-[13px] font-medium text-foreground/40 hover:text-foreground transition-colors duration-300"
             >
               {l.label}
@@ -93,7 +94,7 @@ const NavBar = () => {
             <div className="px-6 py-8 flex flex-col min-h-full">
               <div className="space-y-5 mb-8">
                 {links.map((l) => (
-                  <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
+                  <a key={l.href} href={l.href} onClick={(e) => handleNavClick(e, l.href)} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
                     {l.label}
                   </a>
                 ))}
