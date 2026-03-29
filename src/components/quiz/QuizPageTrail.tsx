@@ -24,8 +24,16 @@ interface Camp {
   img?: string;
 }
 
+interface HandsOn {
+  num: string;
+  title: string;
+  desc?: string;
+  img?: string;
+}
+
 const QuizPageTrail = ({ content, ctaUrl }: Props) => {
   const camps = parseJSON<Camp[]>(content.modules?.camps ?? "[]", []);
+  const handsOn = parseJSON<HandsOn[]>(content.modules?.hands_on ?? "[]", []);
 
   // Group camps by phase
   const grouped: Record<string, Camp[]> = {};
