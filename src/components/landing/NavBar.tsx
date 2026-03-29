@@ -73,7 +73,7 @@ const NavBar = () => {
         </div>
 
         <div className="hidden md:block">
-          <GradientButton href="https://metodomont.com.br/#falar-equipe">
+          <GradientButton href="#falar-equipe" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#falar-equipe")}>
             Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
           </GradientButton>
         </div>
