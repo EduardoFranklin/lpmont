@@ -27,9 +27,9 @@ const NavBar = () => {
   }, []);
 
   const links = [
-    { label: "A Trilha", href: "#modulos" },
-    { label: "O Guia", href: "#guia" },
-    { label: "Investimento", href: "#preco" },
+    { label: "A Trilha", href: "https://metodomont.com.br/#modulos" },
+    { label: "O Guia", href: "https://metodomont.com.br/#guia" },
+    { label: "Investimento", href: "https://metodomont.com.br/#preco" },
   ];
 
   return (
@@ -62,7 +62,7 @@ const NavBar = () => {
         </div>
 
         <div className="hidden md:block">
-          <GradientButton href="#falar-equipe">
+          <GradientButton href="https://metodomont.com.br/#falar-equipe">
             Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
           </GradientButton>
         </div>
@@ -93,7 +93,7 @@ const NavBar = () => {
                 <a href="https://pay.hotmart.com/F97566234Y" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="btn-summit w-full justify-center py-3 text-sm">
                   Comprar Agora <ArrowRight className="w-3.5 h-3.5" />
                 </a>
-                <a href="/#falar-equipe" onClick={() => setMenuOpen(false)} className="btn-gradient w-full">
+                <a href="https://metodomont.com.br/#falar-equipe" onClick={() => setMenuOpen(false)} className="btn-gradient w-full">
                   <div className="btn-gradient-wrapper w-full">
                     <div className="btn-gradient-inner w-full">
                       <div className="btn-gradient-bg" />
