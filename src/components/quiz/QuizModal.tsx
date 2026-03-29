@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, Info, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { QuizPageData, QuizQuestion } from "@/pages/QuizPage";
+import ResultPhase from "./ResultPhase";
 
 interface Props {
   open: boolean;
@@ -273,58 +274,21 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
 
         {/* Result */}
         {phase === "result" && (
-          <div>
-            <div className="p-8 text-center bg-gradient-to-b from-primary/6 to-transparent border-b border-border">
-              <div className="text-[0.72rem] font-bold tracking-[0.12em] uppercase mb-2" style={{ color: cor }}>
-                {emoji} {nivel}
-              </div>
-              <div className="font-['Bebas_Neue',sans-serif] text-7xl leading-none tracking-wide mb-1" style={{ color: cor }}>
-                {finalScore}<span className="text-3xl ml-1 opacity-70">pts</span>
-              </div>
-              {travaTrigger && rawScore > 70 && (
-                <div className="text-[0.72rem] text-red-400/80 bg-red-500/7 border border-red-500/20 rounded-lg px-3 py-1.5 inline-block mt-2 mb-2">
-                  ⚠️ Trava clínica aplicada — pontuação limitada a 70
-                </div>
-              )}
-              <div className="text-[0.95rem] font-semibold mt-2">{titulo}</div>
-            </div>
-
-            <div className="px-7 py-5 border-b border-border">
-              <div className="flex items-center gap-2.5 text-[0.68rem] font-bold tracking-[0.1em] uppercase text-muted-foreground mb-3.5">
-                <div className="w-[30px] h-[30px] rounded-full bg-primary/12 border border-primary/30 flex items-center justify-center font-['Bebas_Neue',sans-serif] text-[0.72rem] text-primary">
-                  BM
-                </div>
-                Seu diagnóstico, {firstName}
-              </div>
-              <blockquote className="text-[0.86rem] text-foreground/65 leading-relaxed italic font-light">
-                {diagnostico}
-              </blockquote>
-              {page.result_closing_text && (
-                <div className="mt-4 p-3.5 bg-foreground/[0.03] border-l-[3px] border-primary rounded-r-lg text-[0.83rem] text-muted-foreground leading-relaxed italic"
-                  dangerouslySetInnerHTML={{ __html: page.result_closing_text }}
-                />
-              )}
-            </div>
-
-            <div className="px-7 py-6 flex flex-col items-center text-center gap-3">
-              <div className="inline-flex items-center gap-1.5 text-[0.72rem] font-semibold tracking-widest uppercase text-primary bg-primary/8 border border-dashed border-primary/35 rounded-lg px-3.5 py-1.5">
-                Cupom <strong className="tracking-[0.12em]">{page.coupon_code}</strong> — {page.coupon_discount} de desconto
-              </div>
-              <a
-                href={page.cta_url}
-                onClick={() => { onClose(); setTimeout(onShowCoupon, 300); }}
-                className="w-full bg-primary text-primary-foreground py-3.5 rounded-xl text-sm font-bold tracking-wide uppercase flex items-center justify-center gap-2 shadow-[0_4px_20px_hsl(var(--brand-gold)/0.3)] hover:shadow-[0_6px_28px_hsl(var(--brand-gold)/0.45)] transition-all"
-              >
-                Garantir acesso com {page.coupon_discount} off <ArrowRight className="w-3.5 h-3.5" />
-              </a>
-              <button
-                onClick={() => { setPhase("lead"); setLeadStep(0); setQi(0); setSelected(null); setConfirmed(false); setScores([]); setTravaTrigger(false); }}
-                className="text-[0.72rem] text-muted-foreground underline underline-offset-[3px] hover:text-foreground/60 transition-colors"
-              >
-                Refazer o diagnóstico
-              </button>
-            </div>
-          </div>
+          <ResultPhase
+            finalScore={finalScore}
+            rawScore={rawScore}
+            travaTrigger={travaTrigger}
+            nivel={nivel}
+            titulo={titulo}
+            diagnostico={diagnostico}
+            cor={cor}
+            emoji={emoji}
+            firstName={firstName}
+            page={page}
+            onClose={onClose}
+            onShowCoupon={onShowCoupon}
+            onReset={() => { setPhase("lead"); setLeadStep(0); setQi(0); setSelected(null); setConfirmed(false); setScores([]); setTravaTrigger(false); }}
+          />
         )}
       </div>
     </div>
