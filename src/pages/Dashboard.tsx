@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, BarChart3, List, Columns3, MessageSquare, Settings, FileText, Users, Zap } from "lucide-react";
+import { LogOut, BarChart3, List, Columns3, MessageSquare, Settings, FileText, Users } from "lucide-react";
 import DashReports from "@/components/dashboard/DashReports";
 import DashLeadsList from "@/components/dashboard/DashLeadsList";
 import DashKanban from "@/components/dashboard/DashKanban";
@@ -12,7 +12,6 @@ import DashMessaging from "@/components/dashboard/DashMessaging";
 import DashSettings from "@/components/dashboard/DashSettings";
 import DashContent from "@/components/dashboard/DashContent";
 import DashUsers from "@/components/dashboard/DashUsers";
-import DashQuizPages from "@/components/dashboard/DashQuizPages";
 import DashDateFilter, { type DatePreset, getDateRange } from "@/components/dashboard/DashDateFilter";
 import type { Session } from "@supabase/supabase-js";
 import { startOfDay, endOfDay } from "date-fns";
@@ -135,12 +134,6 @@ const Dashboard = () => {
                 <TabsTrigger value="settings" className="gap-1.5">
                   <Settings className="w-4 h-4" /> <span className="hidden sm:inline">Configurações</span><span className="sm:hidden">Config</span>
                 </TabsTrigger>
-                <TabsTrigger value="users" className="gap-1.5">
-                  <Users className="w-4 h-4" /> <span className="hidden sm:inline">Usuários</span><span className="sm:hidden">Users</span>
-                </TabsTrigger>
-                <TabsTrigger value="quizpages" className="gap-1.5">
-                  <Zap className="w-4 h-4" /> Páginas
-                </TabsTrigger>
               </TabsList>
               <TabsContent value="reports">
                 <DashReports leads={filteredLeads} />
@@ -159,9 +152,6 @@ const Dashboard = () => {
               </TabsContent>
               <TabsContent value="users">
                 <DashUsers />
-              </TabsContent>
-              <TabsContent value="quizpages">
-                <DashQuizPages />
               </TabsContent>
             </Tabs>
           </>
