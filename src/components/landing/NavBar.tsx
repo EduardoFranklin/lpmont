@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight, Instagram } from "lucide-react";
+import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
 const GradientButton = ({ href, children, className = "", ...rest }: { href: string; children: React.ReactNode; className?: string; [key: string]: any }) => (
   <a href={href} {...rest} className={`btn-gradient ${className}`}>
