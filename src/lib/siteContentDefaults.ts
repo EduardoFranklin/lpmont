@@ -1,6 +1,8 @@
 // Default content for all site sections — used as fallback when DB has no override.
 // Content editors in the dashboard can override any of these values.
 
+import { moduleSynopsis } from "@/components/landing/moduleSynopsis";
+
 export type SectionContent = Record<string, string>;
 export type AllContent = Record<string, SectionContent>;
 
@@ -182,6 +184,12 @@ const defaults: AllContent = {
       { label: "Dr. Breno", url: "https://www.instagram.com/bremontalverne/" },
     ]),
   },
+  synopses: Object.fromEntries(
+    Object.entries(moduleSynopsis).map(([num, data]) => [
+      `synopsis_${num}`,
+      JSON.stringify(data),
+    ])
+  ),
 };
 
 export default defaults;
