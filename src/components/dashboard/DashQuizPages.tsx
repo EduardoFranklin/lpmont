@@ -133,10 +133,43 @@ const DashQuizPages = () => {
 
   const deletePage = async (id: string) => {
     if (!confirm("Excluir esta página?")) return;
+    await supabase.from("quiz_questions").delete().eq("quiz_page_id", id);
     await supabase.from("quiz_pages").delete().eq("id", id);
     if (selectedId === id) { setSelectedId(null); setEditPage(null); setQuestions([]); }
     loadPages();
     toast.success("Página excluída.");
+  };
+
+  const duplicatePage = async (page: QuizPage) => {
+    const newSlug = `${page.slug}-copia-${Date.now().toString(36)}`;
+    const { id, ...rest } = page;
+    const { data, error } = await supabase.from("quiz_pages").insert({
+      ...rest,
+      slug: newSlug,
+      status: "draft",
+    } as any).select().single();
+    if (error) { toast.error(error.message); return; }
+    if (data) {
+      // Duplicate questions
+      const { data: qs } = await supabase.from("quiz_questions").select("*").eq("quiz_page_id", id).order("sort_order");
+      if (qs && qs.length > 0) {
+        const inserts = qs.map((q: any) => ({
+          quiz_page_id: (data as any).id,
+          sort_order: q.sort_order,
+          label: q.label,
+          question: q.question,
+          is_critical: q.is_critical,
+          weight: q.weight,
+          explanation: q.explanation,
+          image_url: q.image_url || "",
+          options: q.options,
+        }));
+        await supabase.from("quiz_questions").insert(inserts);
+      }
+      await loadPages();
+      selectPage(data as QuizPage);
+      toast.success("Página duplicada!");
+    }
   };
 
   const updateField = (key: keyof QuizPage, value: any) => {
@@ -292,6 +325,12 @@ const DashQuizPages = () => {
                   <ExternalLink className="w-3 h-3" /> Abrir
                 </a>
               )}
+              <button
+                onClick={(e) => { e.stopPropagation(); duplicatePage(p); }}
+                className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
+                <Copy className="w-3 h-3" /> Duplicar
+              </button>
               <button
                 onClick={(e) => { e.stopPropagation(); deletePage(p.id); }}
                 className="text-[10px] text-destructive/60 hover:text-destructive flex items-center gap-1 ml-auto"
