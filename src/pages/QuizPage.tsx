@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteContent, parseJSON } from "@/hooks/useSiteContent";
+import QuizNavBar from "@/components/quiz/QuizNavBar";
 import QuizPageHero from "@/components/quiz/QuizPageHero";
 import QuizPageTabs from "@/components/quiz/QuizPageTabs";
 import QuizPageTrail from "@/components/quiz/QuizPageTrail";
