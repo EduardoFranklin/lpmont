@@ -103,9 +103,6 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
             <p className="text-sm text-muted-foreground leading-relaxed font-light mb-4">{page.lesson_desc}</p>
             <div className="flex items-center gap-4 pt-4 border-t border-border">
               <span className="flex items-center gap-1.5 text-[0.73rem] text-muted-foreground">
-                <Clock className="w-3.5 h-3.5" /> {page.lesson_duration}
-              </span>
-              <span className="flex items-center gap-1.5 text-[0.73rem] text-muted-foreground">
                 <Eye className="w-3.5 h-3.5" /> {page.lesson_phase}
               </span>
               <button
