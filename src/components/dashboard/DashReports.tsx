@@ -200,9 +200,9 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
       </div>
 
       {/* Financial KPI */}
-      {totalRevenue > 0 && (
-        <Card>
-          <CardContent className="py-4 flex items-center gap-3">
+      <Card>
+        <CardContent className="py-4 space-y-3">
+          <div className="flex items-center gap-3">
             <DollarSign className="w-5 h-5 text-emerald-400" />
             <span className="text-sm font-medium">
               Faturamento no período: <strong>R$ {totalRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong>
@@ -210,9 +210,92 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
             <span className="text-xs text-muted-foreground ml-auto">
               Ticket médio: R$ {convertidos > 0 ? (totalRevenue / convertidos).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "0,00"}
             </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Hotmart Payment & Quiz Analytics */}
+      <div className="grid md:grid-cols-2 gap-4">
+        {/* Hotmart Tags */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-emerald-400" /> Status de Pagamento (Hotmart)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {(() => {
+              const tagCounts: Record<string, number> = {};
+              const hotmartTags = ["pagou", "abandonou_checkout", "boleto_impresso", "compra_expirada", "entrou_no_curso", "modulo_concluido"];
+              const tagLabels: Record<string, string> = {
+                pagou: "✅ Pagou",
+                abandonou_checkout: "🛒 Abandonou Checkout",
+                boleto_impresso: "🧾 Boleto Impresso",
+                compra_expirada: "⏰ Compra Expirada",
+                entrou_no_curso: "📚 Entrou no Curso",
+                modulo_concluido: "🎓 Módulo Concluído",
+              };
+              filtered.forEach((l) => {
+                const tags = leadTags[l.id] || [];
+                tags.forEach((t) => {
+                  if (hotmartTags.includes(t)) {
+                    tagCounts[t] = (tagCounts[t] || 0) + 1;
+                  }
+                });
+              });
+              const entries = hotmartTags.filter((t) => tagCounts[t]).map((t) => ({ tag: t, label: tagLabels[t], count: tagCounts[t] }));
+              if (entries.length === 0) return <p className="text-sm text-muted-foreground">Sem dados de pagamento</p>;
+              return entries.map((e) => (
+                <div key={e.tag} className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">{e.label}</span>
+                  <span className="font-medium">{e.count}</span>
+                </div>
+              ));
+            })()}
           </CardContent>
         </Card>
-      )}
+
+        {/* Quiz Analytics */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Brain className="w-4 h-4 text-purple-400" /> Quiz / Diagnóstico
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {(() => {
+              const quizLeads = filtered.filter((l) => l.quiz_slug);
+              const withScore = quizLeads.filter((l) => l.quiz_score != null);
+              const avgScore = withScore.length > 0 ? Math.round(withScore.reduce((s, l) => s + (l.quiz_score || 0), 0) / withScore.length) : 0;
+              const bySlug: Record<string, number> = {};
+              quizLeads.forEach((l) => { if (l.quiz_slug) bySlug[l.quiz_slug] = (bySlug[l.quiz_slug] || 0) + 1; });
+              return (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Leads do Quiz</span>
+                    <span className="font-medium">{quizLeads.length}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Completaram</span>
+                    <span className="font-medium">{withScore.length}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Nota média</span>
+                    <span className="font-medium">{avgScore} pts</span>
+                  </div>
+                  {Object.entries(bySlug).sort((a, b) => b[1] - a[1]).map(([slug, count]) => (
+                    <div key={slug} className="flex justify-between text-sm">
+                      <span className="text-muted-foreground font-mono text-xs">/quiz/{slug}</span>
+                      <span className="font-medium">{count}</span>
+                    </div>
+                  ))}
+                  {quizLeads.length === 0 && <p className="text-sm text-muted-foreground">Sem leads do quiz</p>}
+                </>
+              );
+            })()}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Temperature rank */}
       <Card>
