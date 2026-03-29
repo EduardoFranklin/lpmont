@@ -136,6 +136,7 @@ const ModulesSection = () => {
   const handsOnRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [clinicalCurrent, setClinicalCurrent] = useState(0);
   const [clinicalAutoPlay, setClinicalAutoPlay] = useState(true);
+  const [navScrollLocked, setNavScrollLocked] = useState(false);
 
   const clinicalNext = useCallback(() => {
     setClinicalCurrent((c) => (c + 1) % clinicalImages.length);
@@ -152,20 +153,33 @@ const ModulesSection = () => {
   }, [clinicalAutoPlay, clinicalNext]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  useEffect(() => {
+    const lockNavScroll = () => setNavScrollLocked(true);
+    const unlockNavScroll = () => setNavScrollLocked(false);
+
+    window.addEventListener("nav-scroll-lock", lockNavScroll);
+    window.addEventListener("nav-scroll-unlock", unlockNavScroll);
+
+    return () => {
+      window.removeEventListener("nav-scroll-lock", lockNavScroll);
+      window.removeEventListener("nav-scroll-unlock", unlockNavScroll);
+    };
+  }, []);
+
   // Sequential scroll: only move ±1 at a time so no items get skipped
   useEffect(() => {
+    if (navScrollLocked) return;
+
     const observers: IntersectionObserver[] = [];
     camps.forEach((_, i) => {
       const el = itemRefs.current[i];
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !navScrollLocked) {
             setOpenIdx((prev) => {
               if (prev === null) return i;
-              // Only allow moving to adjacent item
               if (i === prev + 1 || i === prev - 1) return i;
-              // If further away, step one closer
               if (i > (prev ?? 0)) return (prev ?? 0) + 1;
               if (i < (prev ?? 0)) return (prev ?? 0) - 1;
               return prev;
@@ -178,16 +192,18 @@ const ModulesSection = () => {
       observers.push(obs);
     });
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  }, [camps, navScrollLocked]);
 
   useEffect(() => {
+    if (navScrollLocked) return;
+
     const observers: IntersectionObserver[] = [];
     handsOn.forEach((_, i) => {
       const el = handsOnRefs.current[i];
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !navScrollLocked) {
             setOpenHandsOn((prev) => {
               if (prev === null) return i;
               if (i === prev + 1 || i === prev - 1) return i;
@@ -203,7 +219,7 @@ const ModulesSection = () => {
       observers.push(obs);
     });
     return () => observers.forEach((o) => o.disconnect());
-  }, []);
+  }, [handsOn, navScrollLocked]);
 
   return (
     <section id="modulos" className="py-28 sm:py-36 relative">
