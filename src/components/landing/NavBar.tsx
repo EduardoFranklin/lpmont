@@ -27,10 +27,20 @@ const NavBar = () => {
   }, []);
 
   const links = [
-    { label: "A Trilha", href: "https://metodomont.com.br/#modulos" },
-    { label: "O Guia", href: "https://metodomont.com.br/#guia" },
-    { label: "Investimento", href: "https://metodomont.com.br/#preco" },
+    { label: "A Trilha", href: "#modulos" },
+    { label: "O Guia", href: "#guia" },
+    { label: "Investimento", href: "#preco" },
   ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    setMenuOpen(false);
+    const id = href.replace("#", "");
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <motion.nav
@@ -54,6 +64,7 @@ const NavBar = () => {
             <a
               key={l.href}
               href={l.href}
+              onClick={(e) => handleNavClick(e, l.href)}
               className="text-[13px] font-medium text-foreground/40 hover:text-foreground transition-colors duration-300"
             >
               {l.label}
@@ -62,7 +73,7 @@ const NavBar = () => {
         </div>
 
         <div className="hidden md:block">
-          <GradientButton href="https://metodomont.com.br/#falar-equipe">
+          <GradientButton href="#falar-equipe" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#falar-equipe")}>
             Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
           </GradientButton>
         </div>
@@ -83,7 +94,7 @@ const NavBar = () => {
             <div className="px-6 py-8 flex flex-col min-h-full">
               <div className="space-y-5 mb-8">
                 {links.map((l) => (
-                  <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
+                  <a key={l.href} href={l.href} onClick={(e) => handleNavClick(e, l.href)} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
                     {l.label}
                   </a>
                 ))}
