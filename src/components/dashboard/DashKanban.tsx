@@ -93,6 +93,14 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
                         </div>
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${TEMP_COLORS[temp]}`} title={temp} />
                       </div>
+                      {(lead as any).quiz_slug && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400 border border-purple-500/25">Quiz</span>
+                          {(lead as any).quiz_score != null && (
+                            <span className="text-[10px] font-mono text-muted-foreground">{(lead as any).quiz_score}pts</span>
+                          )}
+                        </div>
+                      )}
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Phone className="w-3 h-3" />
                         <span className="truncate">{lead.phone}</span>
