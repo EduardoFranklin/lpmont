@@ -25,7 +25,7 @@ const defaults: AllContent = {
       { label: "Mentoria ao Vivo", icon: "Radio" },
     ]),
     reassurance: JSON.stringify([
-      "+2.000 dentistas formados",
+      "+1.500 dentistas formados",
       "Garantia de 15 dias",
     ]),
   },
@@ -91,11 +91,11 @@ const defaults: AllContent = {
     bio: JSON.stringify([
       "Dentista há mais de 20 anos, vivi intensamente a odontologia em todas as suas fases. Cada curso é fruto de milhares de horas no consultório, na pesquisa e na sala de aula.",
       "Doutor em Ciências Odontológicas pela FOB-USP. Mestre em Dentística pela FOB-USP. Professor da UFMA e fundador do Instituto Mont'Alverne.",
-      "Já guiei mais de 2.000 dentistas nesta escalada. Agora é a sua vez.",
+      "Já guiei mais de 1.500 dentistas nesta escalada. Agora é a sua vez.",
     ]),
     stats: JSON.stringify([
       { value: "20+", label: "anos de clínica", icon: "Mountain" },
-      { value: "2.000+", label: "dentistas formados", icon: "Users" },
+      { value: "1.500+", label: "dentistas formados", icon: "Users" },
       { value: "FOB-USP", label: "Doutor e Mestre", icon: "GraduationCap" },
       { value: "UFMA", label: "Professor universitário", icon: "BookOpen" },
     ]),
