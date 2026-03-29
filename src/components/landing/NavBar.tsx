@@ -59,7 +59,7 @@ const NavBar = () => {
         </div>
 
         <div className="hidden md:block">
-          <GradientButton href="/agendar">
+          <GradientButton href="#falar-equipe">
             Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
           </GradientButton>
         </div>
