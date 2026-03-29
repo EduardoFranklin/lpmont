@@ -232,15 +232,6 @@ const ContactFormSection = () => {
                   {/* STEP 1 */}
                   {step === 1 && (
                     <motion.div key="s1" variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.3 }}>
-                      <div className="grid grid-cols-2 gap-2 mb-5">
-                        {benefits.map((b) => (
-                          <div key={b.label} className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-foreground/[0.03] border border-foreground/[0.06]">
-                            <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                            <span className="text-[11px] text-foreground/50 font-medium leading-tight">{b.label}</span>
-                          </div>
-                        ))}
-                      </div>
-
                       <div className="space-y-3">
                         <div className="flex gap-2">
                           <div className="w-[90px] flex-shrink-0">
