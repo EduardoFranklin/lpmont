@@ -13,6 +13,12 @@ const QuizNavBar = ({ ctaUrl }: Props) => {
   const footerContent = useSection("footer");
   const instagramLinks = parseJSON<{ label: string; url: string }[]>(footerContent.instagram_links, []);
 
+  const links = [
+    { label: "A Trilha", href: "https://metodomont.com.br/#modulos" },
+    { label: "O Guia", href: "https://metodomont.com.br/#guia" },
+    { label: "Investimento", href: "https://metodomont.com.br/#preco" },
+  ];
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -37,11 +43,16 @@ const QuizNavBar = ({ ctaUrl }: Props) => {
         </a>
 
         {/* Desktop */}
-        <div className="hidden md:flex items-center gap-3">
-          <span className="flex items-center gap-2 bg-primary/10 border border-primary/25 rounded-full px-3.5 py-1.5 text-[0.72rem] font-medium text-primary uppercase tracking-widest">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Prévia gratuita
-          </span>
+        <div className="hidden md:flex items-center gap-8">
+          {links.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              className="text-[13px] font-medium text-foreground/40 hover:text-foreground transition-colors duration-300"
+            >
+              {l.label}
+            </a>
+          ))}
           <a href={ctaUrl} className="btn-summit text-xs !px-5 !py-2.5">
             Quero Acesso Completo <ArrowRight className="w-3 h-3" />
           </a>
@@ -63,20 +74,18 @@ const QuizNavBar = ({ ctaUrl }: Props) => {
           >
             <div className="px-6 py-8 flex flex-col min-h-full">
               <div className="space-y-5 mb-8">
-                <a href="/" onClick={() => setMenuOpen(false)} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
-                  Início
-                </a>
+                {links.map((l) => (
+                  <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
+                    {l.label}
+                  </a>
+                ))}
               </div>
 
               <div className="space-y-3">
-                <a
-                  href={ctaUrl}
-                  onClick={() => setMenuOpen(false)}
-                  className="btn-summit w-full justify-center py-3 text-sm"
-                >
-                  Quero Acesso Completo <ArrowRight className="w-3.5 h-3.5" />
+                <a href="https://pay.hotmart.com/F97566234Y" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="btn-summit w-full justify-center py-3 text-sm">
+                  Comprar Agora <ArrowRight className="w-3.5 h-3.5" />
                 </a>
-                <a href="/#falar-equipe" onClick={() => setMenuOpen(false)} className="btn-gradient w-full">
+                <a href="https://metodomont.com.br/#falar-equipe" onClick={() => setMenuOpen(false)} className="btn-gradient w-full">
                   <div className="btn-gradient-wrapper w-full">
                     <div className="btn-gradient-inner w-full">
                       <div className="btn-gradient-bg" />
