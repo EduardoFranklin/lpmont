@@ -19,25 +19,29 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       <div className="flex gap-2">
         <button
           onClick={() => setActiveTab(1)}
-          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
+          className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
             activeTab === 1
               ? "bg-card text-foreground border-border/60 z-[2] relative"
               : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
           }`}
         >
-          <BookOpen className="w-4 h-4" />
-          <span className="text-[0.8rem]">Aula 01</span>
+          <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
+            Vídeo
+          </span>
+          Aula 01
         </button>
         <button
           onClick={() => setActiveTab(2)}
-          className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
+          className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
             activeTab === 2
               ? "bg-card text-foreground border-border/60 z-[2] relative"
               : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
           }`}
         >
-          <Brain className="w-4 h-4" />
-          <span className="text-[0.8rem]">Checkpoint</span>
+          <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
+            Quiz
+          </span>
+          Checkpoint
         </button>
       </div>
 
