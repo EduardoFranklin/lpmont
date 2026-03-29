@@ -62,6 +62,7 @@ interface QuizQuestion {
   is_critical: boolean;
   weight: number;
   explanation: string;
+  image_url: string;
   options: { text: string; points: number }[];
   _isNew?: boolean;
   _deleted?: boolean;
@@ -153,6 +154,7 @@ const DashQuizPages = () => {
         is_critical: false,
         weight: 10,
         explanation: "",
+        image_url: "",
         options: [
           { text: "", points: 0 },
           { text: "", points: 10 },
@@ -229,6 +231,7 @@ const DashQuizPages = () => {
           is_critical: q.is_critical,
           weight: q.weight,
           explanation: q.explanation,
+          image_url: q.image_url || "",
           options: JSON.stringify(q.options),
         }));
         const { error: qErr } = await supabase.from("quiz_questions").insert(inserts);
