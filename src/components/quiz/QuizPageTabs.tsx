@@ -98,9 +98,6 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
             <h2 className="text-xl font-semibold leading-tight mb-2.5">{page.lesson_title}</h2>
             <p className="text-sm text-muted-foreground leading-relaxed font-light mb-4">{page.lesson_desc}</p>
             <div className="flex items-center gap-4 pt-4 border-t border-border">
-              <span className="flex items-center gap-1.5 text-[0.73rem] text-muted-foreground">
-                <Eye className="w-3.5 h-3.5" /> {page.lesson_phase}
-              </span>
               <button
                 onClick={unlocked ? onOpenVideo : onUnlock}
                 className={`ml-auto flex items-center gap-1.5 text-[0.72rem] font-semibold tracking-wide uppercase px-3.5 py-1.5 rounded-lg border transition-all ${
@@ -112,7 +109,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
                 {unlocked ? (
                   <>Assistir <ArrowRight className="w-3 h-3" /></>
                 ) : (
-                  <><Lock className="w-3 h-3" /> Desbloquear</>
+                  <><Lock className="w-3 h-3" /> Bloqueado</>
                 )}
               </button>
             </div>
