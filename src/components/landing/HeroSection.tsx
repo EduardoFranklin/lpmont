@@ -141,8 +141,8 @@ const HeroSection = () => {
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="flex flex-col items-center mt-16">
             <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              animate={{ y: [0, 16, 0], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
               className="flex flex-col items-center"
             >
               <div className="caption-line-v h-16"><div className="caption-line-v-inner" /></div>
