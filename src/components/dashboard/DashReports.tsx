@@ -181,6 +181,21 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
         })}
       </div>
 
+      {/* Financial KPI */}
+      {totalRevenue > 0 && (
+        <Card>
+          <CardContent className="py-4 flex items-center gap-3">
+            <DollarSign className="w-5 h-5 text-emerald-400" />
+            <span className="text-sm font-medium">
+              Faturamento no período: <strong>R$ {totalRevenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</strong>
+            </span>
+            <span className="text-xs text-muted-foreground ml-auto">
+              Ticket médio: R$ {convertidos > 0 ? (totalRevenue / convertidos).toLocaleString("pt-BR", { minimumFractionDigits: 2 }) : "0,00"}
+            </span>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Temperature rank */}
       <Card>
         <CardHeader className="pb-3">
