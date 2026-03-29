@@ -153,9 +153,6 @@ const Dashboard = () => {
               <TabsContent value="users">
                 <DashUsers />
               </TabsContent>
-              <TabsContent value="quizpages">
-                <DashQuizPages />
-              </TabsContent>
             </Tabs>
           </>
         ) : (
