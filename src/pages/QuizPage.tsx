@@ -9,6 +9,7 @@ import QuizPageTrail from "@/components/quiz/QuizPageTrail";
 import QuizPageInstructor from "@/components/quiz/QuizPageInstructor";
 import QuizPageTestimonials from "@/components/quiz/QuizPageTestimonials";
 import QuizPageGuarantee from "@/components/quiz/QuizPageGuarantee";
+import QuizPageBonuses from "@/components/quiz/QuizPageBonuses";
 import QuizPageStickyFooter from "@/components/quiz/QuizPageStickyFooter";
 import QuizModal from "@/components/quiz/QuizModal";
 import VideoModal from "@/components/quiz/VideoModal";
@@ -175,6 +176,8 @@ const QuizPage = () => {
       />
 
       <QuizPageTrail content={content} ctaUrl={page.cta_url} />
+
+      <QuizPageBonuses />
 
       <QuizPageInstructor instructor={instructor} />
 
