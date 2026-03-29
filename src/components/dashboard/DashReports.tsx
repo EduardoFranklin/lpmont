@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Lead } from "@/pages/Dashboard";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
   Users, CalendarCheck, UserCheck, TrendingUp, Globe, Megaphone, Target,
-  Snowflake, Flame, Zap, X, ArrowDownWideNarrow, ArrowUpWideNarrow, DollarSign, Trophy
+  Snowflake, Flame, Zap, X, ArrowDownWideNarrow, ArrowUpWideNarrow, DollarSign, Trophy,
+  CreditCard, ShoppingCart, BookOpen, Brain
 } from "lucide-react";
 
 const statusLabels: Record<string, string> = {
@@ -28,6 +30,22 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
   const [filters, setFilters] = useState<Filter[]>([]);
   const [showCity, setShowCity] = useState(true);
   const [locationSortAsc, setLocationSortAsc] = useState(false);
+  const [leadTags, setLeadTags] = useState<Record<string, string[]>>({});
+
+  useEffect(() => {
+    const loadTags = async () => {
+      const { data } = await supabase.from("lead_tags").select("lead_id, tag");
+      if (data) {
+        const map: Record<string, string[]> = {};
+        data.forEach((t: any) => {
+          if (!map[t.lead_id]) map[t.lead_id] = [];
+          map[t.lead_id].push(t.tag);
+        });
+        setLeadTags(map);
+      }
+    };
+    loadTags();
+  }, [leads]);
 
   const toggleFilter = (f: Filter) => {
     setFilters((prev) => {
