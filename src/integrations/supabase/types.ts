@@ -371,6 +371,7 @@ export type Database = {
           created_at: string
           explanation: string
           id: string
+          image_url: string | null
           is_critical: boolean
           label: string
           options: Json
@@ -383,6 +384,7 @@ export type Database = {
           created_at?: string
           explanation?: string
           id?: string
+          image_url?: string | null
           is_critical?: boolean
           label?: string
           options?: Json
@@ -395,6 +397,7 @@ export type Database = {
           created_at?: string
           explanation?: string
           id?: string
+          image_url?: string | null
           is_critical?: boolean
           label?: string
           options?: Json
