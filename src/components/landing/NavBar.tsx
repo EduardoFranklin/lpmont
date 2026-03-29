@@ -17,6 +17,9 @@ const GradientButton = ({ href, children, className = "", ...rest }: { href: str
 const NavBar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const footerContent = useSection("footer");
+  const instagramLinks = parseJSON<{ label: string; url: string }[]>(footerContent.instagram_links, []);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
