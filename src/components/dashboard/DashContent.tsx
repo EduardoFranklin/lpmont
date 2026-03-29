@@ -6,23 +6,38 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Save, RotateCcw, Check, Loader2, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Save, RotateCcw, Loader2, Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
-import ImageUploader from "./ImageUploader";
+import ImageUploadCrop from "./ImageUploadCrop";
+import RichTextEditor from "./RichTextEditor";
 
 type ContentMap = Record<string, Record<string, string>>;
 
 const sectionOrder = ["hero", "problem", "modules", "synopses", "method", "instructor", "benefits", "testimonials", "pricing", "faq", "footer"];
 
-// Detect if a field value looks like JSON
+// Fields that should use the rich text editor
+const richTextFields = new Set([
+  "synopsis_1", "synopsis_2", "synopsis_3", "synopsis_4", "synopsis_5",
+  "synopsis_6", "synopsis_7", "synopsis_8", "synopsis_9", "synopsis_10",
+  "synopsis_11", "synopsis_12", "synopsis_13",
+  "bio", "description", "desc", "content", "body", "text",
+  "result_closing_text",
+]);
+
+function isRichTextField(key: string, value: string): boolean {
+  if (richTextFields.has(key)) return true;
+  if (key.startsWith("synopsis_")) return true;
+  // If contains HTML tags, use rich text
+  if (value && /<[a-z][\s\S]*>/i.test(value) && !value.startsWith("[") && !value.startsWith("{")) return true;
+  return false;
+}
+
 function isJsonField(key: string, value: string): boolean {
   const jsonKeys = ["toggles", "reassurance", "obstacles", "camps", "hands_on", "items", "bio", "stats", "includes", "bonuses", "theory_tags", "practice_tags", "instagram_links"];
   if (jsonKeys.includes(key)) return true;
-  if (key.startsWith("synopsis_")) return true;
   return value.startsWith("[") && value.endsWith("]") || value.startsWith("{") && value.endsWith("}");
 }
 
-// Detect if a field is an image URL field
 function isImageField(key: string, value: string): boolean {
   const imageKeys = ["img", "avatar", "image", "logo", "photo", "cover", "thumbnail", "banner"];
   if (imageKeys.some(ik => key.toLowerCase().includes(ik))) return true;
@@ -31,20 +46,15 @@ function isImageField(key: string, value: string): boolean {
   return false;
 }
 
-// JSON array editor for simple string arrays
 function SimpleArrayEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const items: string[] = (() => { try { return JSON.parse(value); } catch { return []; } })();
-
   const update = (idx: number, newVal: string) => {
-    const copy = [...items];
-    copy[idx] = newVal;
-    onChange(JSON.stringify(copy));
+    const copy = [...items]; copy[idx] = newVal; onChange(JSON.stringify(copy));
   };
   const add = () => onChange(JSON.stringify([...items, ""]));
   const remove = (idx: number) => onChange(JSON.stringify(items.filter((_, i) => i !== idx)));
   const move = (idx: number, dir: -1 | 1) => {
-    const copy = [...items];
-    const target = idx + dir;
+    const copy = [...items]; const target = idx + dir;
     if (target < 0 || target >= copy.length) return;
     [copy[idx], copy[target]] = [copy[target], copy[idx]];
     onChange(JSON.stringify(copy));
@@ -66,27 +76,19 @@ function SimpleArrayEditor({ value, onChange }: { value: string; onChange: (v: s
   );
 }
 
-// JSON array editor for object arrays (obstacles, camps, testimonials, FAQs etc.)
 function ObjectArrayEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const items: Record<string, string>[] = (() => { try { return JSON.parse(value); } catch { return []; } })();
   if (items.length === 0) return <Textarea value={value} onChange={(e) => onChange(e.target.value)} rows={6} className="font-mono text-xs" />;
-
   const keys = Object.keys(items[0]);
-
   const update = (idx: number, key: string, newVal: string) => {
-    const copy = JSON.parse(JSON.stringify(items));
-    copy[idx][key] = newVal;
-    onChange(JSON.stringify(copy));
+    const copy = JSON.parse(JSON.stringify(items)); copy[idx][key] = newVal; onChange(JSON.stringify(copy));
   };
   const add = () => {
-    const empty: Record<string, string> = {};
-    keys.forEach(k => empty[k] = "");
-    onChange(JSON.stringify([...items, empty]));
+    const empty: Record<string, string> = {}; keys.forEach(k => empty[k] = ""); onChange(JSON.stringify([...items, empty]));
   };
   const remove = (idx: number) => onChange(JSON.stringify(items.filter((_, i) => i !== idx)));
   const move = (idx: number, dir: -1 | 1) => {
-    const copy = [...items];
-    const target = idx + dir;
+    const copy = [...items]; const target = idx + dir;
     if (target < 0 || target >= copy.length) return;
     [copy[idx], copy[target]] = [copy[target], copy[idx]];
     onChange(JSON.stringify(copy));
@@ -108,7 +110,13 @@ function ObjectArrayEditor({ value, onChange }: { value: string; onChange: (v: s
             <div key={k}>
               <label className="text-[11px] text-muted-foreground uppercase tracking-wider">{k}</label>
               {isImageField(k, item[k] || "") ? (
-                <ImageUploader value={item[k] || ""} onChange={(v) => update(i, k, v)} />
+                <ImageUploadCrop
+                  value={item[k] || ""}
+                  onChange={(v) => update(i, k, v)}
+                  friendlyName={`${k}-${i + 1}`}
+                />
+              ) : isRichTextField(k, item[k] || "") ? (
+                <RichTextEditor value={item[k] || ""} onChange={(v) => update(i, k, v)} minHeight="100px" />
               ) : (item[k] || "").length > 80 ? (
                 <Textarea value={item[k] || ""} onChange={(e) => update(i, k, e.target.value)} rows={3} className="text-sm" />
               ) : (
@@ -124,19 +132,13 @@ function ObjectArrayEditor({ value, onChange }: { value: string; onChange: (v: s
 }
 
 function JsonFieldEditor({ fieldKey, value, onChange }: { fieldKey: string; value: string; onChange: (v: string) => void }) {
-  // Try to detect if it's a simple string array or object array
   try {
     const parsed = JSON.parse(value);
     if (Array.isArray(parsed)) {
-      if (parsed.length === 0 || typeof parsed[0] === "string") {
-        return <SimpleArrayEditor value={value} onChange={onChange} />;
-      }
-      if (typeof parsed[0] === "object") {
-        return <ObjectArrayEditor value={value} onChange={onChange} />;
-      }
+      if (parsed.length === 0 || typeof parsed[0] === "string") return <SimpleArrayEditor value={value} onChange={onChange} />;
+      if (typeof parsed[0] === "object") return <ObjectArrayEditor value={value} onChange={onChange} />;
     }
   } catch {}
-  // Fallback: raw JSON textarea
   return <Textarea value={value} onChange={(e) => onChange(e.target.value)} rows={8} className="font-mono text-xs" />;
 }
 
@@ -145,7 +147,6 @@ const DashContent = () => {
   const [saving, setSaving] = useState(false);
   const [dirtyKeys, setDirtyKeys] = useState<Set<string>>(new Set());
 
-  // Load current content from DB (merged with defaults)
   useEffect(() => {
     const load = async () => {
       const merged: ContentMap = JSON.parse(JSON.stringify(defaults));
@@ -162,10 +163,7 @@ const DashContent = () => {
   }, []);
 
   const updateField = (section: string, key: string, value: string) => {
-    setContent(prev => ({
-      ...prev,
-      [section]: { ...prev[section], [key]: value },
-    }));
+    setContent(prev => ({ ...prev, [section]: { ...prev[section], [key]: value } }));
     setDirtyKeys(prev => new Set(prev).add(`${section}::${key}`));
   };
 
@@ -177,7 +175,6 @@ const DashContent = () => {
   const saveAll = async () => {
     setSaving(true);
     try {
-      // Only save dirty fields
       const upserts = Array.from(dirtyKeys).map(dk => {
         const [section, key] = dk.split("::");
         return {
@@ -187,24 +184,14 @@ const DashContent = () => {
           content_type: isJsonField(key, content[section]?.[key] ?? "") ? "json" : "text",
         };
       });
-
-      if (upserts.length === 0) {
-        toast.info("Nenhuma alteração para salvar.");
-        setSaving(false);
-        return;
-      }
-
-      const { error } = await supabase.from("site_content").upsert(upserts, {
-        onConflict: "section,content_key",
-      });
-
+      if (upserts.length === 0) { toast.info("Nenhuma alteração."); setSaving(false); return; }
+      const { error } = await supabase.from("site_content").upsert(upserts, { onConflict: "section,content_key" });
       if (error) throw error;
-
       invalidateSiteContentCache();
       setDirtyKeys(new Set());
-      toast.success("Conteúdo salvo com sucesso!");
+      toast.success("Conteúdo salvo!");
     } catch (err: any) {
-      toast.error("Erro ao salvar: " + err.message);
+      toast.error("Erro: " + err.message);
     } finally {
       setSaving(false);
     }
@@ -217,7 +204,7 @@ const DashContent = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">Gerenciar Conteúdo do Site</h2>
-          <p className="text-sm text-muted-foreground">Edite textos e conteúdos de cada seção. As alterações são aplicadas imediatamente no site após salvar.</p>
+          <p className="text-sm text-muted-foreground">Edite textos, imagens e conteúdos de cada seção. Campos de texto suportam formatação rica.</p>
         </div>
         <Button onClick={saveAll} disabled={saving || !hasChanges} className="gap-1.5">
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -250,6 +237,8 @@ const DashContent = () => {
                     const value = sectionContent[key] ?? defaults[section]?.[key] ?? "";
                     const label = labels[key] ?? key;
                     const isJson = isJsonField(key, value);
+                    const isImage = isImageField(key, value);
+                    const isRich = !isJson && !isImage && isRichTextField(key, value);
                     const isDirty = dirtyKeys.has(`${section}::${key}`);
 
                     return (
@@ -270,8 +259,18 @@ const DashContent = () => {
                         </div>
                         {isJson ? (
                           <JsonFieldEditor fieldKey={key} value={value} onChange={(v) => updateField(section, key, v)} />
-                        ) : isImageField(key, value) ? (
-                          <ImageUploader value={value} onChange={(v) => updateField(section, key, v)} />
+                        ) : isImage ? (
+                          <ImageUploadCrop
+                            value={value}
+                            onChange={(v) => updateField(section, key, v)}
+                            friendlyName={`${section}-${key}`}
+                          />
+                        ) : isRich ? (
+                          <RichTextEditor
+                            value={value}
+                            onChange={(v) => updateField(section, key, v)}
+                            placeholder={`Conteúdo de ${label}...`}
+                          />
                         ) : value.includes("\n") || value.length > 100 ? (
                           <Textarea
                             value={value}
