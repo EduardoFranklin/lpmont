@@ -76,10 +76,22 @@ const QuizPageTrail = ({ content, ctaUrl }: Props) => {
                 <div className="flex-1 h-px bg-border" />
               </div>
               {phaseCamps.map((camp) => {
-                const imgIndex = parseInt(camp.number, 10);
-                const imgSrc = imgIndex <= 12
-                  ? `/images/thumbs/freepik_${imgIndex}-thumb.webp`
-                  : `/images/thumbs/freepik_12-thumb.webp`;
+                const campImgMap: Record<string, string> = {
+                  "01": "/images/thumbs/freepik_1-thumb.webp",
+                  "02": "/images/thumbs/freepik_2-thumb.webp",
+                  "03": "/images/thumbs/freepik_3-thumb.webp",
+                  "04": "/images/thumbs/freepik_4-thumb.webp",
+                  "05": "/images/thumbs/freepik_5-thumb.webp",
+                  "06": "/images/thumbs/freepik_6-thumb.webp",
+                  "07": "/images/thumbs/freepik_7-thumb.webp",
+                  "08": "/images/thumbs/freepik_8-thumb.webp",
+                  "09": "/images/thumbs/freepik_9-thumb.webp",
+                  "10": "/images/thumbs/freepik_10-thumb.webp",
+                  "11": "/images/thumbs/freepik_11-thumb.webp",
+                  "12": "/images/thumbs/freepik_11-thumb.webp",
+                  "13": "/images/thumbs/freepik_12-thumb.webp",
+                };
+                const imgSrc = campImgMap[camp.number] || "/images/thumbs/freepik_1-thumb.webp";
                 return (
                   <div
                     key={camp.number}
