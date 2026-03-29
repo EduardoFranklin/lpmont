@@ -25,7 +25,7 @@ const defaults: AllContent = {
       { label: "Mentoria ao Vivo", icon: "Radio" },
     ]),
     reassurance: JSON.stringify([
-      "+2.000 dentistas formados",
+      "+1.500 dentistas formados",
       "Garantia de 15 dias",
     ]),
   },
