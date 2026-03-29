@@ -165,10 +165,10 @@ const QuizPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-5 sm:px-10 h-16 bg-background/90 backdrop-blur-xl border-b border-border">
-        <div className="font-['Bebas_Neue',sans-serif] text-2xl tracking-wider">
-          M<span className="text-primary">ont</span>'
-        </div>
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-5 sm:px-10 h-16 bg-background/90 backdrop-blur-xl border-b border-border/40">
+        <a href="/">
+          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-5 sm:h-6 opacity-80 hover:opacity-100 transition-opacity" />
+        </a>
         <div className="flex items-center gap-3">
           <span className="hidden sm:flex items-center gap-2 bg-primary/10 border border-primary/25 rounded-full px-3.5 py-1.5 text-[0.72rem] font-medium text-primary uppercase tracking-widest">
             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -197,6 +197,16 @@ const QuizPage = () => {
       <QuizPageTestimonials testimonials={testimonials} />
 
       <QuizPageGuarantee />
+
+      {/* Footer */}
+      <footer className="py-14 border-t border-foreground/[0.04] mt-16">
+        <div className="max-w-[860px] mx-auto px-5 sm:px-10 text-center">
+          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-5 opacity-25 mx-auto mb-3" loading="lazy" />
+          <p className="text-foreground/15 text-xs">
+            © {new Date().getFullYear()} Método Mont'. Todos os direitos reservados.
+          </p>
+        </div>
+      </footer>
 
       <QuizPageStickyFooter ctaUrl={page.cta_url} />
 
