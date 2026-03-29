@@ -252,6 +252,27 @@ const LeadDetail = () => {
             </CardContent>
           </Card>
 
+          {/* Quiz info card */}
+          {(lead as any).quiz_slug && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2"><Zap className="w-4 h-4" /> Quiz</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between text-muted-foreground">
+                  <span className="text-xs uppercase tracking-wider">Página</span>
+                  <span className="text-foreground text-xs font-medium">{(lead as any).quiz_slug}</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span className="text-xs uppercase tracking-wider">Pontuação</span>
+                  <span className="text-foreground text-xs font-medium">
+                    {(lead as any).quiz_score != null ? `${(lead as any).quiz_score} pts` : "Não respondeu"}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2"><Globe className="w-4 h-4" /> Origem (UTM)</CardTitle>
