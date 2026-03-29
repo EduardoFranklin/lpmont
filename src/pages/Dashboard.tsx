@@ -119,7 +119,7 @@ const Dashboard = () => {
             </div>
 
             <Tabs defaultValue="reports" className="space-y-6">
-              <TabsList>
+              <TabsList className="flex flex-wrap h-auto gap-1">
                 <TabsTrigger value="reports" className="gap-1.5">
                   <BarChart3 className="w-4 h-4" /> Relatórios
                 </TabsTrigger>
@@ -130,13 +130,13 @@ const Dashboard = () => {
                   <Columns3 className="w-4 h-4" /> Kanban
                 </TabsTrigger>
                 <TabsTrigger value="messaging" className="gap-1.5">
-                  <MessageSquare className="w-4 h-4" /> Mensageria
+                  <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Mensageria</span><span className="sm:hidden">Msg</span>
                 </TabsTrigger>
                 <TabsTrigger value="settings" className="gap-1.5">
-                  <Settings className="w-4 h-4" /> Configurações
+                  <Settings className="w-4 h-4" /> <span className="hidden sm:inline">Configurações</span><span className="sm:hidden">Config</span>
                 </TabsTrigger>
                 <TabsTrigger value="users" className="gap-1.5">
-                  <Users className="w-4 h-4" /> Usuários
+                  <Users className="w-4 h-4" /> <span className="hidden sm:inline">Usuários</span><span className="sm:hidden">Users</span>
                 </TabsTrigger>
                 <TabsTrigger value="quizpages" className="gap-1.5">
                   <Zap className="w-4 h-4" /> Páginas
