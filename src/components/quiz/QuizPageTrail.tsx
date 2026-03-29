@@ -171,19 +171,14 @@ const QuizPageTrail = ({ content, ctaUrl }: Props) => {
           </div>
         )}
 
-        {/* CTA */}
-        <div className="mt-8 bg-gradient-to-br from-primary/8 to-primary/4 border border-primary/20 rounded-2xl p-8 flex items-center justify-between gap-6 flex-wrap">
-          <div>
-            <h3 className="font-['Bebas_Neue',sans-serif] text-2xl tracking-wide mb-1">
-              Acesso completo ao método
-            </h3>
-            <p className="text-sm text-muted-foreground font-light leading-relaxed">
-              Cada semana sem o método é uma restauração entregue abaixo do que você poderia entregar.
-            </p>
-          </div>
-          <a href={ctaUrl} className="btn-summit text-sm flex-shrink-0 whitespace-nowrap">
-            Quero Acesso Completo →
-          </a>
+        {/* CTA text block */}
+        <div className="mt-8 bg-gradient-to-br from-primary/8 to-primary/4 border border-primary/20 rounded-2xl p-8 text-center">
+          <h3 className="font-['Bebas_Neue',sans-serif] text-2xl tracking-wide mb-1">
+            Acesso completo ao método
+          </h3>
+          <p className="text-sm text-muted-foreground font-light leading-relaxed">
+            Cada semana sem o método é uma restauração entregue abaixo do que você poderia entregar.
+          </p>
         </div>
       </section>
     </>
