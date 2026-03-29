@@ -165,20 +165,7 @@ const QuizPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-5 sm:px-10 h-16 bg-background/90 backdrop-blur-xl border-b border-border/40">
-        <a href="/">
-          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-5 sm:h-6 opacity-80 hover:opacity-100 transition-opacity" />
-        </a>
-        <div className="flex items-center gap-3">
-          <span className="hidden sm:flex items-center gap-2 bg-primary/10 border border-primary/25 rounded-full px-3.5 py-1.5 text-[0.72rem] font-medium text-primary uppercase tracking-widest">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Prévia gratuita
-          </span>
-          <a href={page.cta_url} className="btn-summit text-xs !px-5 !py-2.5">
-            Quero Acesso Completo →
-          </a>
-        </div>
-      </nav>
+      <QuizNavBar ctaUrl={page.cta_url} />
 
       <QuizPageHero page={page} />
 
