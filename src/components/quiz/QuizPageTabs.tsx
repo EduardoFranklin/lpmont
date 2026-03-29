@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Play, Lock, Clock, Eye, CheckSquare, ArrowRight } from "lucide-react";
+import { Play, Lock, Clock, Eye, CheckSquare, ArrowRight, BookOpen, Brain } from "lucide-react";
 import type { QuizPageData } from "@/pages/QuizPage";
 
 interface Props {
