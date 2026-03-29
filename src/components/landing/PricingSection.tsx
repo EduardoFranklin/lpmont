@@ -85,7 +85,7 @@ const PricingSection = () => {
                 <a href="https://pay.hotmart.com/F97566234Y" target="_blank" rel="noopener noreferrer" className="btn-summit w-full justify-center text-base">
                   Comprar Agora <ArrowRight className="w-4 h-4" />
                 </a>
-                <a href="/agendar" className="w-full mt-3 inline-flex items-center justify-center gap-2 text-sm font-medium py-3 rounded-xl border border-foreground/10 text-foreground/50 hover:text-foreground/70 hover:border-foreground/20 transition-all duration-300">
+                <a href="#falar-equipe" className="w-full mt-3 inline-flex items-center justify-center gap-2 text-sm font-medium py-3 rounded-xl border border-foreground/10 text-foreground/50 hover:text-foreground/70 hover:border-foreground/20 transition-all duration-300">
                   Falar com a Equipe
                 </a>
 
