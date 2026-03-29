@@ -13,6 +13,7 @@ import LeadDetail from "./pages/LeadDetail.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import QuizPage from "./pages/QuizPage.tsx";
 import Checkout from "./pages/Checkout.tsx";
+import FalarEquipe from "./pages/FalarEquipe.tsx";
 
 /* force-publish-v3 */
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/admin/lead/:id" element={<LeadDetail />} />
           <Route path="/quiz/:slug" element={<QuizPage />} />
           <Route path="/pagar-agora" element={<Checkout />} />
+          <Route path="/falar-equipe" element={<FalarEquipe />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
