@@ -6,7 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Plus, Trash2, Save, Loader2, ExternalLink, ChevronUp, ChevronDown, Copy, Eye } from "lucide-react";
-import { toast } from "sonner";
+import ImageUploadCrop from "./ImageUploadCrop";
+import RichTextEditor from "./RichTextEditor";
 
 interface QuizPage {
   id: string;
