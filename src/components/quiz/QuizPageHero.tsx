@@ -17,7 +17,7 @@ const QuizPageHero = ({ page }: Props) => {
   }, []);
 
   return (
-    <section className="relative min-h-[70vh] flex flex-col justify-center overflow-hidden">
+    <section className="relative min-h-[50vh] sm:min-h-[70vh] flex flex-col justify-center overflow-hidden">
       {/* Parallax background */}
       <div className="absolute inset-0">
         <img
