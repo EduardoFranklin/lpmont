@@ -91,9 +91,6 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
               <span className="text-[0.63rem] font-bold tracking-[0.12em] uppercase px-2 py-0.5 rounded border border-primary/30 bg-primary/7 text-primary">
                 Vídeo
               </span>
-              <span className="font-['Bebas_Neue',sans-serif] text-base text-muted-foreground tracking-wide">
-                {page.lesson_number}
-              </span>
               <span className={`ml-auto text-[0.63rem] font-semibold tracking-[0.1em] uppercase px-2.5 py-0.5 rounded-full ${
                 unlocked
                   ? "bg-green-500/12 text-green-400"
