@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { X, Info, ArrowRight, Clock, Flame } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { X, Info, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { QuizPageData, QuizQuestion } from "@/pages/QuizPage";
+import ResultPhase from "./ResultPhase";
 
 interface Props {
   open: boolean;
