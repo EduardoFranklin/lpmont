@@ -194,6 +194,11 @@ const LeadDetail = () => {
                 <tempBtn.icon className="w-3 h-3 mr-1" />{tempBtn.label}
               </Badge>
             )}
+            {(lead as any).quiz_slug && (
+              <Badge variant="outline" className="bg-purple-500/15 text-purple-400 border-purple-500/25">
+                Quiz {(lead as any).quiz_score != null ? `${(lead as any).quiz_score}pts` : ""}
+              </Badge>
+            )}
             {lead.scheduled_day && lead.scheduled_time && (
               <CalendarCheck className="w-4 h-4 text-amber-400 flex-shrink-0" />
             )}
