@@ -195,6 +195,7 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
           </div>
         );
       })}
+      </div>
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
