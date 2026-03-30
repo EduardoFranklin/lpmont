@@ -1015,19 +1015,45 @@ const SaleNotificationsTab = () => {
 
 const DashMessaging = () => {
   const [sequences, setSequences] = useState<Sequence[]>([]);
+  const [funnelMeta, setFunnelMeta] = useState<Record<string, { label: string; description: string; iconIdx: number }>>({});
   const [loading, setLoading] = useState(true);
 
   const fetchSequences = useCallback(async () => {
-    const { data } = await supabase
-      .from("automation_sequences" as any)
-      .select("*")
-      .order("funnel")
-      .order("step_order") as any;
-    setSequences(data || []);
+    const [{ data: seqData }, { data: metaData }] = await Promise.all([
+      supabase.from("automation_sequences" as any).select("*").order("funnel").order("step_order") as any,
+      supabase.from("site_settings").select("*").like("key", "funnel_meta_%"),
+    ]);
+    setSequences(seqData || []);
+    const meta: Record<string, any> = {};
+    (metaData || []).forEach((row: any) => {
+      const code = row.key.replace("funnel_meta_", "");
+      try { meta[code] = JSON.parse(row.value); } catch {}
+    });
+    setFunnelMeta(meta);
     setLoading(false);
   }, []);
 
   useEffect(() => { fetchSequences(); }, [fetchSequences]);
+
+  // Build dynamic funnel list: defaults + any custom ones from data
+  const allFunnelCodes = new Set([
+    ...DEFAULT_FUNNELS.map(f => f.value),
+    ...sequences.map(s => s.funnel),
+  ]);
+
+  const allFunnels = Array.from(allFunnelCodes).map(code => {
+    const defaultF = DEFAULT_FUNNELS.find(f => f.value === code);
+    if (defaultF) return defaultF;
+    const meta = funnelMeta[code];
+    const iconDef = FUNNEL_ICONS[meta?.iconIdx ?? 0] || FUNNEL_ICONS[0];
+    return {
+      value: code,
+      label: meta?.label || code,
+      icon: iconDef.icon,
+      color: iconDef.color,
+      description: meta?.description || "Fluxo personalizado",
+    };
+  });
 
   if (loading) return (
     <div className="flex items-center justify-center py-12">
@@ -1048,30 +1074,16 @@ const DashMessaging = () => {
           <p className="text-sm text-muted-foreground">
             Arraste para reordenar. Clique no botão ON/OFF do funil para ativar/desativar todas as mensagens de uma vez.
           </p>
-          <Badge variant="outline" className="text-xs">
-            {sequences.filter(s => s.active).length}/{sequences.length} ativos
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              {sequences.filter(s => s.active).length}/{sequences.length} ativos
+            </Badge>
+            <AddFunnelDialog existingFunnels={Array.from(allFunnelCodes)} onAdded={fetchSequences} />
+          </div>
         </div>
         <Accordion type="multiple" className="space-y-2">
-          {FUNNELS.map((funnel) => {
+          {allFunnels.map((funnel) => {
             const funnelSeqs = sequences.filter(s => s.funnel === funnel.value);
-            if (funnelSeqs.length === 0) return (
-              <AccordionItem key={funnel.value} value={funnel.value} className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline py-3">
-                  <div className="flex items-center gap-3">
-                    <funnel.icon className={`w-5 h-5 ${funnel.color}`} />
-                    <div className="text-left">
-                      <p className="text-sm font-semibold">{funnel.label}</p>
-                      <p className="text-xs text-muted-foreground font-normal">{funnel.description}</p>
-                    </div>
-                    <Badge variant="secondary" className="ml-2 text-[10px]">Vazio</Badge>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pb-4">
-                  <AddMessageDialog funnel={funnel.value} existingCount={0} onAdded={fetchSequences} />
-                </AccordionContent>
-              </AccordionItem>
-            );
             return (
               <FunnelSection key={funnel.value} funnel={funnel} sequences={funnelSeqs} onUpdate={fetchSequences} />
             );
