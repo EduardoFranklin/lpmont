@@ -39,7 +39,7 @@ const TestimonialsSection = () => {
   const currentItems = testimonials.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
   return (
-    <section className="py-28 sm:py-36 relative">
+    <section className="py-16 sm:py-36 relative">
       <div className="section-container">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20 max-w-2xl mx-auto">
           <div className="flex items-center justify-center gap-3 mb-6">
