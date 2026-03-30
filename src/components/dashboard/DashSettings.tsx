@@ -61,7 +61,7 @@ const SETTINGS: SettingField[] = [
 
 const ZAPI_FIELDS = [
   { key: "zapi_instance_id", label: "ID da instância", placeholder: "Ex: 3F0A1B2C3D4E5F2405BB3022729239B50", description: "Encontre em app.z-api.io → sua instância → Credenciais → ID da instância" },
-  { key: "zapi_instance_token", label: "Token da instância", placeholder: "Ex: E76BEB19D0B174248AC4AB43", description: "Encontre em app.z-api.io → sua instância → Credenciais → Token da instância" },
+  { key: "zapi_token", label: "Token da instância", placeholder: "Ex: E76BEB19D0B174248AC4AB43", description: "Encontre em app.z-api.io → sua instância → Credenciais → Token da instância" },
   { key: "zapi_client_token", label: "Client Token (Security)", placeholder: "Ex: Fabc123def456ghi789...", description: "Encontre em app.z-api.io → Configurações → Security → Client Token" },
 ];
 
