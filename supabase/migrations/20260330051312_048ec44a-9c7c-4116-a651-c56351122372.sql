@@ -1,0 +1,2 @@
+ALTER TABLE public.automation_sequences ADD COLUMN IF NOT EXISTS skip_sending_window boolean NOT NULL DEFAULT false;
+ALTER TABLE public.message_queue ADD COLUMN IF NOT EXISTS skip_sending_window boolean NOT NULL DEFAULT false;

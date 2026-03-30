@@ -25,6 +25,7 @@ export type Database = {
           delay_minutes: number
           funnel: string
           id: string
+          skip_sending_window: boolean
           step_key: string
           step_order: number
           subject: string | null
@@ -41,6 +42,7 @@ export type Database = {
           delay_minutes?: number
           funnel: string
           id?: string
+          skip_sending_window?: boolean
           step_key: string
           step_order?: number
           subject?: string | null
@@ -57,6 +59,7 @@ export type Database = {
           delay_minutes?: number
           funnel?: string
           id?: string
+          skip_sending_window?: boolean
           step_key?: string
           step_order?: number
           subject?: string | null
@@ -375,6 +378,7 @@ export type Database = {
           scheduled_for: string
           sent_at: string | null
           sequence_id: string | null
+          skip_sending_window: boolean
           status: string
           step_key: string
           subject: string | null
@@ -391,6 +395,7 @@ export type Database = {
           scheduled_for?: string
           sent_at?: string | null
           sequence_id?: string | null
+          skip_sending_window?: boolean
           status?: string
           step_key: string
           subject?: string | null
@@ -407,6 +412,7 @@ export type Database = {
           scheduled_for?: string
           sent_at?: string | null
           sequence_id?: string | null
+          skip_sending_window?: boolean
           status?: string
           step_key?: string
           subject?: string | null
