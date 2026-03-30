@@ -572,7 +572,95 @@ const AddMessageDialog = ({ funnel, existingCount, onAdded }: { funnel: string; 
   );
 };
 
-/* ─── Funnel Section (with drag-and-drop, bulk toggle) ─── */
+/* ─── Add Funnel Dialog ─── */
+
+const AddFunnelDialog = ({ existingFunnels, onAdded }: { existingFunnels: string[]; onAdded: () => void }) => {
+  const [open, setOpen] = useState(false);
+  const [funnelCode, setFunnelCode] = useState("");
+  const [funnelLabel, setFunnelLabel] = useState("");
+  const [funnelDesc, setFunnelDesc] = useState("");
+  const [iconIdx, setIconIdx] = useState(0);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    const code = funnelCode.trim().toUpperCase();
+    if (!code || !funnelLabel.trim()) { toast.error("Preencha código e nome do fluxo"); return; }
+    if (existingFunnels.includes(code)) { toast.error("Já existe um fluxo com esse código"); return; }
+    setSaving(true);
+    const { error } = await supabase.from("automation_sequences" as any).insert({
+      funnel: code,
+      step_order: 1,
+      step_key: `${code.toLowerCase()}_msg_1`,
+      title: `${funnelLabel.trim()} — Mensagem 1`,
+      channel: "whatsapp",
+      delay_minutes: 0,
+      delay_description: "Imediato",
+      subject: null,
+      body: "Olá {{nome}}, ...",
+      conditions: null,
+      active: false,
+    } as any);
+    setSaving(false);
+    if (error) { toast.error("Erro ao criar fluxo"); return; }
+    await supabase.from("site_settings").upsert({
+      key: `funnel_meta_${code}`,
+      value: JSON.stringify({ label: funnelLabel.trim(), description: funnelDesc.trim(), iconIdx }),
+    }, { onConflict: "key" });
+    toast.success(`Fluxo ${code} criado!`);
+    setOpen(false);
+    setFunnelCode(""); setFunnelLabel(""); setFunnelDesc("");
+    onAdded();
+  };
+
+  return (
+    <>
+      <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={() => setOpen(true)}>
+        <Plus className="w-3.5 h-3.5" /> Novo Fluxo
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-base">Criar novo fluxo de automação</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Código (ex: F5, REENG)</Label>
+                <Input value={funnelCode} onChange={(e) => setFunnelCode(e.target.value.toUpperCase().replace(/\s/g, ""))} placeholder="F5" className="text-sm" maxLength={10} />
+              </div>
+              <div>
+                <Label className="text-xs">Ícone</Label>
+                <div className="flex gap-1 mt-1 flex-wrap">
+                  {FUNNEL_ICONS.map((fi, i) => (
+                    <Button key={i} variant={iconIdx === i ? "default" : "outline"} size="icon" className="h-8 w-8" onClick={() => setIconIdx(i)} title={fi.label}>
+                      <fi.icon className={`w-4 h-4 ${iconIdx === i ? "" : fi.color}`} />
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Nome do fluxo</Label>
+              <Input value={funnelLabel} onChange={(e) => setFunnelLabel(e.target.value)} placeholder="Ex: F5 — Reengajamento" className="text-sm" />
+            </div>
+            <div>
+              <Label className="text-xs">Descrição (opcional)</Label>
+              <Input value={funnelDesc} onChange={(e) => setFunnelDesc(e.target.value)} placeholder="Breve descrição do objetivo" className="text-sm" />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild><Button variant="ghost" size="sm">Cancelar</Button></DialogClose>
+            <Button size="sm" className="gap-1" onClick={handleSave} disabled={saving || !funnelCode.trim() || !funnelLabel.trim()}>
+              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />} Criar fluxo
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+/* ─── Funnel Section (with drag-and-drop, bulk toggle, delete funnel) ─── */
 
 const FunnelSection = ({ funnel, sequences, onUpdate }: {
   funnel: typeof FUNNELS[number];
