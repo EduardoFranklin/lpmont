@@ -124,7 +124,7 @@ const HeroSection = () => {
                     </button>
                   ) : (
                     <iframe
-                      src={c.video_url}
+                      src={videoSrc}
                       title="VSL - Método Mont'"
                       className="w-full h-full"
                       style={{ border: "none" }}
