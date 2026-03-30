@@ -14,41 +14,51 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
   const pageType = (page as any).page_type || "video_quiz";
   const hasVideo = pageType !== "quiz_only";
   const hasQuiz = pageType !== "video_only";
-  const [activeTab, setActiveTab] = useState(hasVideo ? 1 : 2);
+  const videoFirst = (page as any).video_first ?? true;
+  const [activeTab, setActiveTab] = useState(videoFirst ? (hasVideo ? 1 : 2) : (hasQuiz ? 2 : 1));
 
   return (
     <div className="max-w-[860px] mx-auto px-0 sm:px-10 z-[1] relative">
       {/* Tab Bar - only show if both types */}
-      {hasVideo && hasQuiz && (
-      <div className="flex gap-2">
-        <button
-          onClick={() => setActiveTab(1)}
-          className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
-            activeTab === 1
-              ? "bg-primary/10 text-foreground border-primary/30 z-[2] relative"
-              : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
-          }`}
-        >
-          <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
-            Vídeo
-          </span>
-          Aula 01
-        </button>
-        <button
-          onClick={() => setActiveTab(2)}
-          className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
-            activeTab === 2
-              ? "bg-primary/10 text-foreground border-primary/30 z-[2] relative"
-              : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
-          }`}
-        >
-          <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
-            Quiz
-          </span>
-          Checkpoint
-        </button>
-      </div>
-      )}
+      {hasVideo && hasQuiz && (() => {
+        const videoTab = (
+          <button
+            key="video"
+            onClick={() => setActiveTab(1)}
+            className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
+              activeTab === 1
+                ? "bg-primary/10 text-foreground border-primary/30 z-[2] relative"
+                : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
+            }`}
+          >
+            <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
+              Vídeo
+            </span>
+            Aula 01
+          </button>
+        );
+        const quizTab = (
+          <button
+            key="quiz"
+            onClick={() => setActiveTab(2)}
+            className={`flex-1 flex flex-col items-center gap-1 px-4 py-3 rounded-t-xl border border-b-0 transition-all text-sm font-medium ${
+              activeTab === 2
+                ? "bg-primary/10 text-foreground border-primary/30 z-[2] relative"
+                : "bg-foreground/[0.02] text-muted-foreground border-border hover:bg-foreground/[0.04]"
+            }`}
+          >
+            <span className="text-[0.58rem] font-bold tracking-[0.12em] uppercase px-1.5 py-0.5 rounded bg-primary/12 text-primary border border-primary/20">
+              Quiz
+            </span>
+            Checkpoint
+          </button>
+        );
+        return (
+          <div className="flex gap-2">
+            {videoFirst ? [videoTab, quizTab] : [quizTab, videoTab]}
+          </div>
+        );
+      })()}
 
       {/* Panel 1: Lesson */}
       {hasVideo && activeTab === 1 && (

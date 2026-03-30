@@ -1,0 +1,1 @@
+ALTER TABLE public.quiz_pages ADD COLUMN video_first boolean NOT NULL DEFAULT true;

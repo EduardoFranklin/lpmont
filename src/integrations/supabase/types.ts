@@ -508,6 +508,7 @@ export type Database = {
           slug: string
           status: string
           updated_at: string
+          video_first: boolean
           video_locked: boolean
         }
         Insert: {
@@ -556,6 +557,7 @@ export type Database = {
           slug: string
           status?: string
           updated_at?: string
+          video_first?: boolean
           video_locked?: boolean
         }
         Update: {
@@ -604,6 +606,7 @@ export type Database = {
           slug?: string
           status?: string
           updated_at?: string
+          video_first?: boolean
           video_locked?: boolean
         }
         Relationships: []
