@@ -400,6 +400,12 @@ const DashContent = () => {
 
         {activeSection === "quizpages" ? (
           <DashQuizPages />
+        ) : activeSection === "modules" ? (
+          <DashModulesEditor
+            content={content}
+            dirtyKeys={dirtyKeys}
+            updateField={updateField}
+          />
         ) : (
           <SectionPanel
             section={activeSection}
