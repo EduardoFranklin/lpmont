@@ -17,7 +17,7 @@ const defaults: AllContent = {
     author_avatar: "/images/foto-breno.png",
     cta_primary: "Falar com a Equipe",
     cta_secondary: "Ver a trilha completa",
-    video_url: "https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=d49c541c-010d-4a28-bdf6-80a535639867&playOpensFullscreenNative=true",
+    video_url: "https://player-vz-8aa69477-53f.tv.pandavideo.com.br/embed/?v=d49c541c-010d-4a28-bdf6-80a535639867",
     video_duration: "12:34",
     video_cta: "Assistir apresentação",
     toggles: JSON.stringify([
