@@ -141,7 +141,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
                 quiz_score: finalTotal,
                 quiz_slug: page.slug,
                 quiz_concluido: true,
-                quiz_diagnostico: diagLevel,
+                quiz_diagnostico: diagCode,
               } as any)
               .eq("id", leadId);
 
