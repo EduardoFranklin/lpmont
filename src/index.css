@@ -274,3 +274,17 @@ html, body {
 html {
   scroll-behavior: smooth;
 }
+
+/* Camps carousel infinite loop */
+@keyframes camps-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.camps-carousel-track {
+  animation: camps-scroll 40s linear infinite;
+}
+
+.camps-carousel-track:hover {
+  animation-play-state: paused;
+}
