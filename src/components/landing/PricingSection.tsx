@@ -8,7 +8,7 @@ const PricingSection = () => {
   const bonuses = parseJSON<string[]>(c.bonuses, []);
 
   return (
-    <section id="preco" className="py-28 sm:py-36 relative">
+    <section id="preco" className="py-16 sm:py-36 relative">
       <div className="glow-gold" style={{ width: 800, height: 600, top: "-10%", left: "50%", transform: "translateX(-50%)", opacity: 0.4 }} />
       <div className="section-container relative z-10">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-14 max-w-2xl mx-auto">
