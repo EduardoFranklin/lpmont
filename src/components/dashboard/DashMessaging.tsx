@@ -381,33 +381,7 @@ const SequenceCard = ({
           {/* Delay editor */}
           <div className="flex items-center gap-2 flex-wrap">
             <Label className="text-xs font-medium flex items-center gap-1"><Clock className="w-3 h-3" /> Tempo de espera:</Label>
-            <div className="flex flex-wrap gap-1">
-              {DELAY_PRESETS.map(p => (
-                <button
-                  key={p.minutes}
-                  onClick={() => { setDelayMinutes(p.minutes); setCustomDelay(""); }}
-                  className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
-                    delayMinutes === p.minutes && !customDelay
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-muted/30 hover:bg-muted/60 border-border"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-              <Input
-                placeholder="Personalizado (min)"
-                value={customDelay}
-                onChange={(e) => {
-                  setCustomDelay(e.target.value);
-                  const v = parseInt(e.target.value);
-                  if (!isNaN(v) && v >= 0) setDelayMinutes(v);
-                }}
-                className="h-5 w-28 text-[10px] px-1.5"
-                type="number"
-                min={0}
-              />
-            </div>
+            <DelayInput minutes={delayMinutes} onChange={setDelayMinutes} />
           </div>
 
           {/* Subject for email */}
@@ -516,20 +490,8 @@ const AddMessageDialog = ({ funnel, existingCount, onAdded }: { funnel: string; 
             </div>
             <div>
               <Label className="text-xs">Tempo de espera</Label>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {DELAY_PRESETS.slice(0, 9).map(p => (
-                  <button
-                    key={p.minutes}
-                    onClick={() => setDelayMinutes(p.minutes)}
-                    className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
-                      delayMinutes === p.minutes
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-muted/30 hover:bg-muted/60 border-border"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+              <div className="mt-1">
+                <DelayInput minutes={delayMinutes} onChange={setDelayMinutes} />
               </div>
             </div>
             {channel === "email" && (
