@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight, Instagram } from "lucide-react";
 import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
@@ -27,8 +27,24 @@ const NavBar = () => {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    const root = document.documentElement;
+    const body = document.body;
+
+    if (menuOpen) {
+      root.style.overflow = "hidden";
+      body.style.overflow = "hidden";
+      body.style.touchAction = "none";
+    } else {
+      root.style.overflow = "";
+      body.style.overflow = "";
+      body.style.touchAction = "";
+    }
+
+    return () => {
+      root.style.overflow = "";
+      body.style.overflow = "";
+      body.style.touchAction = "";
+    };
   }, [menuOpen]);
 
   const links = [
@@ -94,17 +110,19 @@ const NavBar = () => {
           </GradientButton>
         </div>
 
-        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-foreground/70 p-1">
+        <button
+          type="button"
+          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="md:hidden relative z-[60] text-foreground/70 p-2 -mr-2 touch-manipulation"
+        >
           {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="md:hidden fixed inset-0 top-[72px] bg-background z-40 overflow-hidden touch-none"
           >
             <div className="px-6 py-8 flex flex-col min-h-full">
@@ -141,7 +159,7 @@ const NavBar = () => {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </nav>
