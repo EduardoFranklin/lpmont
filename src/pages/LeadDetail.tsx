@@ -216,72 +216,50 @@ const LeadDetail = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* 1. Dados pessoais + 2. Origem (UTM) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2"><User className="w-4 h-4" /> Dados pessoais</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="space-y-2">
-                <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tratamento / Nome</label>
-                  <div className="flex gap-2">
-                    <select value={editFields.treatment} onChange={e => { setEditFields(f => ({...f, treatment: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
-                      {TREATMENT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
-                    </select>
-                    <Input value={editFields.name} onChange={e => { setEditFields(f => ({...f, name: e.target.value})); setHasChanges(true); }} placeholder="Nome completo" className="flex-1 h-9" />
-                  </div>
+        {/* 1. Dados pessoais (full width) */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2"><User className="w-4 h-4" /> Dados pessoais</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tratamento / Nome</label>
+                <div className="flex gap-2">
+                  <select value={editFields.treatment} onChange={e => { setEditFields(f => ({...f, treatment: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                    {TREATMENT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  <Input value={editFields.name} onChange={e => { setEditFields(f => ({...f, name: e.target.value})); setHasChanges(true); }} placeholder="Nome completo" className="flex-1 h-9" />
                 </div>
-                <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Telefone</label>
-                  <Input value={editFields.phone} onChange={e => { setEditFields(f => ({...f, phone: e.target.value})); setHasChanges(true); }} placeholder="(00) 00000-0000" className="h-9" />
-                </div>
-                <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Email</label>
-                  <Input value={editFields.email} onChange={e => { setEditFields(f => ({...f, email: e.target.value.toLowerCase()})); setHasChanges(true); }} placeholder="seu@email.com" type="email" className="h-9" />
-                </div>
-                <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Cidade / UF</label>
-                  <div className="flex gap-2">
-                    <Input value={editFields.city} onChange={e => { setEditFields(f => ({...f, city: e.target.value})); setHasChanges(true); }} placeholder="Cidade" className="flex-1 h-9" />
-                    <select value={editFields.uf} onChange={e => { setEditFields(f => ({...f, uf: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
-                      {UF_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Carreira</label>
-                  <select value={editFields.career} onChange={e => { setEditFields(f => ({...f, career: e.target.value})); setHasChanges(true); }} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
-                    {CAREER_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Telefone</label>
+                <Input value={editFields.phone} onChange={e => { setEditFields(f => ({...f, phone: e.target.value})); setHasChanges(true); }} placeholder="(00) 00000-0000" className="h-9" />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Email</label>
+                <Input value={editFields.email} onChange={e => { setEditFields(f => ({...f, email: e.target.value.toLowerCase()})); setHasChanges(true); }} placeholder="seu@email.com" type="email" className="h-9" />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Cidade / UF</label>
+                <div className="flex gap-2">
+                  <Input value={editFields.city} onChange={e => { setEditFields(f => ({...f, city: e.target.value})); setHasChanges(true); }} placeholder="Cidade" className="flex-1 h-9" />
+                  <select value={editFields.uf} onChange={e => { setEditFields(f => ({...f, uf: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                    {UF_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Carreira</label>
+                <select value={editFields.career} onChange={e => { setEditFields(f => ({...f, career: e.target.value})); setHasChanges(true); }} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
+                  {CAREER_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2"><Globe className="w-4 h-4" /> Origem (UTM)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              {[
-                { label: "Source", value: lead.utm_source },
-                { label: "Medium", value: lead.utm_medium },
-                { label: "Campaign", value: lead.utm_campaign },
-                { label: "Term", value: lead.utm_term },
-                { label: "Content", value: lead.utm_content },
-              ].map((u) => (
-                <div key={u.label} className="flex justify-between text-muted-foreground">
-                  <span className="text-xs uppercase tracking-wider">{u.label}</span>
-                  <span className="text-foreground text-xs font-medium">{u.value || "—"}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* 3. Gerenciar Lead */}
+        {/* 2. Gerenciar Lead */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2"><FileText className="w-4 h-4" /> Gerenciar Lead</CardTitle>
@@ -335,7 +313,7 @@ const LeadDetail = () => {
           </CardContent>
         </Card>
 
-        {/* 4. Tags + 5. Agendamento & Datas */}
+        {/* 3. Tags + 4. Agendamento & Datas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <LeadTags leadId={lead.id} />
 
@@ -363,7 +341,30 @@ const LeadDetail = () => {
           </Card>
         </div>
 
-        {/* 6. Conditional cards: Quiz, Reunião, Compra */}
+        {/* 5. Origem (UTM) */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm flex items-center gap-2"><Globe className="w-4 h-4" /> Origem (UTM)</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              {[
+                { label: "Source", value: lead.utm_source },
+                { label: "Medium", value: lead.utm_medium },
+                { label: "Campaign", value: lead.utm_campaign },
+                { label: "Term", value: lead.utm_term },
+                { label: "Content", value: lead.utm_content },
+              ].map((u) => (
+                <div key={u.label}>
+                  <span className="text-[11px] text-muted-foreground uppercase tracking-wider block">{u.label}</span>
+                  <span className="text-foreground text-xs font-medium">{u.value || "—"}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Conditional cards: Quiz, Reunião, Compra */}
         {(lead.quiz_slug || lead.reuniao_data_hora_iso || lead.hotmart_transaction_id || lead.data_compra) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {lead.quiz_slug && (
@@ -386,7 +387,6 @@ const LeadDetail = () => {
                 </CardContent>
               </Card>
             )}
-
             {lead.reuniao_data_hora_iso && (
               <Card>
                 <CardHeader className="pb-3">
@@ -411,7 +411,6 @@ const LeadDetail = () => {
                 </CardContent>
               </Card>
             )}
-
             {(lead.hotmart_transaction_id || lead.data_compra) && (
               <Card>
                 <CardHeader className="pb-3">
@@ -437,10 +436,10 @@ const LeadDetail = () => {
           </div>
         )}
 
-        {/* 7. Histórico & Eventos */}
+        {/* 6. Histórico & Eventos */}
         <LeadTimeline leadId={lead.id} lead={lead} />
 
-        {/* 8. Notas */}
+        {/* 7. Notas */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
