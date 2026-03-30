@@ -401,30 +401,30 @@ const DashQuizPages = () => {
                       };
                       return (
                         <>
-                          <label
+                          <div
                             className={`flex-1 flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all ${
                               hasVideo ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
                             }`}
-                            onClick={() => toggle("video")}
+                            onClick={(e) => { e.preventDefault(); toggle("video"); }}
                           >
-                            <Checkbox checked={hasVideo} onCheckedChange={() => toggle("video")} disabled={hasVideo && !hasQuiz} />
+                            <Checkbox checked={hasVideo} disabled={hasVideo && !hasQuiz} />
                             <div>
                               <p className="text-sm font-medium leading-none">🎬 Vídeo</p>
                               <p className="text-[10px] mt-0.5 opacity-70">Aula em vídeo</p>
                             </div>
-                          </label>
-                          <label
+                          </div>
+                          <div
                             className={`flex-1 flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all ${
                               hasQuiz ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
                             }`}
-                            onClick={() => toggle("quiz")}
+                            onClick={(e) => { e.preventDefault(); toggle("quiz"); }}
                           >
-                            <Checkbox checked={hasQuiz} onCheckedChange={() => toggle("quiz")} disabled={hasQuiz && !hasVideo} />
+                            <Checkbox checked={hasQuiz} disabled={hasQuiz && !hasVideo} />
                             <div>
                               <p className="text-sm font-medium leading-none">🧠 Quiz</p>
                               <p className="text-[10px] mt-0.5 opacity-70">Questionário</p>
                             </div>
-                          </label>
+                          </div>
                         </>
                       );
                     })()}
