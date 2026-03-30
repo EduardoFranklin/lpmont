@@ -1,11 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.100.1";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
-import { encode as base64Encode } from "https://deno.land/std@0.208.0/encoding/base64.ts";
-
-function encodeSubjectUtf8(subject: string): string {
-  const encoded = base64Encode(new TextEncoder().encode(subject));
-  return `=?UTF-8?B?${encoded}?=`;
-}
+import nodemailer from "npm:nodemailer@6.9.10";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,12 +10,34 @@ const corsHeaders = {
 const ADMIN_EMAIL = "mktmetodomont@gmail.com";
 const CONTATO_EMAIL = "contato@metodomont.com.br";
 
+function createTransporter(smtpPassword: string) {
+  return nodemailer.createTransport({
+    host: "smtp.hostinger.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "contato@metodomont.com.br",
+      pass: smtpPassword,
+    },
+  });
+}
+
+function wrapHtml(html: string): string {
+  if (html.startsWith("<!DOCTYPE")) return html;
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+<body style="font-family:Arial,sans-serif;color:#333;line-height:1.6;max-width:600px;margin:0 auto;padding:20px;">
+${html}
+</body></html>`;
+}
+
 // Generate Google Calendar URL
 function buildCalendarUrl(
   title: string,
   description: string,
-  dateStr: string, // "dd/mm"
-  timeSlot: string, // "9h às 9h30"
+  dateStr: string,
+  timeSlot: string,
   guestEmail: string
 ): string {
   const [dd, mm] = dateStr.split("/").map(Number);
@@ -60,35 +76,22 @@ Deno.serve(async (req) => {
       });
     }
 
+    const smtpPassword = Deno.env.get("SMTP_PASSWORD");
+    if (!smtpPassword) throw new Error("SMTP_PASSWORD not configured");
+
+    const transporter = createTransporter(smtpPassword);
+
     // ── Generic email mode: subject + html provided directly ──
     if (rawSubject && rawHtml) {
-      const smtpPassword = Deno.env.get("SMTP_PASSWORD");
-      if (!smtpPassword) throw new Error("SMTP_PASSWORD not configured");
-
       const senderName = from_name || "Método Mont'";
-      const client = new SMTPClient({
-        connection: {
-          hostname: "smtp.hostinger.com",
-          port: 465,
-          tls: true,
-          auth: {
-            username: "contato@metodomont.com.br",
-            password: smtpPassword,
-          },
-        },
-      });
 
-      const wrappedHtml = rawHtml.startsWith("<!DOCTYPE") ? rawHtml : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`;
-      await client.send({
-        from: `=?UTF-8?B?${base64Encode(new TextEncoder().encode(senderName))}?= <contato@metodomont.com.br>`,
+      await transporter.sendMail({
+        from: `"${senderName}" <contato@metodomont.com.br>`,
         to: recipientEmail,
-        subject: encodeSubjectUtf8(rawSubject),
-        content: wrappedHtml.replace(/<[^>]*>/g, ""),
-        html: wrappedHtml,
-        encoding: { "content": "quoted-printable" },
+        subject: rawSubject,
+        text: rawHtml.replace(/<[^>]*>/g, ""),
+        html: wrapHtml(rawHtml),
       });
-
-      await client.close();
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -161,33 +164,13 @@ Deno.serve(async (req) => {
     // Build HTML email
     const htmlBody = body.replace(/\n/g, "<br>") + calendarSection;
 
-    // Send via SMTP (Hostinger)
-    const smtpPassword = Deno.env.get("SMTP_PASSWORD");
-    if (!smtpPassword) {
-      throw new Error("SMTP_PASSWORD not configured");
-    }
-
-    const client = new SMTPClient({
-      connection: {
-        hostname: "smtp.hostinger.com",
-        port: 465,
-        tls: true,
-        auth: {
-          username: "contato@metodomont.com.br",
-          password: smtpPassword,
-        },
-      },
-    });
-
-    await client.send({
-      from: "=?UTF-8?B?" + base64Encode(new TextEncoder().encode("Método Mont'")) + "?= <contato@metodomont.com.br>",
+    await transporter.sendMail({
+      from: `"Método Mont'" <contato@metodomont.com.br>`,
       to: recipientEmail,
-      subject: encodeSubjectUtf8(subject),
-      content: body,
-      html: htmlBody,
+      subject,
+      text: body,
+      html: wrapHtml(htmlBody),
     });
-
-    await client.close();
 
     // Also send notification to admin with calendar link
     if (scheduledDay && scheduledDate && scheduledTime) {
@@ -198,7 +181,6 @@ Deno.serve(async (req) => {
         scheduledTime,
         recipientEmail
       );
-
 
       const adminHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 500px;">
@@ -213,30 +195,14 @@ Deno.serve(async (req) => {
         </div>
       `;
 
-      // Send to both admin emails
-      const adminRecipients = [ADMIN_EMAIL, CONTATO_EMAIL];
-      for (const adminTo of adminRecipients) {
-        const notifClient = new SMTPClient({
-          connection: {
-            hostname: "smtp.hostinger.com",
-            port: 465,
-            tls: true,
-            auth: {
-              username: "contato@metodomont.com.br",
-              password: smtpPassword,
-            },
-          },
-        });
-
-        await notifClient.send({
-          from: "=?UTF-8?B?" + base64Encode(new TextEncoder().encode("Método Mont'")) + "?= <contato@metodomont.com.br>",
+      for (const adminTo of [ADMIN_EMAIL, CONTATO_EMAIL]) {
+        await transporter.sendMail({
+          from: `"Método Mont'" <contato@metodomont.com.br>`,
           to: adminTo,
-          subject: encodeSubjectUtf8(`Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`),
-          content: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
-          html: adminHtml,
+          subject: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
+          text: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
+          html: wrapHtml(adminHtml),
         });
-
-        await notifClient.close();
       }
     }
 
