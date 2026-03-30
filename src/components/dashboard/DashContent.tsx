@@ -10,10 +10,11 @@ import { toast } from "sonner";
 import ImageUploadCrop from "./ImageUploadCrop";
 import RichTextEditor from "./RichTextEditor";
 import DashQuizPages from "./DashQuizPages";
+import DashModulesEditor from "./DashModulesEditor";
 
 type ContentMap = Record<string, Record<string, string>>;
 
-const sectionOrder = ["hero", "problem", "modules", "synopses", "method", "instructor", "benefits", "testimonials", "pricing", "faq", "footer"];
+const sectionOrder = ["hero", "problem", "modules", "method", "instructor", "benefits", "testimonials", "pricing", "faq", "footer"];
 
 const sectionIcons: Record<string, any> = {
   hero: Settings,
