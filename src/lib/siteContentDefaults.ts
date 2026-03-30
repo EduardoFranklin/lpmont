@@ -199,7 +199,7 @@ export default defaults;
 export const sectionLabels: Record<string, string> = {
   hero: "Hero (Topo)",
   problem: "Problema (Vale)",
-  modules: "Módulos (Trilha)",
+  modules: "Módulos e Sinopses",
   method: "Método (Teoria + Prática)",
   instructor: "Instrutor (O Guia)",
   benefits: "Benefícios (Mochila)",
@@ -207,7 +207,6 @@ export const sectionLabels: Record<string, string> = {
   pricing: "Investimento (Preço)",
   faq: "Perguntas Frequentes",
   footer: "Rodapé",
-  synopses: "Sinopses dos Módulos",
 };
 
 // Helper: labels for each key within a section
