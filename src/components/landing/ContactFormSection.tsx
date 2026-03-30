@@ -200,7 +200,7 @@ const ContactFormSection = () => {
   const stepVariants = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
 
   return (
-    <section id="falar-equipe" className="py-14 sm:py-28 relative">
+    <section id="falar-equipe" className="py-12 sm:py-20 relative">
       <div className="glow-gold" style={{ width: 600, height: 400, top: "10%", left: "50%", transform: "translateX(-50%)", opacity: 0.3 }} />
       <div className="section-container relative z-10">
         <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10 max-w-2xl mx-auto">

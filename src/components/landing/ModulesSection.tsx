@@ -178,7 +178,7 @@ const ModulesSection = () => {
   }, [handsOn, navScrollLocked]);
 
   return (
-    <section id="modulos" className="py-16 sm:py-36 relative">
+    <section id="modulos" className="py-14 sm:py-24 relative">
       <div className="glow-gold" style={{ width: 600, height: 400, top: "10%", left: "-15%", opacity: 0.5 }} />
 
       <div className="section-container relative z-10">
