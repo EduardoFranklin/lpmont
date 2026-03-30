@@ -23,6 +23,7 @@ const TAG_EVENT_MAP: Record<string, { icon: typeof Mail; color: string; title: s
   pagou: { icon: CreditCard, color: "text-emerald-400", title: "Compra aprovada" },
   abandonou_checkout: { icon: ShoppingCart, color: "text-amber-400", title: "Abandonou checkout" },
   boleto_impresso: { icon: CreditCard, color: "text-yellow-400", title: "Boleto impresso" },
+  pix_gerado: { icon: CreditCard, color: "text-cyan-400", title: "PIX gerado (aguardando pagamento)" },
   compra_expirada: { icon: AlertTriangle, color: "text-red-400", title: "Compra expirada" },
   entrou_no_curso: { icon: BookOpen, color: "text-blue-400", title: "Acessou o curso" },
   modulo_concluido: { icon: BookOpen, color: "text-purple-400", title: "Módulo concluído" },
