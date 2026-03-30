@@ -132,21 +132,18 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
         if (finalTotal >= page.result_high_min) diagLevel = page.result_high_level;
         else if (finalTotal >= page.result_mid_min) diagLevel = page.result_mid_level;
 
-        try {
-          const email = leadEmail.trim().toLowerCase();
-          // Update lead with quiz results
-          const { data: updatedLeads } = await supabase.from("leads")
-            .update({
-              quiz_score: finalTotal,
-              quiz_slug: page.slug,
-              quiz_concluido: true,
-              quiz_diagnostico: diagLevel,
-            } as any)
-            .eq("email", email)
-            .select("id");
+        if (leadId) {
+          try {
+            // Update lead with quiz results
+            await supabase.from("leads")
+              .update({
+                quiz_score: finalTotal,
+                quiz_slug: page.slug,
+                quiz_concluido: true,
+                quiz_diagnostico: diagLevel,
+              } as any)
+              .eq("id", leadId);
 
-          if (updatedLeads && updatedLeads[0]?.id) {
-            const leadId = updatedLeads[0].id;
             // Add quiz_concluido tag
             await supabase.from("lead_tags").upsert(
               { lead_id: leadId, tag: "quiz_concluido", source: "quiz" } as any,
@@ -156,8 +153,8 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
             supabase.functions.invoke("enqueue-automation", {
               body: { lead_id: leadId, funnel: "F2", event: "quiz_concluido" },
             });
-          }
-        } catch {}
+          } catch {}
+        }
       } else {
         setQi((i) => i + 1);
         setSelected(null);
