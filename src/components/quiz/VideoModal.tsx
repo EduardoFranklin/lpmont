@@ -9,11 +9,9 @@ interface Props {
 }
 
 const VideoModal = ({ open, onClose, page }: Props) => {
-  if (!open) return null;
-
   // Support Panda Video embed URLs
-  const isPanda = page.lesson_video_url.includes("pandavideo.com");
-  const embedUrl = isPanda
+  const isPanda = open && page.lesson_video_url.includes("pandavideo.com");
+  const embedUrl = !open ? "" : isPanda
     ? page.lesson_video_url + (page.lesson_video_url.includes("?") ? "&" : "?") + "playOpensFullscreenNative=true"
     : page.lesson_video_url.includes("youtube.com/watch")
     ? page.lesson_video_url.replace("watch?v=", "embed/") + "?autoplay=1"
