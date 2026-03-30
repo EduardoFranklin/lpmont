@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
       await client.send({
         from: `${senderName} <contato@metodomont.com.br>`,
         to: recipientEmail,
-        subject: rawSubject,
+        subject: encodeSubjectUtf8(rawSubject),
         content: wrappedHtml.replace(/<[^>]*>/g, ""),
         html: wrappedHtml,
         encoding: { "content": "quoted-printable" },
@@ -180,9 +180,9 @@ Deno.serve(async (req) => {
     });
 
     await client.send({
-      from: "Método Mont' <contato@metodomont.com.br>",
+      from: "=?UTF-8?B?" + base64Encode(new TextEncoder().encode("Método Mont'")) + "?= <contato@metodomont.com.br>",
       to: recipientEmail,
-      subject,
+      subject: encodeSubjectUtf8(subject),
       content: body,
       html: htmlBody,
     });
