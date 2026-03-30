@@ -65,24 +65,92 @@ const defaultCoverSlides = [
 
 const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum: number) => void; coverSlides: string[] }) => {
   const slides = coverSlides.length > 0 ? coverSlides : defaultCoverSlides;
+  // Triple the slides for seamless infinite loop
+  const tripled = [...slides, ...slides, ...slides];
 
-  const autoplayPlugin = useRef(
-    Autoplay({ delay: 0, stopOnInteraction: false, stopOnMouseEnter: true })
-  );
+  const trackRef = useRef<HTMLDivElement>(null);
+  const isPaused = useRef(false);
+  const dragStart = useRef<{ x: number; scrollLeft: number; time: number } | null>(null);
+  const wasDragging = useRef(false);
 
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "start", dragFree: true, slidesToScroll: 1 },
-    [autoplayPlugin.current]
-  );
-
+  // Keep the track centered on the middle set
   useEffect(() => {
-    if (!emblaApi) return;
-    const engine = emblaApi.internalEngine();
-    if (engine && engine.scrollBody) {
-      // Reduce friction for smoother continuous scrolling
-      engine.scrollBody.useDuration(0);
+    const track = trackRef.current;
+    if (!track) return;
+    const slideWidth = 184 + 12; // w-[180px] + gap-3 approx
+    const oneSetWidth = slides.length * slideWidth;
+    track.scrollLeft = oneSetWidth;
+  }, [slides.length]);
+
+  // Smooth continuous auto-scroll via requestAnimationFrame
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let raf: number;
+    const speed = 0.6; // px per frame — smooth and steady
+    const slideWidth = track.scrollWidth / 3;
+
+    const step = () => {
+      if (!isPaused.current && !dragStart.current) {
+        track.scrollLeft += speed;
+        // Seamless loop reset
+        if (track.scrollLeft >= slideWidth * 2) {
+          track.scrollLeft -= slideWidth;
+        } else if (track.scrollLeft <= 0) {
+          track.scrollLeft += slideWidth;
+        }
+      }
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.setPointerCapture(e.pointerId);
+    dragStart.current = { x: e.clientX, scrollLeft: track.scrollLeft, time: Date.now() };
+    wasDragging.current = false;
+    isPaused.current = true;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!dragStart.current || !trackRef.current) return;
+    const dx = e.clientX - dragStart.current.x;
+    if (Math.abs(dx) > 5) wasDragging.current = true;
+    trackRef.current.scrollLeft = dragStart.current.scrollLeft - dx;
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!dragStart.current || !trackRef.current) return;
+    const track = trackRef.current;
+    track.releasePointerCapture(e.pointerId);
+
+    // Inertia
+    const dx = e.clientX - dragStart.current.x;
+    const dt = Date.now() - dragStart.current.time;
+    const velocity = dx / Math.max(dt, 1);
+    dragStart.current = null;
+
+    if (Math.abs(velocity) > 0.3) {
+      let v = velocity * 8;
+      const decel = () => {
+        v *= 0.95;
+        if (Math.abs(v) < 0.5) { isPaused.current = false; return; }
+        track.scrollLeft -= v;
+        requestAnimationFrame(decel);
+      };
+      requestAnimationFrame(decel);
+    } else {
+      isPaused.current = false;
     }
-  }, [emblaApi]);
+  };
+
+  const handleClick = (moduleNum: number) => (e: React.MouseEvent) => {
+    if (wasDragging.current) { e.preventDefault(); return; }
+    onCoverClick(moduleNum);
+  };
 
   return (
     <motion.div
@@ -95,29 +163,38 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
         <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
 
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-4">
-            {slides.map((src, i) => {
-              const moduleNum = i + 1;
-              const camp = camps[moduleNum - 1];
-              return (
-                <div
-                  key={i}
-                  className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group/card"
-                  onClick={() => onCoverClick(moduleNum)}
-                >
-                  <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover/card:border-primary/20 transition-colors duration-300">
-                    <img
-                      src={src}
-                      alt={camp?.title || `Acampamento ${moduleNum}`}
-                      className="w-full h-auto object-cover"
-                      loading="lazy"
-                    />
-                  </div>
+        <div
+          ref={trackRef}
+          className="overflow-hidden flex gap-3 cursor-grab active:cursor-grabbing select-none"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onMouseEnter={() => { isPaused.current = true; }}
+          onMouseLeave={() => { if (!dragStart.current) isPaused.current = false; }}
+        >
+          {tripled.map((src, i) => {
+            const moduleNum = (i % slides.length) + 1;
+            const camp = camps[moduleNum - 1];
+            return (
+              <div
+                key={i}
+                className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group/card"
+                onClick={handleClick(moduleNum)}
+              >
+                <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover/card:border-primary/20 transition-colors duration-300">
+                  <img
+                    src={src}
+                    alt={camp?.title || `Acampamento ${moduleNum}`}
+                    className="w-full h-auto object-cover pointer-events-none"
+                    loading="lazy"
+                    draggable={false}
+                  />
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </motion.div>
