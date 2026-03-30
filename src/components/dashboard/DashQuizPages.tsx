@@ -402,15 +402,29 @@ const DashQuizPages = () => {
                       return (
                         <>
                           <div
-                            className={`flex-1 flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all ${
+                            className={`flex-1 rounded-lg border transition-all ${
                               hasVideo ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
                             }`}
-                            onClick={(e) => { e.preventDefault(); toggle("video"); }}
                           >
-                            <Checkbox checked={hasVideo} disabled={hasVideo && !hasQuiz} />
-                            <div>
-                              <p className="text-sm font-medium leading-none">🎬 Vídeo</p>
-                              <p className="text-[10px] mt-0.5 opacity-70">Aula em vídeo</p>
+                            <div
+                              className="flex items-center gap-2.5 p-3 cursor-pointer"
+                              onClick={(e) => { e.preventDefault(); toggle("video"); }}
+                            >
+                              <Checkbox checked={hasVideo} disabled={hasVideo && !hasQuiz} />
+                              <div className="flex-1">
+                                <p className="text-sm font-medium leading-none">🎬 Vídeo</p>
+                                <p className="text-[10px] mt-0.5 opacity-70">Aula em vídeo</p>
+                              </div>
+                              {hasVideo && (
+                                <div className="flex items-center gap-1.5 ml-auto" onClick={(e) => e.stopPropagation()}>
+                                  <span className="text-[10px] text-muted-foreground">Bloquear</span>
+                                  <Switch
+                                    checked={editPage.video_locked ?? false}
+                                    onCheckedChange={(v) => updateField("video_locked", v)}
+                                    className="scale-75"
+                                  />
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div
@@ -430,18 +444,6 @@ const DashQuizPages = () => {
                     })()}
                   </div>
                 </div>
-                {(editPage.page_type || "video_quiz") !== "quiz_only" && (
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border">
-                    <Switch
-                      checked={editPage.video_locked ?? false}
-                      onCheckedChange={(v) => updateField("video_locked", v)}
-                    />
-                    <div>
-                      <p className="text-sm font-medium">Vídeo bloqueado</p>
-                      <p className="text-[11px] text-muted-foreground">Exigir preenchimento de formulário para liberar o vídeo</p>
-                    </div>
-                  </div>
-                )}
                 <Field label="CTA URL" value={editPage.cta_url} onChange={(v) => updateField("cta_url", v)} />
                 <Field label="Cupom" value={editPage.coupon_code} onChange={(v) => updateField("coupon_code", v)} />
                 <Field label="Desconto" value={editPage.coupon_discount} onChange={(v) => updateField("coupon_discount", v)} />
