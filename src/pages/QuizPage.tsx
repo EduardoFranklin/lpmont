@@ -87,7 +87,7 @@ const QuizPage = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [showCoupon, setShowCoupon] = useState(false);
-  const [unlocked, setUnlocked] = useState(true);
+  const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
     const load = async () => {
