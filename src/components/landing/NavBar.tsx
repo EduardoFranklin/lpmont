@@ -49,7 +49,7 @@ const NavBar = () => {
 
   const links = [
     { label: "A Trilha", href: "#modulos" },
-    { label: "Spoiler (Grátis)", href: "/quiz/aula1", external: true },
+    { label: "Spoiler (grátis)", href: "/quiz/aula1", external: true },
     { label: "O Guia", href: "#guia" },
     { label: "Investimento", href: "#preco" },
   ];
