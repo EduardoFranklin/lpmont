@@ -18,7 +18,7 @@ const InstructorSection = () => {
             <div className="relative">
               <div className="absolute -inset-10 rounded-full bg-primary/5 blur-[80px]" />
               <div className="gradient-card rounded-3xl overflow-hidden">
-                <img src="/images/thumbs/breno-thumb.webp" alt="Prof. Breno Montalverne" className="relative w-full max-w-sm" loading="lazy" />
+                <img src={c.image || "/images/thumbs/breno-thumb.webp"} alt="Prof. Breno Montalverne" className="relative w-full max-w-sm" loading="lazy" />
               </div>
             </div>
           </motion.div>
