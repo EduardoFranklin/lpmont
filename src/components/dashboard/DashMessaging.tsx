@@ -359,7 +359,17 @@ const SequenceCard = ({
     }
   };
 
-  return (
+    const handleDelayChange = async (m: number) => {
+      setDelayMinutes(m);
+      const delayDesc = minutesToLabel(m);
+      await supabase.from("automation_sequences" as any).update({
+        delay_minutes: m,
+        delay_description: delayDesc,
+      } as any).eq("id", seq.id);
+      onUpdate();
+    };
+
+    return (
     <div
       className={`rounded-lg border p-3 space-y-2 transition-all ${!active ? "opacity-50" : ""} hover:shadow-sm`}
       {...dragHandleProps}
@@ -372,40 +382,36 @@ const SequenceCard = ({
           <span className="text-sm font-medium">{seq.title}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          {/* Delay badge - clickable to edit */}
-          {!editing ? (
-            <Badge
-              variant="outline"
-              className="text-[10px] h-5 cursor-pointer hover:bg-muted/50"
-              onClick={() => setEditing(true)}
-            >
-              <Clock className="w-3 h-3 mr-1" /> {minutesToLabel(delayMinutes)}
-            </Badge>
-          ) : null}
-          {!editing && (
-            <div className="flex flex-wrap gap-1 mt-1">
-              {/* Always show safety conditions */}
-              {condTags.required_tags?.map((t: string) => (
-                <Badge key={`req-${t}`} variant="outline" className="text-[10px] h-5 bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
-                  ✓ {t}
-                </Badge>
-              ))}
-              {condTags.excluded_tags?.map((t: string) => (
-                <Badge key={`exc-${t}`} variant="outline" className="text-[10px] h-5 bg-red-500/10 text-red-500 border-red-500/30">
-                  ✕ {t}
-                </Badge>
-              ))}
-              {!hasConditions && (
-                <Badge variant="outline" className="text-[10px] h-5 bg-amber-500/10 text-amber-600 border-amber-500/30">
-                  ⚠ Sem filtro de tags
-                </Badge>
-              )}
-            </div>
-          )}
           <Switch checked={active} onCheckedChange={handleToggle} />
           <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive/60 hover:text-destructive" onClick={handleDeleteClick}>
             <Trash2 className="w-3 h-3" />
           </Button>
+        </div>
+      </div>
+
+      {/* Inline delay + conditions - always visible */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-[10px] text-muted-foreground font-medium">Espera:</span>
+          <DelayInput minutes={delayMinutes} onChange={handleDelayChange} />
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {condTags.required_tags?.map((t: string) => (
+            <Badge key={`req-${t}`} variant="outline" className="text-[10px] h-5 bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+              ✓ {t}
+            </Badge>
+          ))}
+          {condTags.excluded_tags?.map((t: string) => (
+            <Badge key={`exc-${t}`} variant="outline" className="text-[10px] h-5 bg-red-500/10 text-red-500 border-red-500/30">
+              ✕ {t}
+            </Badge>
+          ))}
+          {!hasConditions && (
+            <Badge variant="outline" className="text-[10px] h-5 bg-amber-500/10 text-amber-600 border-amber-500/30">
+              ⚠ Sem filtro
+            </Badge>
+          )}
         </div>
       </div>
 
