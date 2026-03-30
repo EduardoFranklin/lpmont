@@ -20,6 +20,7 @@ type Camp = {
   desc: string;
   phase: string;
   img: string;
+  cover: string;
 };
 
 type HandsOn = {
@@ -156,6 +157,17 @@ function ModuleItem({
                 value={camp.img}
                 onChange={(v) => onChange("img", v)}
                 friendlyName={`modulo-${camp.num}`}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[11px] text-muted-foreground uppercase tracking-wider">Capa do Carrossel</label>
+            <div className="mt-1">
+              <ImageUploadCrop
+                value={camp.cover || ""}
+                onChange={(v) => onChange("cover", v)}
+                friendlyName={`capa-modulo-${camp.num}`}
               />
             </div>
           </div>
