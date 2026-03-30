@@ -216,7 +216,7 @@ const LeadDetail = () => {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Info grid */}
+        {/* 1. Dados pessoais + 2. Origem (UTM) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-3">
@@ -260,78 +260,6 @@ const LeadDetail = () => {
             </CardContent>
           </Card>
 
-          {/* Quiz info card */}
-          {lead.quiz_slug && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2"><Zap className="w-4 h-4" /> Quiz</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                {[
-                  { label: "Página", value: lead.quiz_slug },
-                  { label: "Pontuação", value: lead.quiz_score != null ? `${lead.quiz_score} pts` : "Não respondeu" },
-                  { label: "Diagnóstico", value: lead.quiz_diagnostico || "—" },
-                  { label: "Concluiu", value: lead.quiz_concluido ? "Sim" : "Não" },
-                ].map(r => (
-                  <div key={r.label} className="flex justify-between text-muted-foreground">
-                    <span className="text-xs uppercase tracking-wider">{r.label}</span>
-                    <span className="text-foreground text-xs font-medium">{r.value}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Reunião card */}
-          {lead.reuniao_data_hora_iso && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2"><Video className="w-4 h-4" /> Reunião</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                {[
-                  { label: "Data", value: lead.reuniao_data_extenso || "—" },
-                  { label: "Horário", value: lead.reuniao_hora_extenso || "—" },
-                  { label: "Consultor", value: lead.reuniao_consultor || "—" },
-                  { label: "Status", value: lead.reuniao_status || "pendente" },
-                ].map(r => (
-                  <div key={r.label} className="flex justify-between text-muted-foreground">
-                    <span className="text-xs uppercase tracking-wider">{r.label}</span>
-                    <span className="text-foreground text-xs font-medium">{r.value}</span>
-                  </div>
-                ))}
-                {lead.reuniao_link_google_meet && (
-                  <a href={lead.reuniao_link_google_meet} target="_blank" rel="noopener noreferrer"
-                    className="text-xs text-primary underline">Abrir Google Meet</a>
-                )}
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Hotmart / Compra card */}
-          {(lead.hotmart_transaction_id || lead.data_compra) && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2"><CreditCard className="w-4 h-4" /> Compra</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                {[
-                  { label: "Status Hotmart", value: lead.hotmart_status || "—" },
-                  { label: "Transação", value: lead.hotmart_transaction_id || "—" },
-                  { label: "Valor pago", value: lead.valor_pago != null ? `R$ ${Number(lead.valor_pago).toFixed(2)}` : "—" },
-                  { label: "Forma pgto", value: lead.forma_pagamento || "—" },
-                  { label: "Cupom", value: lead.cupom_usado_compra || "—" },
-                  { label: "Data compra", value: lead.data_compra ? format(new Date(lead.data_compra), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "—" },
-                ].map(r => (
-                  <div key={r.label} className="flex justify-between text-muted-foreground">
-                    <span className="text-xs uppercase tracking-wider">{r.label}</span>
-                    <span className="text-foreground text-xs font-medium">{r.value}</span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          )}
-
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2"><Globe className="w-4 h-4" /> Origem (UTM)</CardTitle>
@@ -351,32 +279,9 @@ const LeadDetail = () => {
               ))}
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> Agendamento & Datas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div>
-                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
-                <div className="flex gap-2">
-                  <Input value={editFields.scheduled_day} onChange={e => { setEditFields(f => ({...f, scheduled_day: e.target.value})); setHasChanges(true); }} placeholder="Dia (ex: Segunda)" className="flex-1 h-9" />
-                  <Input value={editFields.scheduled_time} onChange={e => { setEditFields(f => ({...f, scheduled_time: e.target.value})); setHasChanges(true); }} placeholder="Horário" className="w-32 h-9" />
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Criado em {format(new Date(lead.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="w-3.5 h-3.5" />
-                <span>Atualizado em {format(new Date(lead.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
-        {/* Manage section */}
+        {/* 3. Gerenciar Lead */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2"><FileText className="w-4 h-4" /> Gerenciar Lead</CardTitle>
@@ -430,13 +335,112 @@ const LeadDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Tags & Timeline — timeline last since it tends to be large */}
+        {/* 4. Tags + 5. Agendamento & Datas */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <LeadTags leadId={lead.id} />
-          <LeadTimeline leadId={lead.id} lead={lead} />
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2"><Calendar className="w-4 h-4" /> Agendamento & Datas</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
+                <div className="flex gap-2">
+                  <Input value={editFields.scheduled_day} onChange={e => { setEditFields(f => ({...f, scheduled_day: e.target.value})); setHasChanges(true); }} placeholder="Dia (ex: Segunda)" className="flex-1 h-9" />
+                  <Input value={editFields.scheduled_time} onChange={e => { setEditFields(f => ({...f, scheduled_time: e.target.value})); setHasChanges(true); }} placeholder="Horário" className="w-32 h-9" />
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Criado em {format(new Date(lead.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Atualizado em {format(new Date(lead.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Notes */}
+        {/* 6. Conditional cards: Quiz, Reunião, Compra */}
+        {(lead.quiz_slug || lead.reuniao_data_hora_iso || lead.hotmart_transaction_id || lead.data_compra) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {lead.quiz_slug && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2"><Zap className="w-4 h-4" /> Quiz</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  {[
+                    { label: "Página", value: lead.quiz_slug },
+                    { label: "Pontuação", value: lead.quiz_score != null ? `${lead.quiz_score} pts` : "Não respondeu" },
+                    { label: "Diagnóstico", value: lead.quiz_diagnostico || "—" },
+                    { label: "Concluiu", value: lead.quiz_concluido ? "Sim" : "Não" },
+                  ].map(r => (
+                    <div key={r.label} className="flex justify-between text-muted-foreground">
+                      <span className="text-xs uppercase tracking-wider">{r.label}</span>
+                      <span className="text-foreground text-xs font-medium">{r.value}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {lead.reuniao_data_hora_iso && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2"><Video className="w-4 h-4" /> Reunião</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  {[
+                    { label: "Data", value: lead.reuniao_data_extenso || "—" },
+                    { label: "Horário", value: lead.reuniao_hora_extenso || "—" },
+                    { label: "Consultor", value: lead.reuniao_consultor || "—" },
+                    { label: "Status", value: lead.reuniao_status || "pendente" },
+                  ].map(r => (
+                    <div key={r.label} className="flex justify-between text-muted-foreground">
+                      <span className="text-xs uppercase tracking-wider">{r.label}</span>
+                      <span className="text-foreground text-xs font-medium">{r.value}</span>
+                    </div>
+                  ))}
+                  {lead.reuniao_link_google_meet && (
+                    <a href={lead.reuniao_link_google_meet} target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-primary underline">Abrir Google Meet</a>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {(lead.hotmart_transaction_id || lead.data_compra) && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm flex items-center gap-2"><CreditCard className="w-4 h-4" /> Compra</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm">
+                  {[
+                    { label: "Status Hotmart", value: lead.hotmart_status || "—" },
+                    { label: "Transação", value: lead.hotmart_transaction_id || "—" },
+                    { label: "Valor pago", value: lead.valor_pago != null ? `R$ ${Number(lead.valor_pago).toFixed(2)}` : "—" },
+                    { label: "Forma pgto", value: lead.forma_pagamento || "—" },
+                    { label: "Cupom", value: lead.cupom_usado_compra || "—" },
+                    { label: "Data compra", value: lead.data_compra ? format(new Date(lead.data_compra), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "—" },
+                  ].map(r => (
+                    <div key={r.label} className="flex justify-between text-muted-foreground">
+                      <span className="text-xs uppercase tracking-wider">{r.label}</span>
+                      <span className="text-foreground text-xs font-medium">{r.value}</span>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* 7. Histórico & Eventos */}
+        <LeadTimeline leadId={lead.id} lead={lead} />
+
+        {/* 8. Notas */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
