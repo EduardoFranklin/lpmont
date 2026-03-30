@@ -316,7 +316,8 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
                     let textCls = "text-foreground/70 hover:text-foreground";
 
                     if (confirmed) {
-                      if (opt.points === questions[qi].weight) {
+                      const isCorrect = isCorrectOption(questions[qi], i);
+                      if (isCorrect) {
                         borderCls = "border-green-500/50";
                         bgCls = "bg-green-500/8";
                         textCls = "text-green-400";
@@ -350,7 +351,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
                         <span className={`w-7 h-7 rounded-lg flex items-center justify-center text-[0.7rem] font-bold flex-shrink-0 transition-colors ${
                           i === selected && !confirmed
                             ? "bg-primary/15 text-primary border border-primary/30"
-                            : confirmed && opt.points === questions[qi].weight
+                            : confirmed && isCorrectOption(questions[qi], i)
                             ? "bg-green-500/15 text-green-400 border border-green-500/30"
                             : "bg-foreground/5 text-muted-foreground border border-transparent"
                         }`}>
@@ -359,7 +360,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
                         <span className="flex-1">{opt.text}</span>
                         {confirmed && (
                           <span className={`text-[0.72rem] font-bold flex-shrink-0 ${
-                            opt.points === questions[qi].weight ? "text-green-400" : opt.points > 0 ? "text-primary" : "text-red-400/50"
+                            isCorrectOption(questions[qi], i) ? "text-green-400" : opt.points > 0 ? "text-primary" : "text-red-400/50"
                           }`}>
                             {opt.points > 0 ? `+${opt.points}` : "0"}
                           </span>
