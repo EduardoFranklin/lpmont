@@ -11,6 +11,7 @@ import ImageUploadCrop from "./ImageUploadCrop";
 import RichTextEditor from "./RichTextEditor";
 import DashQuizPages from "./DashQuizPages";
 import DashModulesEditor from "./DashModulesEditor";
+import { DashFAQEditor, DashTestimonialsEditor, DashBenefitsEditor } from "./DashListEditors";
 
 type ContentMap = Record<string, Record<string, string>>;
 
@@ -406,6 +407,12 @@ const DashContent = () => {
             dirtyKeys={dirtyKeys}
             updateField={updateField}
           />
+        ) : activeSection === "faq" ? (
+          <DashFAQEditor content={content} updateField={updateField} />
+        ) : activeSection === "testimonials" ? (
+          <DashTestimonialsEditor content={content} updateField={updateField} />
+        ) : activeSection === "benefits" ? (
+          <DashBenefitsEditor content={content} updateField={updateField} />
         ) : (
           <SectionPanel
             section={activeSection}
