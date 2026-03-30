@@ -37,7 +37,7 @@ const richTextFields = new Set([
 
 function isRichTextField(key: string, value: string): boolean {
   if (richTextFields.has(key)) return true;
-  if (key.startsWith("synopsis_")) return true;
+  if (key.match(/^synopsis_\d+_content$/)) return true;
   if (value && /<[a-z][\s\S]*>/i.test(value) && !value.startsWith("[") && !value.startsWith("{")) return true;
   return false;
 }
