@@ -352,10 +352,25 @@ const SequenceCard = ({
               <Clock className="w-3 h-3 mr-1" /> {minutesToLabel(delayMinutes)}
             </Badge>
           ) : null}
-          {hasConditions && !editing && (
-            <Badge variant="outline" className="text-[10px] h-5 bg-amber-500/10 text-amber-700 border-amber-500/30">
-              <Tag className="w-3 h-3 mr-1" /> {(condTags.required_tags?.length || 0) + (condTags.excluded_tags?.length || 0)} tags
-            </Badge>
+          {!editing && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {/* Always show safety conditions */}
+              {condTags.required_tags?.map((t: string) => (
+                <Badge key={`req-${t}`} variant="outline" className="text-[10px] h-5 bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+                  ✓ {t}
+                </Badge>
+              ))}
+              {condTags.excluded_tags?.map((t: string) => (
+                <Badge key={`exc-${t}`} variant="outline" className="text-[10px] h-5 bg-red-500/10 text-red-500 border-red-500/30">
+                  ✕ {t}
+                </Badge>
+              ))}
+              {!hasConditions && (
+                <Badge variant="outline" className="text-[10px] h-5 bg-amber-500/10 text-amber-600 border-amber-500/30">
+                  ⚠ Sem filtro de tags
+                </Badge>
+              )}
+            </div>
           )}
           <Switch checked={active} onCheckedChange={handleToggle} />
           <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive/60 hover:text-destructive" onClick={handleDeleteClick}>
