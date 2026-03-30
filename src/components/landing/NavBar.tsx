@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 import { Menu, X, ArrowRight, Instagram } from "lucide-react";
 import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
@@ -25,27 +25,6 @@ const NavBar = () => {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    const body = document.body;
-
-    if (menuOpen) {
-      root.style.overflow = "hidden";
-      body.style.overflow = "hidden";
-      body.style.touchAction = "none";
-    } else {
-      root.style.overflow = "";
-      body.style.overflow = "";
-      body.style.touchAction = "";
-    }
-
-    return () => {
-      root.style.overflow = "";
-      body.style.overflow = "";
-      body.style.touchAction = "";
-    };
-  }, [menuOpen]);
 
   const links = [
     { label: "A Trilha", href: "#modulos" },
@@ -78,91 +57,169 @@ const NavBar = () => {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "backdrop-blur-xl bg-background/60 border-b border-foreground/[0.04]"
-          : "bg-transparent"
-      }`}
-      style={scrolled ? { backgroundImage: "linear-gradient(hsl(var(--background)), hsl(var(--background) / 0.3))" } : {}}
+    <>
+      <nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? "backdrop-blur-xl bg-background/60 border-b border-foreground/[0.04]"
+            : "bg-transparent"
+        }`}
+        style={scrolled ? { backgroundImage: "linear-gradient(hsl(var(--background)), hsl(var(--background) / 0.3))" } : {}}
+      >
+        <div className="section-container flex items-center justify-between h-[72px]">
+          <a href="#" className="flex items-center gap-2">
+            <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" decoding="async" />
+          </a>
+
+          <div className="hidden lg:flex items-center gap-10">
+            {links.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                {...(l.external ? {} : { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, l.href) })}
+                className="text-[13px] font-medium text-foreground/40 hover:text-foreground transition-colors duration-300"
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden lg:block">
+            <GradientButton href="#falar-equipe" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#falar-equipe")}>
+              Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
+            </GradientButton>
+          </div>
+
+          <button
+            type="button"
+            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+            onClick={() => setMenuOpen((prev) => !prev)}
+            className="lg:hidden relative z-[70] text-foreground/70 p-2 -mr-2"
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile menu as a portal — fully isolated from nav DOM */}
+      {menuOpen && createPortal(
+        <MobileMenu
+          links={links}
+          instagramLinks={instagramLinks}
+          onNavClick={handleNavClick}
+          onClose={() => setMenuOpen(false)}
+        />,
+        document.body
+      )}
+    </>
+  );
+};
+
+const MobileMenu = ({
+  links,
+  instagramLinks,
+  onNavClick,
+  onClose,
+}: {
+  links: { label: string; href: string; external?: boolean }[];
+  instagramLinks: { label: string; url: string }[];
+  onNavClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void;
+  onClose: () => void;
+}) => {
+  // Lock scroll while mounted
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
+  return (
+    <div
+      className="lg:hidden fixed inset-0 z-[60] bg-background"
+      role="dialog"
+      aria-modal="true"
     >
+      {/* Header matching navbar height */}
       <div className="section-container flex items-center justify-between h-[72px]">
-        <a href="#" className="flex items-center gap-2">
+        <a href="#" className="flex items-center gap-2" onClick={onClose}>
           <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" decoding="async" />
         </a>
+        <button
+          type="button"
+          aria-label="Fechar menu"
+          onClick={onClose}
+          className="text-foreground/70 p-2 -mr-2"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
 
-        <div className="hidden lg:flex items-center gap-10">
+      {/* Menu content */}
+      <div className="px-6 py-8 flex flex-col">
+        <div className="space-y-5 mb-8">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              {...(l.external ? {} : { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, l.href) })}
-              className="text-[13px] font-medium text-foreground/40 hover:text-foreground transition-colors duration-300"
+              {...(l.external
+                ? { onClick: onClose }
+                : { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => onNavClick(e, l.href) }
+              )}
+              className="block text-lg text-foreground/60 hover:text-foreground transition-colors"
             >
               {l.label}
             </a>
           ))}
         </div>
 
-        <div className="hidden lg:block">
-          <GradientButton href="#falar-equipe" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#falar-equipe")}>
-            Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
-          </GradientButton>
+        <div className="space-y-3">
+          <a
+            href="https://pay.hotmart.com/F97566234Y"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onClose}
+            className="btn-summit w-full justify-center py-3 text-sm"
+          >
+            Comprar Agora <ArrowRight className="w-3.5 h-3.5" />
+          </a>
+          <a
+            href="https://metodomont.com.br/#falar-equipe"
+            onClick={onClose}
+            className="btn-gradient w-full"
+          >
+            <div className="btn-gradient-wrapper w-full">
+              <div className="btn-gradient-inner w-full">
+                <div className="btn-gradient-bg" />
+                <span className="btn-gradient-text justify-center w-full">Falar com a Equipe</span>
+              </div>
+            </div>
+          </a>
         </div>
 
-        <button
-          type="button"
-          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
-          onClick={() => setMenuOpen((open) => !open)}
-          className="lg:hidden relative z-[60] text-foreground/70 p-2 -mr-2 touch-manipulation"
-        >
-          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
-
-      <AnimatePresence>
-        {menuOpen && (
-          <div
-            className="lg:hidden fixed inset-0 top-[72px] bg-background z-40 overflow-hidden touch-none"
-          >
-            <div className="px-6 py-8 flex flex-col min-h-full">
-              <div className="space-y-5 mb-8">
-                {links.map((l) => (
-                  <a key={l.href} href={l.href} {...(l.external ? { onClick: () => setMenuOpen(false) } : { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, l.href) })} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
-                    {l.label}
-                  </a>
-                ))}
-              </div>
-
-              <div className="space-y-3">
-                <a href="https://pay.hotmart.com/F97566234Y" target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} className="btn-summit w-full justify-center py-3 text-sm">
-                  Comprar Agora <ArrowRight className="w-3.5 h-3.5" />
-                </a>
-                <a href="https://metodomont.com.br/#falar-equipe" onClick={() => setMenuOpen(false)} className="btn-gradient w-full">
-                  <div className="btn-gradient-wrapper w-full">
-                    <div className="btn-gradient-inner w-full">
-                      <div className="btn-gradient-bg" />
-                      <span className="btn-gradient-text justify-center w-full">Falar com a Equipe</span>
-                    </div>
-                  </div>
-                </a>
-              </div>
-
-              {instagramLinks.length > 0 && (
-                <div className="flex items-center justify-center gap-5 mt-10">
-                  {instagramLinks.map((l) => (
-                    <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-foreground/25 hover:text-primary transition-colors text-xs">
-                      <Instagram className="w-4 h-4" />
-                      <span>{l.label}</span>
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
+        {instagramLinks.length > 0 && (
+          <div className="flex items-center justify-center gap-5 mt-10">
+            {instagramLinks.map((l) => (
+              <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-foreground/25 hover:text-primary transition-colors text-xs">
+                <Instagram className="w-4 h-4" />
+                <span>{l.label}</span>
+              </a>
+            ))}
           </div>
         )}
-      </AnimatePresence>
-    </nav>
+      </div>
+    </div>
   );
 };
 
