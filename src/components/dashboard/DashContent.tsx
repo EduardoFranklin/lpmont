@@ -404,7 +404,18 @@ const DashContent = () => {
         {activeSection === "quizpages" ? (
           <DashQuizPages />
         ) : activeSection === "onboarding" ? (
-          <DashOnboarding />
+          <div className="space-y-8">
+            <SectionPanel
+              section="onboarding"
+              content={content}
+              dirtyKeys={dirtyKeys}
+              updateField={updateField}
+              resetField={resetField}
+            />
+            <div className="border-t border-border pt-6">
+              <DashOnboarding />
+            </div>
+          </div>
         ) : activeSection === "modules" ? (
           <DashModulesEditor
             content={content}
