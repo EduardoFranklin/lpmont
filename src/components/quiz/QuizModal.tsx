@@ -50,6 +50,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
       setConfirmed(false);
       setScores([]);
       setTravaTrigger(false);
+      setLeadId(null);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
