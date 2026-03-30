@@ -80,6 +80,7 @@ const DashQuizPages = () => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [expandedQ, setExpandedQ] = useState<number | null>(null);
 
   const loadPages = async () => {
     const { data } = await supabase.from("quiz_pages").select("*").order("created_at", { ascending: false });
@@ -549,73 +550,79 @@ const DashQuizPages = () => {
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">
                 Questões ({questions.length})
               </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 space-y-4">
-                {questions.map((q, qi) => (
-                  <div key={qi} className="border border-border rounded-lg p-4 space-y-3 bg-muted/20">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-muted-foreground">Questão {qi + 1}</span>
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => moveQuestion(qi, -1)} disabled={qi === 0} className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30">
-                          <ChevronUp className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => moveQuestion(qi, 1)} disabled={qi === questions.length - 1} className="p-1 text-muted-foreground hover:text-foreground disabled:opacity-30">
-                          <ChevronDown className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => removeQuestion(qi)} className="p-1 text-destructive/60 hover:text-destructive">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                    <Field label="Label" value={q.label} onChange={(v) => updateQuestion(qi, "label", v)} />
-                    <Field label="Pergunta" value={q.question} onChange={(v) => updateQuestion(qi, "question", v)} multi />
-                    <div className="flex items-center gap-4">
-                      <Field label="Peso (pts)" value={String(q.weight)} onChange={(v) => updateQuestion(qi, "weight", parseInt(v) || 10)} />
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">Crítica (trava)</span>
-                        <Switch checked={q.is_critical} onCheckedChange={(v) => updateQuestion(qi, "is_critical", v)} />
-                      </div>
-                    </div>
-                    <Field label="Explicação" value={q.explanation} onChange={(v) => updateQuestion(qi, "explanation", v)} multi />
-                    <div>
-                      <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Imagem da Questão</label>
-                      <ImageUploadCrop
-                        value={q.image_url || ""}
-                        onChange={(v) => updateQuestion(qi, "image_url", v)}
-                        friendlyName={`quiz-q${qi + 1}`}
-                        maxWidth={800}
-                        maxHeight={500}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Opções</span>
-                      {q.options.map((opt, oi) => (
-                        <div key={oi} className="flex items-center gap-2">
-                          <Input
-                            value={opt.text}
-                            onChange={(e) => updateOption(qi, oi, "text", e.target.value)}
-                            placeholder={`Opção ${oi + 1}`}
-                            className="flex-1 text-sm"
-                          />
-                          <Input
-                            type="number"
-                            value={String(opt.points)}
-                            onChange={(e) => updateOption(qi, oi, "points", parseInt(e.target.value) || 0)}
-                            className="w-20 text-sm"
-                            placeholder="Pts"
-                          />
-                          <button onClick={() => removeOption(qi, oi)} className="text-destructive/60 hover:text-destructive p-1">
-                            <Trash2 className="w-3 h-3" />
+              <AccordionContent className="px-4 pb-4 space-y-1">
+                {questions.map((q, qi) => {
+                  const isExpanded = expandedQ === qi;
+                  return (
+                    <div key={qi} className="border border-border rounded-lg overflow-hidden bg-muted/10">
+                      {/* Compact row */}
+                      <div className="flex items-center gap-1 px-2 py-1.5">
+                        {/* Drag handle / reorder buttons */}
+                        <div className="flex flex-col">
+                          <button onClick={() => moveQuestion(qi, -1)} disabled={qi === 0} className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20">
+                            <ChevronUp className="w-3 h-3" />
+                          </button>
+                          <button onClick={() => moveQuestion(qi, 1)} disabled={qi === questions.length - 1} className="p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-20">
+                            <ChevronDown className="w-3 h-3" />
                           </button>
                         </div>
-                      ))}
-                      <Button variant="outline" size="sm" onClick={() => addOption(qi)} className="gap-1">
-                        <Plus className="w-3 h-3" /> Opção
-                      </Button>
+                        <span className="text-[10px] font-bold text-muted-foreground w-5 text-center shrink-0">{qi + 1}</span>
+                        {q.image_url && (
+                          <img src={q.image_url} alt="" className="w-8 h-8 rounded object-cover shrink-0 border border-border" />
+                        )}
+                        <button
+                          onClick={() => setExpandedQ(isExpanded ? null : qi)}
+                          className="flex-1 text-left truncate text-sm font-medium hover:text-primary transition-colors px-1"
+                        >
+                          {q.question || q.label || <span className="italic text-muted-foreground">Sem pergunta</span>}
+                        </button>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">{q.weight}pts</span>
+                        {q.is_critical && <span className="text-[9px] px-1.5 py-0.5 rounded bg-destructive/10 text-destructive shrink-0">Crítica</span>}
+                        <button onClick={() => removeQuestion(qi)} className="p-1 text-destructive/40 hover:text-destructive shrink-0">
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      {/* Expanded editor */}
+                      {isExpanded && (
+                        <div className="border-t border-border px-4 py-3 space-y-3 bg-card">
+                          <Field label="Label" value={q.label} onChange={(v) => updateQuestion(qi, "label", v)} />
+                          <Field label="Pergunta" value={q.question} onChange={(v) => updateQuestion(qi, "question", v)} multi />
+                          <div className="flex items-center gap-4">
+                            <Field label="Peso (pts)" value={String(q.weight)} onChange={(v) => updateQuestion(qi, "weight", parseInt(v) || 10)} />
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-muted-foreground">Crítica</span>
+                              <Switch checked={q.is_critical} onCheckedChange={(v) => updateQuestion(qi, "is_critical", v)} />
+                            </div>
+                          </div>
+                          <Field label="Explicação" value={q.explanation} onChange={(v) => updateQuestion(qi, "explanation", v)} multi />
+                          <div>
+                            <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Imagem</label>
+                            <ImageUploadCrop
+                              value={q.image_url || ""}
+                              onChange={(v) => updateQuestion(qi, "image_url", v)}
+                              friendlyName={`quiz-q${qi + 1}`}
+                              maxWidth={800}
+                              maxHeight={500}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Opções</span>
+                            {q.options.map((opt, oi) => (
+                              <div key={oi} className="flex items-center gap-2">
+                                <Input value={opt.text} onChange={(e) => updateOption(qi, oi, "text", e.target.value)} placeholder={`Opção ${oi + 1}`} className="flex-1 text-sm" />
+                                <Input type="number" value={String(opt.points)} onChange={(e) => updateOption(qi, oi, "points", parseInt(e.target.value) || 0)} className="w-20 text-sm" placeholder="Pts" />
+                                <button onClick={() => removeOption(qi, oi)} className="text-destructive/60 hover:text-destructive p-1"><Trash2 className="w-3 h-3" /></button>
+                              </div>
+                            ))}
+                            <Button variant="outline" size="sm" onClick={() => addOption(qi)} className="gap-1"><Plus className="w-3 h-3" /> Opção</Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
-                <Button variant="outline" onClick={addQuestion} className="gap-1.5">
+                  );
+                })}
+                <Button variant="outline" onClick={addQuestion} className="gap-1.5 mt-2">
                   <Plus className="w-4 h-4" /> Adicionar Questão
                 </Button>
               </AccordionContent>
