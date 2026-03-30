@@ -1,0 +1,1 @@
+UPDATE message_queue SET status = 'pending', attempts = 0, last_error = NULL, scheduled_for = now() - interval '1 minute' WHERE id = 'b27fb72a-839b-4d79-8ad7-82d53c836f33';
