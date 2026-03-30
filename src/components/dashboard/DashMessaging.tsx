@@ -30,11 +30,22 @@ import { toast } from "sonner";
 
 /* ─── constants ─── */
 
-const FUNNELS = [
+const DEFAULT_FUNNELS = [
   { value: "F1", label: "F1 — Reunião com Consultor", icon: Users, color: "text-blue-500", description: "Confirmação, lembretes e follow-up pós-reunião" },
   { value: "F2", label: "F2 — Quiz de Diagnóstico", icon: Zap, color: "text-amber-500", description: "Diagnósticos A/B/C + recuperação de abandono" },
   { value: "F3", label: "F3 — Tráfego Direto", icon: ShoppingCart, color: "text-emerald-500", description: "Retargeting, abandono de checkout, objeções" },
   { value: "F4", label: "F4 — Pós-Compra (Onboarding)", icon: GraduationCap, color: "text-purple-500", description: "Boas-vindas, engajamento, reengajamento" },
+];
+
+const FUNNEL_ICONS = [
+  { icon: Users, label: "Pessoas", color: "text-blue-500" },
+  { icon: Zap, label: "Automação", color: "text-amber-500" },
+  { icon: ShoppingCart, label: "Vendas", color: "text-emerald-500" },
+  { icon: GraduationCap, label: "Educação", color: "text-purple-500" },
+  { icon: Trophy, label: "Conquista", color: "text-yellow-500" },
+  { icon: Mail, label: "Email", color: "text-sky-500" },
+  { icon: MessageCircle, label: "Chat", color: "text-green-500" },
+  { icon: Phone, label: "Telefone", color: "text-orange-500" },
 ];
 
 const VARIABLES = [
