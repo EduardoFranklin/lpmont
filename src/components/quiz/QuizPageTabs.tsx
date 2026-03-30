@@ -14,7 +14,8 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
   const pageType = (page as any).page_type || "video_quiz";
   const hasVideo = pageType !== "quiz_only";
   const hasQuiz = pageType !== "video_only";
-  const [activeTab, setActiveTab] = useState(hasVideo ? 1 : 2);
+  const videoFirst = (page as any).video_first ?? true;
+  const [activeTab, setActiveTab] = useState(videoFirst ? (hasVideo ? 1 : 2) : (hasQuiz ? 2 : 1));
 
   return (
     <div className="max-w-[860px] mx-auto px-0 sm:px-10 z-[1] relative">

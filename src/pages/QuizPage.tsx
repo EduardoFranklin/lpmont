@@ -21,6 +21,7 @@ export interface QuizPageData {
   slug: string;
   page_type: string;
   video_locked: boolean;
+  video_first: boolean;
   hero_label: string;
   hero_title: string;
   hero_message: string;
