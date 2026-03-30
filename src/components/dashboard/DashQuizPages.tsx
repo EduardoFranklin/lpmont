@@ -319,6 +319,14 @@ const DashQuizPages = () => {
               </span>
             </div>
             <div className="font-medium text-sm truncate">{p.hero_title || p.lesson_title}</div>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                {(p as any).page_type === "video_only" ? "Vídeo" : (p as any).page_type === "quiz_only" ? "Quiz" : "Vídeo + Quiz"}
+              </span>
+              {(p as any).video_locked && (p as any).page_type !== "quiz_only" && (
+                <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded bg-primary/10 text-primary">🔒 Bloqueado</span>
+              )}
+            </div>
             <div className="flex items-center gap-2 mt-2">
               {p.status === "published" && (
                 <a
