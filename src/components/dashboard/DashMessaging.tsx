@@ -59,20 +59,10 @@ const AVAILABLE_TAGS = [
   "onboarding_pendente", "onboarding_completo",
 ];
 
-const DELAY_PRESETS = [
-  { label: "Imediato", minutes: 0 },
-  { label: "5 min", minutes: 5 },
-  { label: "15 min", minutes: 15 },
-  { label: "30 min", minutes: 30 },
-  { label: "1 hora", minutes: 60 },
-  { label: "2 horas", minutes: 120 },
-  { label: "4 horas", minutes: 240 },
-  { label: "12 horas", minutes: 720 },
-  { label: "24 horas", minutes: 1440 },
-  { label: "48 horas", minutes: 2880 },
-  { label: "72 horas", minutes: 4320 },
-  { label: "5 dias", minutes: 7200 },
-  { label: "7 dias", minutes: 10080 },
+const DELAY_UNITS = [
+  { label: "Min", multiplier: 1 },
+  { label: "Hora", multiplier: 60 },
+  { label: "Dia", multiplier: 1440 },
 ];
 
 function minutesToLabel(m: number): string {
