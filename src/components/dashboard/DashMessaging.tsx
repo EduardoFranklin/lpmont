@@ -6,11 +6,19 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import {
-  Save, MessageCircle, Mail, Bold, Italic, Link2, Image, Type,
-  Variable, Strikethrough, Code, Plus, Trash2, Clock, Bell, Trophy, Phone,
-  Zap, Users, ShoppingCart, GraduationCap, ChevronDown, ChevronUp,
-  Send, CheckCircle2, XCircle, Loader2, History, RefreshCw,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
+} from "@/components/ui/dialog";
+import {
+  Save, MessageCircle, Mail, Bold, Italic, Link2, Type,
+  Variable, Strikethrough, Plus, Trash2, Clock, Trophy, Phone,
+  Zap, Users, ShoppingCart, GraduationCap,
+  Send, CheckCircle2, XCircle, Loader2, RefreshCw,
+  GripVertical, Tag, Power, PowerOff, ChevronRight, Settings2,
 } from "lucide-react";
 import {
   Popover, PopoverContent, PopoverTrigger,
@@ -36,11 +44,43 @@ const VARIABLES = [
   { key: "{{tratamento}}", desc: "Dr. / Dra." },
   { key: "{{cidade}}", desc: "Cidade" },
   { key: "{{score}}", desc: "Pontuação do quiz" },
-  { key: "{{data}}", desc: "Data da reunião (extenso)" },
-  { key: "{{hora}}", desc: "Horário da reunião (extenso)" },
+  { key: "{{data}}", desc: "Data da reunião" },
+  { key: "{{hora}}", desc: "Horário da reunião" },
   { key: "{{reuniao_link_google_meet}}", desc: "Link do Google Meet" },
   { key: "{{id_lead}}", desc: "ID do lead" },
 ];
+
+const AVAILABLE_TAGS = [
+  "quiz_diagnostico_a", "quiz_diagnostico_b", "quiz_diagnostico_c",
+  "quiz_concluido", "quiz_abandonou",
+  "reuniao_agendada", "reuniao_confirmada", "reuniao_nao_compareceu",
+  "wa_sem_resposta_1", "wa_sem_resposta_2", "wa_sem_resposta_3",
+  "comprou", "nao_comprou", "abandonou_checkout",
+  "onboarding_pendente", "onboarding_completo",
+];
+
+const DELAY_PRESETS = [
+  { label: "Imediato", minutes: 0 },
+  { label: "5 min", minutes: 5 },
+  { label: "15 min", minutes: 15 },
+  { label: "30 min", minutes: 30 },
+  { label: "1 hora", minutes: 60 },
+  { label: "2 horas", minutes: 120 },
+  { label: "4 horas", minutes: 240 },
+  { label: "12 horas", minutes: 720 },
+  { label: "24 horas", minutes: 1440 },
+  { label: "48 horas", minutes: 2880 },
+  { label: "72 horas", minutes: 4320 },
+  { label: "5 dias", minutes: 7200 },
+  { label: "7 dias", minutes: 10080 },
+];
+
+function minutesToLabel(m: number): string {
+  if (m === 0) return "Imediato";
+  if (m < 60) return `${m} min`;
+  if (m < 1440) return `${Math.round(m / 60)} hora${Math.round(m / 60) > 1 ? "s" : ""}`;
+  return `${Math.round(m / 1440)} dia${Math.round(m / 1440) > 1 ? "s" : ""}`;
+}
 
 /* ─── types ─── */
 
@@ -59,18 +99,6 @@ interface Sequence {
   active: boolean;
 }
 
-interface QueueItem {
-  id: string;
-  lead_id: string;
-  funnel: string;
-  step_key: string;
-  channel: string;
-  status: string;
-  scheduled_for: string;
-  sent_at: string | null;
-  lead_name?: string;
-}
-
 /* ─── toolbar helpers ─── */
 
 function insertAtCursor(ref: React.RefObject<HTMLTextAreaElement>, text: string) {
@@ -78,9 +106,7 @@ function insertAtCursor(ref: React.RefObject<HTMLTextAreaElement>, text: string)
   if (!el) return;
   const start = el.selectionStart;
   const end = el.selectionEnd;
-  const before = el.value.slice(0, start);
-  const after = el.value.slice(end);
-  el.value = before + text + after;
+  el.value = el.value.slice(0, start) + text + el.value.slice(end);
   el.focus();
   el.setSelectionRange(start + text.length, start + text.length);
   el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -92,9 +118,7 @@ function wrapSelection(ref: React.RefObject<HTMLTextAreaElement>, before: string
   const start = el.selectionStart;
   const end = el.selectionEnd;
   const selected = el.value.slice(start, end) || "texto";
-  const pre = el.value.slice(0, start);
-  const post = el.value.slice(end);
-  el.value = pre + before + selected + after + post;
+  el.value = el.value.slice(0, start) + before + selected + after + el.value.slice(end);
   el.focus();
   el.setSelectionRange(start + before.length, start + before.length + selected.length);
   el.dispatchEvent(new Event("input", { bubbles: true }));
@@ -110,15 +134,9 @@ const VariablesPopover = ({ textareaRef }: { textareaRef: React.RefObject<HTMLTe
       </Button>
     </PopoverTrigger>
     <PopoverContent className="w-64 p-2" align="start">
-      <p className="text-[10px] text-muted-foreground font-medium mb-1.5 uppercase tracking-wider">
-        Clique para inserir
-      </p>
+      <p className="text-[10px] text-muted-foreground font-medium mb-1.5 uppercase tracking-wider">Clique para inserir</p>
       {VARIABLES.map((v) => (
-        <button
-          key={v.key}
-          onClick={() => insertAtCursor(textareaRef, v.key)}
-          className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-muted/50 flex justify-between items-center"
-        >
+        <button key={v.key} onClick={() => insertAtCursor(textareaRef, v.key)} className="w-full text-left px-2 py-1.5 rounded text-xs hover:bg-muted/50 flex justify-between items-center">
           <code className="text-primary font-mono text-[11px]">{v.key}</code>
           <span className="text-muted-foreground text-[10px]">{v.desc}</span>
         </button>
@@ -150,23 +168,117 @@ const MessageToolbar = ({ textareaRef, isEmail }: { textareaRef: React.RefObject
   </div>
 );
 
-/* ─── Sequence card ─── */
+/* ─── Conditions Editor ─── */
 
-const SequenceCard = ({ seq, onUpdate }: { seq: Sequence; onUpdate: () => void }) => {
+const ConditionsEditor = ({ conditions, onChange }: { conditions: any; onChange: (c: any) => void }) => {
+  const cond = conditions || {};
+  const requiredTags: string[] = cond.required_tags || [];
+  const excludedTags: string[] = cond.excluded_tags || [];
+
+  const addTag = (type: "required_tags" | "excluded_tags", tag: string) => {
+    const list = [...(cond[type] || [])];
+    if (!list.includes(tag)) {
+      list.push(tag);
+      onChange({ ...cond, [type]: list });
+    }
+  };
+
+  const removeTag = (type: "required_tags" | "excluded_tags", tag: string) => {
+    const list = (cond[type] || []).filter((t: string) => t !== tag);
+    onChange({ ...cond, [type]: list });
+  };
+
+  const availableForRequired = AVAILABLE_TAGS.filter(t => !requiredTags.includes(t) && !excludedTags.includes(t));
+  const availableForExcluded = AVAILABLE_TAGS.filter(t => !excludedTags.includes(t) && !requiredTags.includes(t));
+
+  return (
+    <div className="space-y-3 p-3 bg-muted/30 rounded-lg border border-dashed">
+      <div className="space-y-1.5">
+        <Label className="text-xs font-medium flex items-center gap-1.5"><Tag className="w-3 h-3 text-green-500" /> Tags obrigatórias (lead DEVE ter)</Label>
+        <div className="flex flex-wrap gap-1">
+          {requiredTags.map(tag => (
+            <Badge key={tag} className="text-[10px] gap-1 bg-green-500/10 text-green-700 border-green-500/30 hover:bg-green-500/20 cursor-pointer" onClick={() => removeTag("required_tags", tag)}>
+              {tag} <XCircle className="w-2.5 h-2.5" />
+            </Badge>
+          ))}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-5 text-[10px] px-1.5 gap-0.5"><Plus className="w-2.5 h-2.5" /></Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-1.5 max-h-48 overflow-y-auto" align="start">
+              {availableForRequired.length === 0 ? <p className="text-xs text-muted-foreground p-2">Todas as tags já adicionadas</p> : availableForRequired.map(tag => (
+                <button key={tag} onClick={() => addTag("required_tags", tag)} className="w-full text-left px-2 py-1 rounded text-xs hover:bg-muted/50">{tag}</button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <Label className="text-xs font-medium flex items-center gap-1.5"><Tag className="w-3 h-3 text-red-500" /> Tags de exclusão (lead NÃO pode ter)</Label>
+        <div className="flex flex-wrap gap-1">
+          {excludedTags.map(tag => (
+            <Badge key={tag} className="text-[10px] gap-1 bg-red-500/10 text-red-700 border-red-500/30 hover:bg-red-500/20 cursor-pointer" onClick={() => removeTag("excluded_tags", tag)}>
+              {tag} <XCircle className="w-2.5 h-2.5" />
+            </Badge>
+          ))}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="h-5 text-[10px] px-1.5 gap-0.5"><Plus className="w-2.5 h-2.5" /></Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-1.5 max-h-48 overflow-y-auto" align="start">
+              {availableForExcluded.length === 0 ? <p className="text-xs text-muted-foreground p-2">Todas as tags já adicionadas</p> : availableForExcluded.map(tag => (
+                <button key={tag} onClick={() => addTag("excluded_tags", tag)} className="w-full text-left px-2 py-1 rounded text-xs hover:bg-muted/50">{tag}</button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Sequence card (with drag, delay edit, conditions) ─── */
+
+const SequenceCard = ({
+  seq, onUpdate, onDelete,
+  dragHandleProps,
+}: {
+  seq: Sequence;
+  onUpdate: () => void;
+  onDelete: (id: string) => void;
+  dragHandleProps: {
+    draggable: boolean;
+    onDragStart: (e: React.DragEvent) => void;
+    onDragOver: (e: React.DragEvent) => void;
+    onDrop: (e: React.DragEvent) => void;
+    onDragEnd: () => void;
+  };
+}) => {
   const [editing, setEditing] = useState(false);
   const [body, setBody] = useState(seq.body);
   const [subject, setSubject] = useState(seq.subject || "");
   const [active, setActive] = useState(seq.active);
+  const [delayMinutes, setDelayMinutes] = useState(seq.delay_minutes);
+  const [conditions, setConditions] = useState<any>(seq.conditions);
+  const [showConditions, setShowConditions] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [customDelay, setCustomDelay] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isEmail = seq.channel === "email";
 
+  const condTags = conditions || {};
+  const hasConditions = (condTags.required_tags?.length > 0) || (condTags.excluded_tags?.length > 0);
+
   const handleSave = async () => {
     setSaving(true);
+    const delayDesc = minutesToLabel(delayMinutes);
     const { error } = await supabase.from("automation_sequences" as any).update({
       body,
       subject: isEmail ? subject : null,
       active,
+      delay_minutes: delayMinutes,
+      delay_description: delayDesc,
+      conditions,
     } as any).eq("id", seq.id);
     setSaving(false);
     if (error) { toast.error("Erro ao salvar"); return; }
@@ -182,27 +294,52 @@ const SequenceCard = ({ seq, onUpdate }: { seq: Sequence; onUpdate: () => void }
     onUpdate();
   };
 
+  const handleDeleteClick = () => {
+    if (confirm(`Excluir "${seq.title}"? Esta ação não pode ser desfeita.`)) {
+      onDelete(seq.id);
+    }
+  };
+
   return (
-    <div className={`rounded-lg border p-3 space-y-2 transition-opacity ${!active ? "opacity-50" : ""}`}>
+    <div
+      className={`rounded-lg border p-3 space-y-2 transition-all ${!active ? "opacity-50" : ""} hover:shadow-sm`}
+      {...dragHandleProps}
+    >
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
+          <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab active:cursor-grabbing shrink-0" />
           {isEmail ? <Mail className="w-4 h-4 text-blue-400" /> : <MessageCircle className="w-4 h-4 text-green-400" />}
           <span className="text-sm font-medium">{seq.title}</span>
-          <Badge variant="outline" className="text-[10px] h-5">
-            <Clock className="w-3 h-3 mr-1" /> {seq.delay_description}
-          </Badge>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
+          {/* Delay badge - clickable to edit */}
+          {!editing ? (
+            <Badge
+              variant="outline"
+              className="text-[10px] h-5 cursor-pointer hover:bg-muted/50"
+              onClick={() => setEditing(true)}
+            >
+              <Clock className="w-3 h-3 mr-1" /> {minutesToLabel(delayMinutes)}
+            </Badge>
+          ) : null}
+          {hasConditions && !editing && (
+            <Badge variant="outline" className="text-[10px] h-5 bg-amber-500/10 text-amber-700 border-amber-500/30">
+              <Tag className="w-3 h-3 mr-1" /> {(condTags.required_tags?.length || 0) + (condTags.excluded_tags?.length || 0)} tags
+            </Badge>
+          )}
           <Switch checked={active} onCheckedChange={handleToggle} />
+          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive/60 hover:text-destructive" onClick={handleDeleteClick}>
+            <Trash2 className="w-3 h-3" />
+          </Button>
         </div>
       </div>
 
+      {/* View mode */}
       {!editing ? (
         <div className="cursor-pointer" onClick={() => setEditing(true)}>
           {isEmail && seq.subject && (
-            <p className="text-xs text-muted-foreground mb-1">
-              <strong>Assunto:</strong> {seq.subject}
-            </p>
+            <p className="text-xs text-muted-foreground mb-1"><strong>Assunto:</strong> {seq.subject}</p>
           )}
           <pre className="text-xs text-muted-foreground whitespace-pre-wrap line-clamp-3 font-mono bg-muted/30 rounded p-2">
             {seq.body.slice(0, 200)}{seq.body.length > 200 ? "..." : ""}
@@ -210,15 +347,46 @@ const SequenceCard = ({ seq, onUpdate }: { seq: Sequence; onUpdate: () => void }
           <p className="text-[10px] text-muted-foreground mt-1">Clique para editar</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        /* Edit mode */
+        <div className="space-y-3">
+          {/* Delay editor */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Label className="text-xs font-medium flex items-center gap-1"><Clock className="w-3 h-3" /> Tempo de espera:</Label>
+            <div className="flex flex-wrap gap-1">
+              {DELAY_PRESETS.map(p => (
+                <button
+                  key={p.minutes}
+                  onClick={() => { setDelayMinutes(p.minutes); setCustomDelay(""); }}
+                  className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
+                    delayMinutes === p.minutes && !customDelay
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-muted/30 hover:bg-muted/60 border-border"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+              <Input
+                placeholder="Personalizado (min)"
+                value={customDelay}
+                onChange={(e) => {
+                  setCustomDelay(e.target.value);
+                  const v = parseInt(e.target.value);
+                  if (!isNaN(v) && v >= 0) setDelayMinutes(v);
+                }}
+                className="h-5 w-28 text-[10px] px-1.5"
+                type="number"
+                min={0}
+              />
+            </div>
+          </div>
+
+          {/* Subject for email */}
           {isEmail && (
-            <Input
-              placeholder="Assunto do e-mail"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              className="text-sm"
-            />
+            <Input placeholder="Assunto do e-mail" value={subject} onChange={(e) => setSubject(e.target.value)} className="text-sm" />
           )}
+
+          {/* Body toolbar + textarea */}
           <MessageToolbar textareaRef={textareaRef} isEmail={isEmail} />
           <textarea
             ref={textareaRef}
@@ -227,8 +395,20 @@ const SequenceCard = ({ seq, onUpdate }: { seq: Sequence; onUpdate: () => void }
             rows={8}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
           />
+
+          {/* Conditions toggle */}
+          <div>
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5" onClick={() => setShowConditions(!showConditions)}>
+              <Settings2 className="w-3 h-3" />
+              Condições (Tags)
+              <ChevronRight className={`w-3 h-3 transition-transform ${showConditions ? "rotate-90" : ""}`} />
+            </Button>
+          </div>
+          {showConditions && <ConditionsEditor conditions={conditions} onChange={setConditions} />}
+
+          {/* Action buttons */}
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setEditing(false); setBody(seq.body); setSubject(seq.subject || ""); }}>
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setEditing(false); setBody(seq.body); setSubject(seq.subject || ""); setDelayMinutes(seq.delay_minutes); setConditions(seq.conditions); }}>
               Cancelar
             </Button>
             <Button size="sm" className="h-7 text-xs gap-1" onClick={handleSave} disabled={saving}>
@@ -241,7 +421,122 @@ const SequenceCard = ({ seq, onUpdate }: { seq: Sequence; onUpdate: () => void }
   );
 };
 
-/* ─── Funnel Section ─── */
+/* ─── Add Message Dialog ─── */
+
+const AddMessageDialog = ({ funnel, existingCount, onAdded }: { funnel: string; existingCount: number; onAdded: () => void }) => {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [channel, setChannel] = useState("whatsapp");
+  const [delayMinutes, setDelayMinutes] = useState(60);
+  const [body, setBody] = useState("");
+  const [subject, setSubject] = useState("");
+  const [saving, setSaving] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleSave = async () => {
+    if (!title.trim() || !body.trim()) { toast.error("Preencha título e corpo"); return; }
+    setSaving(true);
+    const stepKey = `${funnel.toLowerCase()}_custom_${Date.now()}`;
+    const { error } = await supabase.from("automation_sequences" as any).insert({
+      funnel,
+      step_order: existingCount + 1,
+      step_key: stepKey,
+      title: title.trim(),
+      channel,
+      delay_minutes: delayMinutes,
+      delay_description: minutesToLabel(delayMinutes),
+      subject: channel === "email" ? subject : null,
+      body: body.trim(),
+      conditions: null,
+      active: true,
+    } as any);
+    setSaving(false);
+    if (error) { toast.error("Erro ao criar mensagem"); return; }
+    toast.success("Mensagem adicionada!");
+    setOpen(false);
+    setTitle(""); setBody(""); setSubject("");
+    onAdded();
+  };
+
+  return (
+    <>
+      <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5 w-full border-dashed" onClick={() => setOpen(true)}>
+        <Plus className="w-3 h-3" /> Adicionar mensagem ao funil
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-base">Nova mensagem — {funnel}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Título</Label>
+                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Lembrete D+3" className="text-sm" />
+              </div>
+              <div>
+                <Label className="text-xs">Canal</Label>
+                <Select value={channel} onValueChange={setChannel}>
+                  <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="email">E-mail</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Tempo de espera</Label>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {DELAY_PRESETS.slice(0, 9).map(p => (
+                  <button
+                    key={p.minutes}
+                    onClick={() => setDelayMinutes(p.minutes)}
+                    className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
+                      delayMinutes === p.minutes
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-muted/30 hover:bg-muted/60 border-border"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {channel === "email" && (
+              <div>
+                <Label className="text-xs">Assunto</Label>
+                <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Assunto do e-mail" className="text-sm" />
+              </div>
+            )}
+            <div>
+              <Label className="text-xs">Corpo da mensagem</Label>
+              <MessageToolbar textareaRef={textareaRef} isEmail={channel === "email"} />
+              <textarea
+                ref={textareaRef}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                rows={6}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono mt-1"
+                placeholder="Escreva a mensagem aqui..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="ghost" size="sm">Cancelar</Button>
+            </DialogClose>
+            <Button size="sm" className="gap-1" onClick={handleSave} disabled={saving}>
+              {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Plus className="w-3 h-3" />} Criar mensagem
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+};
+
+/* ─── Funnel Section (with drag-and-drop, bulk toggle) ─── */
 
 const FunnelSection = ({ funnel, sequences, onUpdate }: {
   funnel: typeof FUNNELS[number];
@@ -250,44 +545,104 @@ const FunnelSection = ({ funnel, sequences, onUpdate }: {
 }) => {
   const Icon = funnel.icon;
   const activeCount = sequences.filter(s => s.active).length;
+  const allActive = activeCount === sequences.length;
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [orderedSeqs, setOrderedSeqs] = useState(sequences);
 
-  // Group by step_key to show WA + Email side by side
-  const stepGroups: { key: string; items: Sequence[] }[] = [];
-  const seen = new Set<string>();
-  for (const s of sequences) {
-    if (!seen.has(s.step_key)) {
-      seen.add(s.step_key);
-      stepGroups.push({ key: s.step_key, items: sequences.filter(x => x.step_key === s.step_key) });
+  useEffect(() => { setOrderedSeqs(sequences); }, [sequences]);
+
+  // Bulk toggle all messages in funnel
+  const handleBulkToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newVal = !allActive;
+    const ids = sequences.map(s => s.id);
+    for (const id of ids) {
+      await supabase.from("automation_sequences" as any).update({ active: newVal } as any).eq("id", id);
     }
-  }
+    toast.success(newVal ? `Funil ${funnel.value} ativado` : `Funil ${funnel.value} desativado`);
+    onUpdate();
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (idx: number) => (e: React.DragEvent) => {
+    setDragIdx(idx);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", String(idx));
+  };
+
+  const handleDragOver = (_idx: number) => (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (targetIdx: number) => async (e: React.DragEvent) => {
+    e.preventDefault();
+    if (dragIdx === null || dragIdx === targetIdx) return;
+
+    const newOrder = [...orderedSeqs];
+    const [moved] = newOrder.splice(dragIdx, 1);
+    newOrder.splice(targetIdx, 0, moved);
+    setOrderedSeqs(newOrder);
+    setDragIdx(null);
+
+    // Persist new order
+    const updates = newOrder.map((seq, i) =>
+      supabase.from("automation_sequences" as any).update({ step_order: i + 1 } as any).eq("id", seq.id)
+    );
+    await Promise.all(updates);
+    toast.success("Ordem atualizada!");
+    onUpdate();
+  };
+
+  const handleDragEnd = () => setDragIdx(null);
+
+  const handleDelete = async (id: string) => {
+    await supabase.from("automation_sequences" as any).delete().eq("id", id);
+    toast.success("Mensagem excluída");
+    onUpdate();
+  };
 
   return (
     <AccordionItem value={funnel.value} className="border rounded-lg px-4">
       <AccordionTrigger className="hover:no-underline py-3">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full">
           <Icon className={`w-5 h-5 ${funnel.color}`} />
-          <div className="text-left">
+          <div className="text-left flex-1">
             <p className="text-sm font-semibold">{funnel.label}</p>
             <p className="text-xs text-muted-foreground font-normal">{funnel.description}</p>
           </div>
           <Badge variant="secondary" className="ml-2 text-[10px]">
             {activeCount}/{sequences.length} ativos
           </Badge>
+          <Button
+            variant={allActive ? "default" : "outline"}
+            size="sm"
+            className={`h-6 text-[10px] px-2 gap-1 ml-1 ${allActive ? "bg-green-600 hover:bg-green-700" : "text-muted-foreground"}`}
+            onClick={handleBulkToggle}
+            title={allActive ? "Desativar funil inteiro" : "Ativar funil inteiro"}
+          >
+            {allActive ? <Power className="w-3 h-3" /> : <PowerOff className="w-3 h-3" />}
+            {allActive ? "ON" : "OFF"}
+          </Button>
         </div>
       </AccordionTrigger>
-      <AccordionContent className="pb-4 space-y-4">
-        {stepGroups.map((group) => (
-          <div key={group.key} className="space-y-2">
-            {group.items.length > 1 && (
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider pl-1">
-                {group.items[0].title}
-              </p>
-            )}
-            {group.items.map((seq) => (
-              <SequenceCard key={seq.id} seq={seq} onUpdate={onUpdate} />
-            ))}
-          </div>
+      <AccordionContent className="pb-4 space-y-2">
+        {orderedSeqs.map((seq, idx) => (
+          <SequenceCard
+            key={seq.id}
+            seq={seq}
+            onUpdate={onUpdate}
+            onDelete={handleDelete}
+            dragHandleProps={{
+              draggable: true,
+              onDragStart: handleDragStart(idx),
+              onDragOver: handleDragOver(idx),
+              onDrop: handleDrop(idx),
+              onDragEnd: handleDragEnd,
+            }}
+          />
         ))}
+        <AddMessageDialog funnel={funnel.value} existingCount={orderedSeqs.length} onAdded={onUpdate} />
       </AccordionContent>
     </AccordionItem>
   );
@@ -314,7 +669,6 @@ const QueueMonitor = () => {
 
   useEffect(() => { fetchQueue(); }, [fetchQueue]);
 
-  // Realtime subscription
   useEffect(() => {
     const channel = supabase
       .channel("queue-monitor")
@@ -344,13 +698,7 @@ const QueueMonitor = () => {
       <div className="flex items-center justify-between">
         <div className="flex gap-1">
           {["pending", "sent", "failed", "cancelled"].map((s) => (
-            <Button
-              key={s}
-              variant={filter === s ? "default" : "outline"}
-              size="sm"
-              className="h-7 text-xs capitalize"
-              onClick={() => setFilter(s)}
-            >
+            <Button key={s} variant={filter === s ? "default" : "outline"} size="sm" className="h-7 text-xs capitalize" onClick={() => setFilter(s)}>
               {s === "pending" ? "Pendentes" : s === "sent" ? "Enviadas" : s === "failed" ? "Falhas" : "Canceladas"}
             </Button>
           ))}
@@ -363,11 +711,9 @@ const QueueMonitor = () => {
       {loading ? (
         <div className="text-center py-8"><Loader2 className="w-5 h-5 animate-spin mx-auto text-muted-foreground" /></div>
       ) : queue.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center text-muted-foreground text-sm">
-            Nenhuma mensagem {filter === "pending" ? "pendente" : filter === "sent" ? "enviada" : filter === "failed" ? "com falha" : "cancelada"}.
-          </CardContent>
-        </Card>
+        <Card><CardContent className="py-8 text-center text-muted-foreground text-sm">
+          Nenhuma mensagem {filter === "pending" ? "pendente" : filter === "sent" ? "enviada" : filter === "failed" ? "com falha" : "cancelada"}.
+        </CardContent></Card>
       ) : (
         <div className="space-y-2">
           {queue.map((item: any) => (
@@ -377,15 +723,11 @@ const QueueMonitor = () => {
                 {item.channel === "email" ? <Mail className="w-4 h-4 text-blue-400" /> : <MessageCircle className="w-4 h-4 text-green-400" />}
                 <div>
                   <p className="text-sm font-medium">{item.leads?.name || "Lead"}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.funnel} · {item.step_key} · {new Date(item.scheduled_for).toLocaleString("pt-BR")}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{item.funnel} · {item.step_key} · {new Date(item.scheduled_for).toLocaleString("pt-BR")}</p>
                 </div>
               </div>
               {item.status === "pending" && (
-                <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive" onClick={() => handleCancel(item.id)}>
-                  Cancelar
-                </Button>
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive" onClick={() => handleCancel(item.id)}>Cancelar</Button>
               )}
             </div>
           ))}
@@ -397,12 +739,7 @@ const QueueMonitor = () => {
 
 /* ─── Sale Notifications Tab ─── */
 
-interface SaleContact {
-  id?: string;
-  name: string;
-  phone: string;
-  active: boolean;
-}
+interface SaleContact { id?: string; name: string; phone: string; active: boolean; }
 
 const SaleNotificationsTab = () => {
   const [contacts, setContacts] = useState<SaleContact[]>([]);
@@ -433,15 +770,15 @@ const SaleNotificationsTab = () => {
     fetchContacts();
   };
 
-  const handleToggle = async (contact: SaleContact) => {
-    if (!contact.id) return;
-    await supabase.from("sale_notification_contacts").update({ active: !contact.active }).eq("id", contact.id);
+  const handleToggle = async (c: SaleContact) => {
+    if (!c.id) return;
+    await supabase.from("sale_notification_contacts").update({ active: !c.active }).eq("id", c.id);
     fetchContacts();
   };
 
-  const handleDelete = async (contact: SaleContact) => {
-    if (!contact.id || !confirm("Excluir este contato?")) return;
-    await supabase.from("sale_notification_contacts").delete().eq("id", contact.id);
+  const handleDelete = async (c: SaleContact) => {
+    if (!c.id || !confirm("Excluir este contato?")) return;
+    await supabase.from("sale_notification_contacts").delete().eq("id", c.id);
     toast.success("Contato removido");
     fetchContacts();
   };
@@ -450,13 +787,9 @@ const SaleNotificationsTab = () => {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">
-        Cadastre os números que devem receber uma notificação via WhatsApp quando um lead for convertido.
-      </p>
+      <p className="text-sm text-muted-foreground">Cadastre os números que devem receber uma notificação via WhatsApp quando um lead for convertido.</p>
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2"><Plus className="w-4 h-4" /> Adicionar contato</CardTitle>
-        </CardHeader>
+        <CardHeader className="pb-3"><CardTitle className="text-sm flex items-center gap-2"><Plus className="w-4 h-4" /> Adicionar contato</CardTitle></CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row gap-2">
             <Input placeholder="Nome (opcional)" value={newName} onChange={(e) => setNewName(e.target.value)} className="sm:w-48" />
@@ -517,52 +850,49 @@ const DashMessaging = () => {
   return (
     <Tabs defaultValue="automacoes" className="space-y-4">
       <TabsList>
-        <TabsTrigger value="automacoes" className="gap-1.5">
-          <Zap className="w-4 h-4" /> Automações
-        </TabsTrigger>
-        <TabsTrigger value="fila" className="gap-1.5">
-          <Send className="w-4 h-4" /> Fila de Envio
-        </TabsTrigger>
-        <TabsTrigger value="vendas" className="gap-1.5">
-          <Trophy className="w-4 h-4" /> Notif. Vendas
-        </TabsTrigger>
+        <TabsTrigger value="automacoes" className="gap-1.5"><Zap className="w-4 h-4" /> Automações</TabsTrigger>
+        <TabsTrigger value="fila" className="gap-1.5"><Send className="w-4 h-4" /> Fila de Envio</TabsTrigger>
+        <TabsTrigger value="vendas" className="gap-1.5"><Trophy className="w-4 h-4" /> Notif. Vendas</TabsTrigger>
       </TabsList>
 
       <TabsContent value="automacoes" className="space-y-4">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm text-muted-foreground">
-              Réguas de comunicação automáticas. Cada funil dispara mensagens por WhatsApp e E-mail baseadas nos eventos do lead.
-            </p>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Arraste para reordenar. Clique no botão ON/OFF do funil para ativar/desativar todas as mensagens de uma vez.
+          </p>
           <Badge variant="outline" className="text-xs">
             {sequences.filter(s => s.active).length}/{sequences.length} ativos
           </Badge>
         </div>
-
         <Accordion type="multiple" className="space-y-2">
           {FUNNELS.map((funnel) => {
             const funnelSeqs = sequences.filter(s => s.funnel === funnel.value);
-            if (funnelSeqs.length === 0) return null;
+            if (funnelSeqs.length === 0) return (
+              <AccordionItem key={funnel.value} value={funnel.value} className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-3">
+                  <div className="flex items-center gap-3">
+                    <funnel.icon className={`w-5 h-5 ${funnel.color}`} />
+                    <div className="text-left">
+                      <p className="text-sm font-semibold">{funnel.label}</p>
+                      <p className="text-xs text-muted-foreground font-normal">{funnel.description}</p>
+                    </div>
+                    <Badge variant="secondary" className="ml-2 text-[10px]">Vazio</Badge>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <AddMessageDialog funnel={funnel.value} existingCount={0} onAdded={fetchSequences} />
+                </AccordionContent>
+              </AccordionItem>
+            );
             return (
-              <FunnelSection
-                key={funnel.value}
-                funnel={funnel}
-                sequences={funnelSeqs}
-                onUpdate={fetchSequences}
-              />
+              <FunnelSection key={funnel.value} funnel={funnel} sequences={funnelSeqs} onUpdate={fetchSequences} />
             );
           })}
         </Accordion>
       </TabsContent>
 
-      <TabsContent value="fila">
-        <QueueMonitor />
-      </TabsContent>
-
-      <TabsContent value="vendas">
-        <SaleNotificationsTab />
-      </TabsContent>
+      <TabsContent value="fila"><QueueMonitor /></TabsContent>
+      <TabsContent value="vendas"><SaleNotificationsTab /></TabsContent>
     </Tabs>
   );
 };
