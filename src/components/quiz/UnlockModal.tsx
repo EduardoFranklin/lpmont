@@ -37,6 +37,8 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
         notes: `Quiz page: ${page.slug}`,
         quiz_slug: page.slug,
       } as any);
+      localStorage.setItem("lead_email", email.trim().toLowerCase());
+      localStorage.setItem("lead_phone", phone.trim());
     } catch {}
 
     setSuccess(true);
