@@ -26,6 +26,11 @@ const NavBar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
   const links = [
     { label: "Spoiler (Grátis)", href: "/quiz/aula1", external: true },
     { label: "A Trilha", href: "#modulos" },
