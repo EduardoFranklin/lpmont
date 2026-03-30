@@ -21,6 +21,27 @@ const VideoModal = ({ open, onClose, page }: Props) => {
     ? `https://www.youtube.com/embed/${page.lesson_video_url.split("youtu.be/")[1]}?autoplay=1`
     : page.lesson_video_url;
 
+  const pandaId = isPanda ? (() => { const m = page.lesson_video_url.match(/[?&]v=([a-f0-9-]+)/i); return m ? m[1] : null; })() : null;
+  const playerId = pandaId ? `panda-${pandaId}` : undefined;
+
+  useEffect(() => {
+    if (!isPanda || !playerId) return;
+    if (!document.querySelector('script[src="https://player.pandavideo.com.br/api.v2.js"]')) {
+      const s = document.createElement("script");
+      s.src = "https://player.pandavideo.com.br/api.v2.js";
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    (window as any).pandascripttag = (window as any).pandascripttag || [];
+    (window as any).pandascripttag.push(function () {
+      const p = new (window as any).PandaPlayer(playerId, {
+        onReady() {
+          p.loadWindowScreen({ panda_id_player: playerId });
+        },
+      });
+    });
+  }, [isPanda, playerId]);
+
   return (
     <div
       className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-sm flex items-center justify-center p-5 animate-in fade-in duration-300"
@@ -38,6 +59,7 @@ const VideoModal = ({ open, onClose, page }: Props) => {
         </button>
         <div className="relative pb-[56.25%] bg-black">
           <iframe
+            id={playerId}
             src={embedUrl}
             className="absolute inset-0 w-full h-full border-0"
             allowFullScreen

@@ -5,6 +5,54 @@ import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = { Users, BookOpen, Radio };
 
+/** Extract Panda video ID from an embed URL */
+const getPandaId = (src: string) => {
+  const m = src.match(/[?&]v=([a-f0-9-]+)/i);
+  return m ? m[1] : null;
+};
+
+const PandaEmbed = ({ src }: { src: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const videoId = getPandaId(src);
+  const playerId = videoId ? `panda-${videoId}` : undefined;
+
+  useEffect(() => {
+    if (!playerId) return;
+    // Load PandaVideo API script once
+    if (!document.querySelector('script[src="https://player.pandavideo.com.br/api.v2.js"]')) {
+      const s = document.createElement("script");
+      s.src = "https://player.pandavideo.com.br/api.v2.js";
+      s.async = true;
+      document.head.appendChild(s);
+    }
+    // Initialize player
+    (window as any).pandascripttag = (window as any).pandascripttag || [];
+    (window as any).pandascripttag.push(function () {
+      const p = new (window as any).PandaPlayer(playerId, {
+        onReady() {
+          p.loadWindowScreen({ panda_id_player: playerId });
+        },
+      });
+    });
+  }, [playerId]);
+
+  return (
+    <div ref={ref} className="w-full h-full">
+      <iframe
+        id={playerId}
+        src={src}
+        title="VSL"
+        className="w-full h-full"
+        style={{ border: "none" }}
+        allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
+        allowFullScreen
+        // @ts-ignore
+        fetchpriority="high"
+      />
+    </div>
+  );
+};
+
 const HeroSection = () => {
   const c = useSection("hero");
   const [playing, setPlaying] = useState(false);
