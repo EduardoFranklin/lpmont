@@ -35,6 +35,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
   const [confirmed, setConfirmed] = useState(false);
   const [scores, setScores] = useState<number[]>([]);
   const [travaTrigger, setTravaTrigger] = useState(false);
+  const [leadId, setLeadId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -49,6 +50,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
       setConfirmed(false);
       setScores([]);
       setTravaTrigger(false);
+      setLeadId(null);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -62,7 +64,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
 
   const totalSteps = 3 + questions.length;
 
-  const confirmLead = useCallback(() => {
+  const confirmLead = useCallback(async () => {
     const vals = [leadName, leadPhone, leadEmail];
     if (!vals[leadStep]?.trim()) {
       if (inputRef.current) inputRef.current.style.borderColor = "hsl(var(--destructive))";
@@ -70,24 +72,32 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
     }
     if (leadStep === 2) {
       try {
-        supabase.from("leads").insert({
+        const email = leadEmail.trim().toLowerCase();
+        const phone = leadPhone.trim();
+        // Upsert lead by email — avoid duplicates
+        const { data: upsertData } = await supabase.from("leads").upsert({
           name: leadName.trim(),
-          email: leadEmail.trim(),
-          phone: leadPhone.trim(),
+          email,
+          phone,
           treatment: "Dr.",
           uf: "N/A",
           city: "N/A",
           career: "N/A",
           notes: `Quiz: ${page.slug}`,
           quiz_slug: page.slug,
-        } as any).then(async (res) => {
-          if (res.data && (res.data as any)[0]?.id) {
-            const leadId = (res.data as any)[0].id;
-            await supabase.from("lead_tags").insert({ lead_id: leadId, tag: "quiz", source: "quiz" } as any);
-          }
-        });
-        localStorage.setItem("lead_email", leadEmail.trim().toLowerCase());
-        localStorage.setItem("lead_phone", leadPhone.trim());
+          quiz_started_at: new Date().toISOString(),
+        } as any, { onConflict: "email" }).select("id");
+
+        if (upsertData && upsertData[0]?.id) {
+          const leadId = upsertData[0].id;
+          setLeadId(leadId);
+          await supabase.from("lead_tags").upsert(
+            { lead_id: leadId, tag: "quiz", source: "quiz" } as any,
+            { onConflict: "lead_id,tag" }
+          );
+        }
+        localStorage.setItem("lead_email", email);
+        localStorage.setItem("lead_phone", phone);
       } catch {}
       setPhase("quiz");
       return;
@@ -123,21 +133,18 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
         if (finalTotal >= page.result_high_min) diagLevel = page.result_high_level;
         else if (finalTotal >= page.result_mid_min) diagLevel = page.result_mid_level;
 
-        try {
-          const email = leadEmail.trim().toLowerCase();
-          // Update lead with quiz results
-          const { data: updatedLeads } = await supabase.from("leads")
-            .update({
-              quiz_score: finalTotal,
-              quiz_slug: page.slug,
-              quiz_concluido: true,
-              quiz_diagnostico: diagLevel,
-            } as any)
-            .eq("email", email)
-            .select("id");
+        if (leadId) {
+          try {
+            // Update lead with quiz results
+            await supabase.from("leads")
+              .update({
+                quiz_score: finalTotal,
+                quiz_slug: page.slug,
+                quiz_concluido: true,
+                quiz_diagnostico: diagLevel,
+              } as any)
+              .eq("id", leadId);
 
-          if (updatedLeads && updatedLeads[0]?.id) {
-            const leadId = updatedLeads[0].id;
             // Add quiz_concluido tag
             await supabase.from("lead_tags").upsert(
               { lead_id: leadId, tag: "quiz_concluido", source: "quiz" } as any,
@@ -147,8 +154,8 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
             supabase.functions.invoke("enqueue-automation", {
               body: { lead_id: leadId, funnel: "F2", event: "quiz_concluido" },
             });
-          }
-        } catch {}
+          } catch {}
+        }
       } else {
         setQi((i) => i + 1);
         setSelected(null);
