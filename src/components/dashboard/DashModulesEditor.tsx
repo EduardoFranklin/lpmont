@@ -455,7 +455,7 @@ const DashModulesEditor = ({
 
   const addCamp = () => {
     const newNum = String(camps.length + 1).padStart(2, "0");
-    const newCamp: Camp = { num: newNum, altitude: "", title: "", desc: "", phase: "Base", img: "" };
+    const newCamp: Camp = { num: newNum, altitude: "", title: "", desc: "", phase: "Base", img: "", cover: "" };
     updateField("modules", "camps", JSON.stringify([...camps, newCamp]));
     setOpenCampIdx(camps.length);
   };
