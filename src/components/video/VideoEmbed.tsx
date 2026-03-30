@@ -23,7 +23,7 @@ interface VideoEmbedProps {
   iframeId?: string;
 }
 
-const DEFAULT_ALLOW = "accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture";
+const DEFAULT_ALLOW = "accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;fullscreen";
 const PANDA_SCRIPT_SRC = "https://player.pandavideo.com.br/api.v2.js";
 
 const VideoEmbed = ({ value, title, className, allow = DEFAULT_ALLOW, iframeId }: VideoEmbedProps) => {
