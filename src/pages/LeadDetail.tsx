@@ -338,11 +338,11 @@ const LeadDetail = () => {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {[
-                { label: "Source", value: (lead as any).utm_source },
-                { label: "Medium", value: (lead as any).utm_medium },
-                { label: "Campaign", value: (lead as any).utm_campaign },
-                { label: "Term", value: (lead as any).utm_term },
-                { label: "Content", value: (lead as any).utm_content },
+                { label: "Source", value: lead.utm_source },
+                { label: "Medium", value: lead.utm_medium },
+                { label: "Campaign", value: lead.utm_campaign },
+                { label: "Term", value: lead.utm_term },
+                { label: "Content", value: lead.utm_content },
               ].map((u) => (
                 <div key={u.label} className="flex justify-between text-muted-foreground">
                   <span className="text-xs uppercase tracking-wider">{u.label}</span>
