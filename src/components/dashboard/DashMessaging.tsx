@@ -743,9 +743,62 @@ const QueueMonitor = () => {
   );
 };
 
-/* ─── Sale Notifications Tab ─── */
+/* ─── Contact Row with inline edit ─── */
 
 interface SaleContact { id?: string; name: string; phone: string; active: boolean; }
+
+const ContactRow = ({ contact: c, onToggle, onDelete, onUpdate }: {
+  contact: SaleContact;
+  onToggle: () => void;
+  onDelete: () => void;
+  onUpdate: () => void;
+}) => {
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(c.name);
+  const [phone, setPhone] = useState(c.phone);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!c.id || !phone.trim()) return;
+    setSaving(true);
+    await supabase.from("sale_notification_contacts").update({ name: name.trim(), phone: phone.trim() }).eq("id", c.id);
+    setSaving(false);
+    setEditing(false);
+    toast.success("Contato atualizado");
+    onUpdate();
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2 rounded-lg border border-primary/30 p-3">
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nome" className="h-8 text-sm flex-1" />
+        <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Telefone" className="h-8 text-sm w-40" />
+        <Button size="sm" className="h-8 gap-1" onClick={handleSave} disabled={saving || !phone.trim()}>
+          <Save className="w-3 h-3" /> {saving ? "..." : "Salvar"}
+        </Button>
+        <Button size="sm" variant="ghost" className="h-8" onClick={() => { setName(c.name); setPhone(c.phone); setEditing(false); }}>Cancelar</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`flex items-center justify-between rounded-lg border p-3 ${!c.active ? "opacity-50" : ""}`}>
+      <div className="flex items-center gap-3 cursor-pointer" onClick={() => setEditing(true)}>
+        <Phone className="w-4 h-4 text-muted-foreground" />
+        <div>
+          <p className="text-sm font-medium">{c.name || "Sem nome"}</p>
+          <p className="text-xs text-muted-foreground">{c.phone}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch checked={c.active} onCheckedChange={onToggle} />
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={onDelete}><Trash2 className="w-3.5 h-3.5" /></Button>
+      </div>
+    </div>
+  );
+};
+
+/* ─── Sale Notifications Tab ─── */
 
 const SaleNotificationsTab = () => {
   const [contacts, setContacts] = useState<SaleContact[]>([]);
