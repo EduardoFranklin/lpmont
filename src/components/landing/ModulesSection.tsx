@@ -100,7 +100,7 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
           style={{ willChange: "transform" }}
         >
           {doubled.map((src, i) => {
-            const moduleNum = (i % coverSlides.length) + 1;
+            const moduleNum = (i % slides.length) + 1;
             const camp = camps[moduleNum - 1];
             return (
               <div
@@ -248,7 +248,7 @@ const ModulesSection = () => {
         </motion.div>
 
         {/* Covers Carousel */}
-        <CampsCarousel onCoverClick={(num) => setSynopsisModule(num)} />
+        <CampsCarousel onCoverClick={(num) => setSynopsisModule(num)} coverSlides={camps.map((c) => (c as any).cover || "").filter(Boolean)} />
 
         {/* Trail */}
         <div className="max-w-3xl mx-auto relative">
