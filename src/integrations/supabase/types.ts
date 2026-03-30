@@ -461,6 +461,39 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_announcements: {
+        Row: {
+          active: boolean
+          announcement_date: string
+          created_at: string
+          description: string
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          announcement_date?: string
+          created_at?: string
+          description?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          announcement_date?: string
+          created_at?: string
+          description?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quiz_pages: {
         Row: {
           coupon_code: string
