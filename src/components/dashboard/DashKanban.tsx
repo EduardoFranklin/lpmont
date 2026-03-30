@@ -3,9 +3,13 @@ import { useNavigate } from "react-router-dom";
 import type { Lead } from "@/pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
-import { Phone, Mail, MessageCircle, Trash2 } from "lucide-react";
+import { Phone, Mail, MessageCircle, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 
@@ -30,6 +34,40 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showNewLead, setShowNewLead] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [newLead, setNewLead] = useState({
+    treatment: "Dr.",
+    name: "",
+    phone: "",
+    email: "",
+    uf: "",
+    city: "",
+    career: "",
+  });
+
+  const resetForm = () => setNewLead({ treatment: "Dr.", name: "", phone: "", email: "", uf: "", city: "", career: "" });
+
+  const handleCreateLead = async () => {
+    if (!newLead.name || !newLead.phone || !newLead.email || !newLead.uf || !newLead.city || !newLead.career) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("leads").insert({
+      ...newLead,
+      status: "novo" as const,
+      funnel_origin: "manual",
+    });
+    if (error) toast.error("Erro ao criar lead");
+    else {
+      toast.success("Lead criado com sucesso!");
+      resetForm();
+      setShowNewLead(false);
+      onRefresh();
+    }
+    setSaving(false);
+  };
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -70,9 +108,16 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => handleDrop(e, col.status)}
           >
-            <div className="p-3 border-b border-border">
-              <h3 className="text-xs font-semibold text-foreground">{col.label}</h3>
-              <span className="text-xs text-muted-foreground">{colLeads.length}</span>
+            <div className="p-3 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-semibold text-foreground">{col.label}</h3>
+                <span className="text-xs text-muted-foreground">{colLeads.length}</span>
+              </div>
+              {col.status === "novo" && (
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowNewLead(true)} title="Novo lead">
+                  <Plus className="w-3.5 h-3.5" />
+                </Button>
+              )}
             </div>
             <div className="p-2 space-y-2">
               {colLeads.map((lead) => {
@@ -160,6 +205,64 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={showNewLead} onOpenChange={(open) => { if (!open) { resetForm(); setShowNewLead(false); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Novo Lead</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-3">
+            <div className="grid grid-cols-[80px_1fr] gap-2">
+              <div>
+                <Label className="text-xs">Tratamento</Label>
+                <Select value={newLead.treatment} onValueChange={(v) => setNewLead({ ...newLead, treatment: v })}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Dr.">Dr.</SelectItem>
+                    <SelectItem value="Dra.">Dra.</SelectItem>
+                    <SelectItem value="Sr.">Sr.</SelectItem>
+                    <SelectItem value="Sra.">Sra.</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Nome *</Label>
+                <Input className="h-9" value={newLead.name} onChange={(e) => setNewLead({ ...newLead, name: e.target.value })} placeholder="Nome completo" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Telefone *</Label>
+                <Input className="h-9" value={newLead.phone} onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })} placeholder="(11) 99999-9999" />
+              </div>
+              <div>
+                <Label className="text-xs">E-mail *</Label>
+                <Input className="h-9" type="email" value={newLead.email} onChange={(e) => setNewLead({ ...newLead, email: e.target.value })} placeholder="email@exemplo.com" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <Label className="text-xs">UF *</Label>
+                <Input className="h-9" maxLength={2} value={newLead.uf} onChange={(e) => setNewLead({ ...newLead, uf: e.target.value.toUpperCase() })} placeholder="SP" />
+              </div>
+              <div>
+                <Label className="text-xs">Cidade *</Label>
+                <Input className="h-9" value={newLead.city} onChange={(e) => setNewLead({ ...newLead, city: e.target.value })} placeholder="São Paulo" />
+              </div>
+              <div>
+                <Label className="text-xs">Especialidade *</Label>
+                <Input className="h-9" value={newLead.career} onChange={(e) => setNewLead({ ...newLead, career: e.target.value })} placeholder="Dentista" />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { resetForm(); setShowNewLead(false); }}>Cancelar</Button>
+            <Button onClick={handleCreateLead} disabled={saving}>
+              {saving ? "Salvando..." : "Criar Lead"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
