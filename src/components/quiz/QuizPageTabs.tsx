@@ -51,26 +51,47 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       )}
 
       {/* Panel 1: Lesson */}
-      {activeTab === 1 && (
-        <div className="bg-card border border-border/60 rounded-b-2xl rounded-tr-xl overflow-hidden">
-          {/* Panda Video Embed */}
-          <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-            {page.lesson_video_url ? (
-              <iframe
-                src={page.lesson_video_url}
-                style={{ border: "none" }}
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-                allowFullScreen
-                // @ts-ignore
-                fetchPriority="high"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-foreground/5 text-muted-foreground text-sm">
-                Vídeo não configurado
+      {hasVideo && activeTab === 1 && (
+        <div className={`bg-card border border-border/60 overflow-hidden ${hasVideo && hasQuiz ? "rounded-b-2xl rounded-tr-xl" : "rounded-2xl"}`}>
+          {/* Video - locked overlay */}
+          {(page as any).video_locked && !unlocked ? (
+            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-foreground/5">
+                {page.lesson_thumbnail ? (
+                  <img src={page.lesson_thumbnail} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30" />
+                ) : null}
+                <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+                <div className="relative z-10 flex flex-col items-center gap-3 text-center px-6">
+                  <Lock className="w-8 h-8 text-primary/60" />
+                  <p className="text-sm font-medium text-foreground/70">Conteúdo bloqueado</p>
+                  <button
+                    onClick={onUnlock}
+                    className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
+                  >
+                    Desbloquear agora <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+              {page.lesson_video_url ? (
+                <iframe
+                  src={page.lesson_video_url}
+                  style={{ border: "none" }}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
+                  allowFullScreen
+                  // @ts-ignore
+                  fetchPriority="high"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center bg-foreground/5 text-muted-foreground text-sm">
+                  Vídeo não configurado
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Info */}
           <div className="p-6 sm:p-7">
@@ -78,8 +99,10 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
               <span className="text-[0.63rem] font-bold tracking-[0.12em] uppercase px-2 py-0.5 rounded border border-primary/30 bg-primary/7 text-primary">
                 Vídeo
               </span>
-              <span className="ml-auto text-[0.63rem] font-semibold tracking-[0.1em] uppercase px-2.5 py-0.5 rounded-full bg-green-500/12 text-green-400">
-                Disponível
+              <span className={`ml-auto text-[0.63rem] font-semibold tracking-[0.1em] uppercase px-2.5 py-0.5 rounded-full ${
+                (page as any).video_locked && !unlocked ? "bg-muted text-muted-foreground" : "bg-green-500/12 text-green-400"
+              }`}>
+                {(page as any).video_locked && !unlocked ? "Bloqueado" : "Disponível"}
               </span>
             </div>
             <h2 className="text-xl font-semibold leading-tight mb-2.5">{page.lesson_title}</h2>
