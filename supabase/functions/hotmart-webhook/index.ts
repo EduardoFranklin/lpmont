@@ -66,15 +66,20 @@ serve(async (req: Request) => {
       body.data?.user?.email ??
       body.buyer?.email ??
       "";
+    const buyerPhone: string =
+      body.data?.buyer?.checkout_phone ??
+      body.data?.buyer?.phone ??
+      body.buyer?.checkout_phone ??
+      "";
     const productPrice: number =
       body.data?.purchase?.price?.value ??
       body.data?.purchase?.original_offer_price?.value ??
       body.data?.purchase?.price ??
       0;
 
-    if (!buyerEmail) {
-      console.error("No buyer email found in payload");
-      return new Response(JSON.stringify({ error: "No buyer email" }), {
+    if (!buyerEmail && !buyerPhone) {
+      console.error("No buyer email or phone found in payload");
+      return new Response(JSON.stringify({ error: "No buyer identifier" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -85,12 +90,32 @@ serve(async (req: Request) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Find lead by email
-    const { data: lead, error: leadErr } = await supabase
-      .from("leads")
-      .select("id, revenue, status")
-      .eq("email", buyerEmail.toLowerCase().trim())
-      .maybeSingle();
+    // Find lead by email first
+    let lead: any = null;
+    let leadErr: any = null;
+
+    if (buyerEmail) {
+      const res = await supabase
+        .from("leads")
+        .select("id, revenue, status")
+        .eq("email", buyerEmail.toLowerCase().trim())
+        .maybeSingle();
+      lead = res.data;
+      leadErr = res.error;
+    }
+
+    // Fallback: try phone
+    if (!lead && !leadErr && buyerPhone) {
+      const cleanedPhone = buyerPhone.replace(/\D/g, "");
+      const res = await supabase
+        .from("leads")
+        .select("id, revenue, status")
+        .eq("phone", cleanedPhone)
+        .maybeSingle();
+      lead = res.data;
+      leadErr = res.error;
+      if (lead) console.log(`Lead found by phone fallback: ${lead.id}`);
+    }
 
     if (leadErr) {
       console.error("Error fetching lead:", leadErr);
@@ -101,7 +126,7 @@ serve(async (req: Request) => {
     }
 
     if (!lead) {
-      console.log(`No lead found for email: ${buyerEmail}`);
+      console.log(`No lead found for email: ${buyerEmail}, phone: ${buyerPhone}`);
       return new Response(
         JSON.stringify({ ok: true, message: "No matching lead" }),
         {
