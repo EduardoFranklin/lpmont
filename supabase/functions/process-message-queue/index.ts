@@ -5,7 +5,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Variable substitution from lead data
+// ── SLEEP HELPER ──────────────────────────────────────────
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// ── VARIABLE SUBSTITUTION ─────────────────────────────────
 function substituteVariables(template: string, lead: any): string {
   const vars: Record<string, string> = {
     "{{nome}}": lead.name || "",
@@ -26,15 +29,15 @@ function substituteVariables(template: string, lead: any): string {
   return result;
 }
 
-// Format phone to E.164
+// ── FORMAT PHONE ──────────────────────────────────────────
 function formatPhoneE164(phone: string): string {
   const digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("55") && digits.length >= 12) return `+${digits}`;
-  if (digits.length === 11 || digits.length === 10) return `+55${digits}`;
-  return `+55${digits}`;
+  if (digits.startsWith("55") && digits.length >= 12) return digits;
+  if (digits.length === 11 || digits.length === 10) return `55${digits}`;
+  return `55${digits}`;
 }
 
-// Check if within sending window (08-21h São Paulo)
+// ── SENDING WINDOW CHECK (08h–21h São Paulo) ──────────────
 function isWithinSendingWindow(): boolean {
   const now = new Date();
   const spTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
@@ -42,8 +45,100 @@ function isWithinSendingWindow(): boolean {
   return hour >= 8 && hour < 21;
 }
 
-// Send WhatsApp via Z-API
-async function sendWhatsApp(phone: string, message: string, settings: any): Promise<{ success: boolean; error?: string }> {
+// ── DETERMINISTIC HASH FOR VARIATION ──────────────────────
+function hashToIndex(str: string, len: number): number {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+  return Math.abs(h) % len;
+}
+
+// ── MESSAGE VARIATION (anti-ban: no identical messages) ───
+function getTimeGreeting(): string {
+  const now = new Date();
+  const spTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+  const hour = spTime.getHours();
+  if (hour < 12) return "Bom dia";
+  if (hour < 18) return "Boa tarde";
+  return "Boa noite";
+}
+
+const aberturas = [
+  "{{tratamento}} {{primeiro_nome}},",
+  "Oi, {{tratamento}} {{primeiro_nome}}! 👋",
+  "Olá, {{primeiro_nome}}!",
+  "{{primeiro_nome}}, tudo bem?",
+  "{{saudacao}}, {{tratamento}} {{primeiro_nome}}! ☀️",
+];
+
+const fechamentos = [
+  "— Equipe Mont'Alverne",
+  "— Prof. Breno Mont'Alverne",
+  "Qualquer dúvida, é só responder aqui. 😊",
+  "Estou à disposição. 🙏",
+];
+
+function addVariation(body: string, lead: any): string {
+  const primeiroNome = (lead.name || "").split(" ")[0];
+  const tratamento = lead.treatment || "Dr.";
+  const saudacao = getTimeGreeting();
+
+  const abIdx = hashToIndex(lead.id || "a", aberturas.length);
+  const feIdx = hashToIndex((lead.id || "a") + "f", fechamentos.length);
+
+  const abertura = aberturas[abIdx]
+    .replace("{{primeiro_nome}}", primeiroNome)
+    .replace("{{tratamento}}", tratamento)
+    .replace("{{saudacao}}", saudacao);
+
+  const fechamento = fechamentos[feIdx];
+
+  return `${abertura}\n\n${body}\n\n${fechamento}`;
+}
+
+// ── HUMANIZED DELAY (simulates typing behavior) ──────────
+function calculateHumanDelay(messageLength: number): number {
+  // 1s per 30 chars, clamped 3s–12s
+  const charDelay = Math.floor(messageLength / 30) * 1000;
+  const baseDelay = Math.max(3000, Math.min(charDelay, 12000));
+  // Jitter ±30%
+  const jitter = baseDelay * (0.7 + Math.random() * 0.6);
+  return Math.round(jitter);
+}
+
+// ── Z-API: SEND TYPING PRESENCE ──────────────────────────
+async function zapiSendPresence(
+  phone: string,
+  presence: "composing" | "paused",
+  settings: any
+): Promise<void> {
+  const instanceId = settings.zapi_instance_id;
+  const token = settings.zapi_token;
+  const clientToken = settings.zapi_client_token;
+  if (!instanceId || !token) return;
+
+  try {
+    await fetch(
+      `https://api.z-api.io/instances/${instanceId}/token/${token}/send-presence`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(clientToken ? { "Client-Token": clientToken } : {}),
+        },
+        body: JSON.stringify({ phone, presence }),
+      }
+    );
+  } catch (e) {
+    console.warn("Presence send failed:", e);
+  }
+}
+
+// ── Z-API: SEND WHATSAPP WITH HUMANIZED DELAY ────────────
+async function sendWhatsAppHumanized(
+  phone: string,
+  message: string,
+  settings: any
+): Promise<{ success: boolean; error?: string }> {
   const instanceId = settings.zapi_instance_id;
   const token = settings.zapi_token;
   const clientToken = settings.zapi_client_token;
@@ -53,6 +148,21 @@ async function sendWhatsApp(phone: string, message: string, settings: any): Prom
   }
 
   try {
+    const formattedPhone = formatPhoneE164(phone);
+    const totalDelay = calculateHumanDelay(message.length);
+
+    // 1. Send "typing..." presence for 60% of delay
+    const typingDuration = Math.round(totalDelay * 0.6);
+    await zapiSendPresence(formattedPhone, "composing", settings);
+    await sleep(typingDuration);
+
+    // 2. Pause presence
+    await zapiSendPresence(formattedPhone, "paused", settings);
+
+    // 3. Wait remaining 40%
+    await sleep(totalDelay - typingDuration);
+
+    // 4. Send the actual message
     const url = `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`;
     const res = await fetch(url, {
       method: "POST",
@@ -60,7 +170,7 @@ async function sendWhatsApp(phone: string, message: string, settings: any): Prom
         "Content-Type": "application/json",
         ...(clientToken ? { "Client-Token": clientToken } : {}),
       },
-      body: JSON.stringify({ phone: formatPhoneE164(phone), message }),
+      body: JSON.stringify({ phone: formattedPhone, message }),
     });
 
     if (!res.ok) {
@@ -73,26 +183,20 @@ async function sendWhatsApp(phone: string, message: string, settings: any): Prom
   }
 }
 
-// Send email via SMTP edge function (reuse existing send-welcome-email pattern)
+// ── SEND EMAIL ────────────────────────────────────────────
 async function sendEmail(
-  to: string, subject: string, body: string, supabaseUrl: string, serviceKey: string
+  to: string,
+  subject: string,
+  body: string,
+  supabaseUrl: string,
+  serviceKey: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const smtpHost = Deno.env.get("SMTP_HOST") || "smtp.hostinger.com";
-    const smtpPort = parseInt(Deno.env.get("SMTP_PORT") || "465");
-    const smtpUser = Deno.env.get("SMTP_USER") || "contato@metodomont.com.br";
-    const smtpPass = Deno.env.get("SMTP_PASSWORD");
-
-    if (!smtpPass) {
-      return { success: false, error: "SMTP_PASSWORD not configured" };
-    }
-
-    // Use the existing send-welcome-email function for actual sending
     const res = await fetch(`${supabaseUrl}/functions/v1/send-welcome-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${serviceKey}`,
+        Authorization: `Bearer ${serviceKey}`,
       },
       body: JSON.stringify({
         to,
@@ -112,6 +216,14 @@ async function sendEmail(
   }
 }
 
+// ── GLOBAL RATE LIMIT: max 30 WA messages per hour ───────
+const HOURLY_WA_LIMIT = 30;
+const MAX_DAILY_WA = 200;
+const MIN_SAME_LEAD_INTERVAL_SEC = 60;
+
+// ══════════════════════════════════════════════════════════
+// MAIN HANDLER
+// ══════════════════════════════════════════════════════════
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -122,14 +234,41 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Fetch pending messages that are due
+    // ── Check sending window (08h–21h SP) ─────────────────
+    if (!isWithinSendingWindow()) {
+      console.log("Outside sending window (08h–21h SP). Skipping batch.");
+      return new Response(
+        JSON.stringify({ processed: 0, reason: "outside_window" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── Check hourly WA rate (via message_history last 1h) ─
+    const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
+    const { count: waLastHour } = await supabase
+      .from("message_history")
+      .select("*", { count: "exact", head: true })
+      .eq("channel", "whatsapp")
+      .eq("status", "sent")
+      .gte("created_at", oneHourAgo);
+
+    const waRemaining = HOURLY_WA_LIMIT - (waLastHour || 0);
+    if (waRemaining <= 0) {
+      console.log("Hourly WA limit reached (30/h). Skipping.");
+      return new Response(
+        JSON.stringify({ processed: 0, reason: "hourly_limit" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── Fetch pending messages due now ─────────────────────
     const { data: pendingMessages, error: fetchError } = await supabase
       .from("message_queue")
       .select("*, leads(*)")
       .eq("status", "pending")
       .lte("scheduled_for", new Date().toISOString())
       .order("scheduled_for")
-      .limit(50);
+      .limit(Math.min(waRemaining, 10)); // Process max 10 per cycle
 
     if (fetchError) throw fetchError;
     if (!pendingMessages || pendingMessages.length === 0) {
@@ -138,15 +277,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Check sending window
-    if (!isWithinSendingWindow()) {
-      console.log("Outside sending window (08-21h SP). Skipping.");
-      return new Response(JSON.stringify({ processed: 0, reason: "outside_window" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Fetch Z-API settings
+    // ── Fetch Z-API settings ──────────────────────────────
     const { data: settingsRows } = await supabase
       .from("site_settings")
       .select("key, value")
@@ -159,43 +290,110 @@ Deno.serve(async (req) => {
 
     let processed = 0;
     let errors = 0;
+    let skipped = 0;
 
+    // CONCURRENCY = 1: process one message at a time (anti-ban)
     for (const msg of pendingMessages) {
       const lead = msg.leads;
       if (!lead) {
-        await supabase.from("message_queue").update({
-          status: "failed",
-          last_error: "Lead not found",
-          attempts: msg.attempts + 1,
-        }).eq("id", msg.id);
+        await supabase
+          .from("message_queue")
+          .update({ status: "failed", last_error: "Lead not found", attempts: msg.attempts + 1 })
+          .eq("id", msg.id);
         errors++;
         continue;
       }
 
-      // Check if lead already purchased (cancel all sales funnel messages)
+      // ── Cancel sales funnel if lead already converted ───
       if (lead.status === "convertido" && msg.funnel !== "F4") {
         await supabase.from("message_queue").update({ status: "cancelled" }).eq("id", msg.id);
+        skipped++;
         continue;
       }
 
-      // Substitute variables in body and subject
-      const body = substituteVariables(msg.body, lead);
+      // ── WA-specific anti-ban checks ─────────────────────
+      if (msg.channel === "whatsapp") {
+        // CHECK 1: wa_sem_resposta_count >= 3 → block WA
+        if ((lead.wa_sem_resposta_count || 0) >= 3) {
+          await supabase
+            .from("message_queue")
+            .update({ status: "cancelled", last_error: "wa_sem_resposta >= 3 — bloqueado" })
+            .eq("id", msg.id);
+          console.log(`Lead ${lead.id}: WA blocked (${lead.wa_sem_resposta_count} sem resposta)`);
+          skipped++;
+          continue;
+        }
+
+        // CHECK 2: Min 60s between WA to same lead
+        if (lead.last_wa_sent_at) {
+          const lastSent = new Date(lead.last_wa_sent_at).getTime();
+          const elapsed = (Date.now() - lastSent) / 1000;
+          if (elapsed < MIN_SAME_LEAD_INTERVAL_SEC) {
+            console.log(`Lead ${lead.id}: skipping, only ${elapsed.toFixed(0)}s since last WA`);
+            // Reschedule for 60s from last send
+            const newTime = new Date(lastSent + MIN_SAME_LEAD_INTERVAL_SEC * 1000).toISOString();
+            await supabase
+              .from("message_queue")
+              .update({ scheduled_for: newTime })
+              .eq("id", msg.id);
+            skipped++;
+            continue;
+          }
+        }
+
+        // CHECK 3: Daily WA limit per number
+        const today = new Date().toISOString().split("T")[0];
+        const dailyCount =
+          lead.daily_wa_date === today ? lead.daily_wa_count || 0 : 0;
+        if (dailyCount >= MAX_DAILY_WA) {
+          console.log(`Lead ${lead.id}: daily WA limit (${MAX_DAILY_WA}) reached`);
+          // Reschedule to tomorrow 08:05
+          const tomorrow = new Date();
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          tomorrow.setHours(11, 5, 0, 0); // UTC 11:05 = SP 08:05
+          await supabase
+            .from("message_queue")
+            .update({ scheduled_for: tomorrow.toISOString() })
+            .eq("id", msg.id);
+          skipped++;
+          continue;
+        }
+      }
+
+      // ── Substitute variables ────────────────────────────
+      let body = substituteVariables(msg.body, lead);
       const subject = msg.subject ? substituteVariables(msg.subject, lead) : null;
+
+      // ── Add variation for WhatsApp (anti-ban: no identical texts)
+      if (msg.channel === "whatsapp") {
+        body = addVariation(body, lead);
+      }
 
       let result: { success: boolean; error?: string };
 
       if (msg.channel === "whatsapp") {
-        result = await sendWhatsApp(lead.phone, body, settings);
+        // Send with humanized delay (typing simulation + jitter)
+        result = await sendWhatsAppHumanized(lead.phone, body, settings);
       } else {
-        result = await sendEmail(lead.email, subject || "Método Mont'Alverne", body, supabaseUrl, serviceKey);
+        result = await sendEmail(
+          lead.email,
+          subject || "Método Mont'Alverne",
+          body,
+          supabaseUrl,
+          serviceKey
+        );
       }
 
       if (result.success) {
-        await supabase.from("message_queue").update({
-          status: "sent",
-          sent_at: new Date().toISOString(),
-          attempts: msg.attempts + 1,
-        }).eq("id", msg.id);
+        // Update queue status
+        await supabase
+          .from("message_queue")
+          .update({
+            status: "sent",
+            sent_at: new Date().toISOString(),
+            attempts: msg.attempts + 1,
+          })
+          .eq("id", msg.id);
 
         // Log to history
         await supabase.from("message_history").insert({
@@ -203,28 +401,56 @@ Deno.serve(async (req) => {
           funnel: msg.funnel,
           step_key: msg.step_key,
           channel: msg.channel,
-          subject: subject,
+          subject,
           body_preview: body.substring(0, 150),
           status: "sent",
         });
 
+        // ── WA anti-ban post-send updates ──────────────────
+        if (msg.channel === "whatsapp") {
+          const today = new Date().toISOString().split("T")[0];
+          const newDailyCount =
+            lead.daily_wa_date === today ? (lead.daily_wa_count || 0) + 1 : 1;
+
+          await supabase
+            .from("leads")
+            .update({
+              last_wa_sent_at: new Date().toISOString(),
+              wa_sem_resposta_count: (lead.wa_sem_resposta_count || 0) + 1,
+              daily_wa_count: newDailyCount,
+              daily_wa_date: today,
+            })
+            .eq("id", lead.id);
+        }
+
         processed++;
+
+        // ── Inter-message delay: 1–3s between different leads ─
+        if (processed < pendingMessages.length) {
+          const interDelay = 1000 + Math.random() * 2000;
+          await sleep(interDelay);
+        }
       } else {
         const newAttempts = msg.attempts + 1;
-        await supabase.from("message_queue").update({
-          status: newAttempts >= 3 ? "failed" : "pending",
-          last_error: result.error,
-          attempts: newAttempts,
-          // Retry in 5 minutes
-          ...(newAttempts < 3 ? { scheduled_for: new Date(Date.now() + 5 * 60 * 1000).toISOString() } : {}),
-        }).eq("id", msg.id);
+        await supabase
+          .from("message_queue")
+          .update({
+            status: newAttempts >= 3 ? "failed" : "pending",
+            last_error: result.error,
+            attempts: newAttempts,
+            ...(newAttempts < 3
+              ? { scheduled_for: new Date(Date.now() + 5 * 60 * 1000).toISOString() }
+              : {}),
+          })
+          .eq("id", msg.id);
         errors++;
       }
     }
 
-    return new Response(JSON.stringify({ processed, errors, total: pendingMessages.length }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ processed, errors, skipped, total: pendingMessages.length }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (error: any) {
     console.error("process-message-queue error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
