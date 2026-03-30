@@ -27,6 +27,7 @@ const NavBar = () => {
   }, []);
 
   const links = [
+    { label: "Spoiler (Grátis)", href: "/quiz/aula1", external: true },
     { label: "A Trilha", href: "#modulos" },
     { label: "O Guia", href: "#guia" },
     { label: "Investimento", href: "#preco" },
@@ -77,7 +78,7 @@ const NavBar = () => {
             <a
               key={l.href}
               href={l.href}
-              onClick={(e) => handleNavClick(e, l.href)}
+              {...(l.external ? {} : { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, l.href) })}
               className="text-[13px] font-medium text-foreground/40 hover:text-foreground transition-colors duration-300"
             >
               {l.label}
@@ -107,7 +108,7 @@ const NavBar = () => {
             <div className="px-6 py-8 flex flex-col min-h-full">
               <div className="space-y-5 mb-8">
                 {links.map((l) => (
-                  <a key={l.href} href={l.href} onClick={(e) => handleNavClick(e, l.href)} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
+                  <a key={l.href} href={l.href} {...(l.external ? { onClick: () => setMenuOpen(false) } : { onClick: (e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, l.href) })} className="block text-lg text-foreground/60 hover:text-foreground transition-colors">
                     {l.label}
                   </a>
                 ))}
