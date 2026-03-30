@@ -112,8 +112,8 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
       )}
 
       {/* Panel 2: Quiz */}
-      {activeTab === 2 && (
-        <div className="bg-card border border-border/60 rounded-b-2xl rounded-tl-xl overflow-hidden">
+      {hasQuiz && activeTab === 2 && (
+        <div className={`bg-card border border-border/60 overflow-hidden ${hasVideo && hasQuiz ? "rounded-b-2xl rounded-tl-xl" : "rounded-2xl"}`}>
           <div className="relative overflow-hidden">
             {/* Cover image */}
             <div className="relative w-full aspect-[16/7] bg-black overflow-hidden">
