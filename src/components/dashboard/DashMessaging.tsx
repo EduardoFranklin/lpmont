@@ -663,7 +663,7 @@ const AddFunnelDialog = ({ existingFunnels, onAdded }: { existingFunnels: string
 /* ─── Funnel Section (with drag-and-drop, bulk toggle, delete funnel) ─── */
 
 const FunnelSection = ({ funnel, sequences, onUpdate }: {
-  funnel: typeof FUNNELS[number];
+  funnel: { value: string; label: string; icon: any; color: string; description: string };
   sequences: Sequence[];
   onUpdate: () => void;
 }) => {
