@@ -14,6 +14,8 @@ interface QuizPage {
   id: string;
   slug: string;
   status: string;
+  page_type: string;
+  video_locked: boolean;
   hero_label: string;
   hero_title: string;
   hero_message: string;
