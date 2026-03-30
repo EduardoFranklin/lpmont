@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Plus, Trash2, Save, Loader2, ExternalLink, ChevronUp, ChevronDown, Copy, Eye, Check } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, ExternalLink, ChevronUp, ChevronDown, Copy, Eye, Check, GripVertical, ArrowUpDown } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploadCrop from "./ImageUploadCrop";
 import RichTextEditor from "./RichTextEditor";
@@ -17,6 +17,7 @@ interface QuizPage {
   status: string;
   page_type: string;
   video_locked: boolean;
+  video_first: boolean;
   hero_label: string;
   hero_title: string;
   hero_message: string;
