@@ -51,12 +51,14 @@ const VARIABLES = [
 ];
 
 const AVAILABLE_TAGS = [
-  "quiz_diagnostico_a", "quiz_diagnostico_b", "quiz_diagnostico_c",
-  "quiz_concluido", "quiz_abandonou",
+  "pagou", "comprador", "reembolso", "chargeback",
   "reuniao_agendada", "reuniao_confirmada", "reuniao_nao_compareceu",
+  "quiz_concluido", "quiz_abandonou",
+  "abandonou_checkout", "visitou_site", "visitou_pagina_vendas",
+  "clicou_falar_equipe", "cupom_enviado",
   "wa_sem_resposta_1", "wa_sem_resposta_2", "wa_sem_resposta_3",
-  "comprou", "nao_comprou", "abandonou_checkout",
   "onboarding_pendente", "onboarding_completo",
+  "boleto_impresso", "compra_expirada", "entrou_no_curso", "modulo_concluido",
 ];
 
 const DELAY_UNITS = [
