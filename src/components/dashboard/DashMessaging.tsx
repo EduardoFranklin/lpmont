@@ -320,6 +320,7 @@ const SequenceCard = ({
   const [delayMinutes, setDelayMinutes] = useState(seq.delay_minutes);
   const [conditions, setConditions] = useState<any>(seq.conditions);
   const [showConditions, setShowConditions] = useState(false);
+  const [skipWindow, setSkipWindow] = useState(!!(seq as any).skip_sending_window);
   const [saving, setSaving] = useState(false);
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -391,10 +392,30 @@ const SequenceCard = ({
 
       {/* Inline delay + conditions - always visible */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1.5">
-          <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-[10px] text-muted-foreground font-medium">Espera:</span>
-          <DelayInput minutes={delayMinutes} onChange={handleDelayChange} />
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 border border-border rounded-md px-2 py-1 bg-muted/20">
+            <Clock className="w-3 h-3 text-muted-foreground" />
+            <span className="text-[10px] text-muted-foreground">Espera:</span>
+            <DelayInput minutes={delayMinutes} onChange={handleDelayChange} />
+          </div>
+          <button
+            onClick={async () => {
+              const newVal = !skipWindow;
+              setSkipWindow(newVal);
+              await supabase.from("automation_sequences" as any).update({ skip_sending_window: newVal } as any).eq("id", seq.id);
+              toast.success(newVal ? "Envio imediato (sem janela)" : "Respeita janela de envio");
+              onUpdate();
+            }}
+            className={`flex items-center gap-1 border rounded-md px-2 py-1 text-[10px] font-medium transition-colors ${
+              skipWindow
+                ? "bg-amber-500/10 text-amber-600 border-amber-500/30 hover:bg-amber-500/20"
+                : "bg-muted/20 text-muted-foreground border-border hover:bg-muted/40"
+            }`}
+            title={skipWindow ? "Envia a qualquer hora" : "Respeita a janela de envio configurada"}
+          >
+            <Zap className="w-3 h-3" />
+            {skipWindow ? "Qualquer hora" : "Dentro da janela"}
+          </button>
         </div>
         <div className="flex flex-wrap gap-1">
           {condTags.required_tags?.map((t: string) => (

@@ -145,6 +145,7 @@ Deno.serve(async (req) => {
         body: seq.body,
         scheduled_for: scheduledFor.toISOString(),
         status: "pending",
+        skip_sending_window: seq.skip_sending_window || false,
       });
     }
 
