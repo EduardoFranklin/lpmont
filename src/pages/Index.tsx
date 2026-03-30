@@ -13,10 +13,12 @@ import FooterSection from "@/components/landing/FooterSection";
 import WhatsAppButton from "@/components/landing/WhatsAppButton";
 import useTrackingScripts from "@/hooks/useTrackingScripts";
 import useUtmCapture from "@/hooks/useUtmCapture";
+import { useLeadTracking } from "@/hooks/useLeadTracking";
 
 const Index = () => {
   useTrackingScripts();
   useUtmCapture();
+  useLeadTracking("site_visit");
   return (
     <div className="min-h-screen bg-background">
       <NavBar />

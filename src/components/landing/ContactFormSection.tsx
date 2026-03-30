@@ -169,6 +169,10 @@ const ContactFormSection = () => {
         utm_content: utmParams.utm_content || null,
       } as any);
 
+      // Save for tracking
+      localStorage.setItem("lead_email", form.email.toLowerCase());
+      localStorage.setItem("lead_phone", form.phone);
+
       let calMeetLink: string | null = null;
       try {
         const { data: calData } = await supabase.functions.invoke("create-calendar-event", {
