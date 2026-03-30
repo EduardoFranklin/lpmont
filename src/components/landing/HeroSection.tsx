@@ -113,17 +113,7 @@ const HeroSection = () => {
                       <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground/30 bg-foreground/[0.05] border border-foreground/[0.06]">{c.video_duration}</div>
                     </button>
                   ) : (
-                    <iframe
-                      id="panda-d49c541c-010d-4a28-bdf6-80a535639867"
-                      src={c.video_url}
-                      title="VSL - Método Mont'"
-                      className="w-full h-full"
-                      style={{ border: "none" }}
-                      allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-                      allowFullScreen
-                      // @ts-ignore
-                      fetchpriority="high"
-                    />
+                    <PandaEmbed src={c.video_url} />
                   )}
                 </div>
               </div>
