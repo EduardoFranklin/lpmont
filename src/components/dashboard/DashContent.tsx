@@ -407,6 +407,12 @@ const DashContent = () => {
             dirtyKeys={dirtyKeys}
             updateField={updateField}
           />
+        ) : activeSection === "faq" ? (
+          <DashFAQEditor content={content} updateField={updateField} />
+        ) : activeSection === "testimonials" ? (
+          <DashTestimonialsEditor content={content} updateField={updateField} />
+        ) : activeSection === "benefits" ? (
+          <DashBenefitsEditor content={content} updateField={updateField} />
         ) : (
           <SectionPanel
             section={activeSection}
