@@ -70,24 +70,32 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
     }
     if (leadStep === 2) {
       try {
-        supabase.from("leads").insert({
+        const email = leadEmail.trim().toLowerCase();
+        const phone = leadPhone.trim();
+        // Upsert lead by email — avoid duplicates
+        const { data: upsertData } = await supabase.from("leads").upsert({
           name: leadName.trim(),
-          email: leadEmail.trim(),
-          phone: leadPhone.trim(),
+          email,
+          phone,
           treatment: "Dr.",
           uf: "N/A",
           city: "N/A",
           career: "N/A",
           notes: `Quiz: ${page.slug}`,
           quiz_slug: page.slug,
-        } as any).then(async (res) => {
-          if (res.data && (res.data as any)[0]?.id) {
-            const leadId = (res.data as any)[0].id;
-            await supabase.from("lead_tags").insert({ lead_id: leadId, tag: "quiz", source: "quiz" } as any);
-          }
-        });
-        localStorage.setItem("lead_email", leadEmail.trim().toLowerCase());
-        localStorage.setItem("lead_phone", leadPhone.trim());
+          quiz_started_at: new Date().toISOString(),
+        } as any, { onConflict: "email" }).select("id");
+
+        if (upsertData && upsertData[0]?.id) {
+          const leadId = upsertData[0].id;
+          setLeadId(leadId);
+          await supabase.from("lead_tags").upsert(
+            { lead_id: leadId, tag: "quiz", source: "quiz" } as any,
+            { onConflict: "lead_id,tag" }
+          );
+        }
+        localStorage.setItem("lead_email", email);
+        localStorage.setItem("lead_phone", phone);
       } catch {}
       setPhase("quiz");
       return;
