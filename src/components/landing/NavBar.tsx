@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight, Instagram } from "lucide-react";
 import { useSection, parseJSON } from "@/hooks/useSiteContent";
 
