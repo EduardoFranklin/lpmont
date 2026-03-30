@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import { useSection, parseJSON } from "@/hooks/useSiteContent";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,10 @@ import {
   Bell,
   HelpCircle,
   ChevronRight,
+  Menu,
+  X,
+  ArrowRight,
+  Instagram,
 } from "lucide-react";
 
 type Announcement = {
@@ -28,6 +33,7 @@ type Announcement = {
 
 const Onboarding = () => {
   const c = useSection("onboarding");
+  const footerContent = useSection("footer");
   const [scrollY, setScrollY] = useState(0);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
