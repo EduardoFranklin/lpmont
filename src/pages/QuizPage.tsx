@@ -19,6 +19,8 @@ import CouponModal from "@/components/quiz/CouponModal";
 export interface QuizPageData {
   id: string;
   slug: string;
+  page_type: string;
+  video_locked: boolean;
   hero_label: string;
   hero_title: string;
   hero_message: string;
@@ -85,7 +87,7 @@ const QuizPage = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [showQuiz, setShowQuiz] = useState(false);
   const [showCoupon, setShowCoupon] = useState(false);
-  const [unlocked, setUnlocked] = useState(true);
+  const [unlocked, setUnlocked] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -104,6 +106,10 @@ const QuizPage = () => {
       }
 
       setPage(pageData as QuizPageData);
+      // If video is not locked, start unlocked
+      if (!(pageData as any).video_locked) {
+        setUnlocked(true);
+      }
 
       const { data: qData } = await supabase
         .from("quiz_questions")

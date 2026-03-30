@@ -14,6 +14,8 @@ interface QuizPage {
   id: string;
   slug: string;
   status: string;
+  page_type: string;
+  video_locked: boolean;
   hero_label: string;
   hero_title: string;
   hero_message: string;
@@ -106,7 +108,9 @@ const DashQuizPages = () => {
     const slug = `quiz${pages.length + 1}`;
     const { data, error } = await supabase.from("quiz_pages").insert({
       slug,
-      hero_title: "Novo Quiz",
+      page_type: "video_quiz",
+      video_locked: false,
+      hero_title: "Nova Página",
       hero_message: "",
       hero_author_name: "Dr. Breno Mont'Alverne",
       hero_author_role: "Fundador do Instituto Mont'Alverne",
@@ -124,7 +128,7 @@ const DashQuizPages = () => {
       result_low_title: "",
       result_low_diagnostic: "",
       result_closing_text: "",
-    }).select().single();
+    } as any).select().single();
     if (error) { toast.error(error.message); return; }
     if (data) {
       await loadPages();
@@ -315,6 +319,14 @@ const DashQuizPages = () => {
               </span>
             </div>
             <div className="font-medium text-sm truncate">{p.hero_title || p.lesson_title}</div>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                {(p as any).page_type === "video_only" ? "Vídeo" : (p as any).page_type === "quiz_only" ? "Quiz" : "Vídeo + Quiz"}
+              </span>
+              {(p as any).video_locked && (p as any).page_type !== "quiz_only" && (
+                <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded bg-primary/10 text-primary">🔒 Bloqueado</span>
+              )}
+            </div>
             <div className="flex items-center gap-2 mt-2">
               {p.status === "published" && (
                 <a
@@ -370,6 +382,30 @@ const DashQuizPages = () => {
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">Geral</AccordionTrigger>
               <AccordionContent className="px-4 pb-4 space-y-3">
                 <Field label="Slug (URL)" value={editPage.slug} onChange={(v) => updateField("slug", v)} />
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tipo de Página</label>
+                  <select
+                    value={editPage.page_type || "video_quiz"}
+                    onChange={(e) => updateField("page_type", e.target.value)}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="video_quiz">Vídeo + Quiz</option>
+                    <option value="video_only">Apenas Vídeo</option>
+                    <option value="quiz_only">Apenas Quiz</option>
+                  </select>
+                </div>
+                {(editPage.page_type || "video_quiz") !== "quiz_only" && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border">
+                    <Switch
+                      checked={editPage.video_locked ?? false}
+                      onCheckedChange={(v) => updateField("video_locked", v)}
+                    />
+                    <div>
+                      <p className="text-sm font-medium">Vídeo bloqueado</p>
+                      <p className="text-[11px] text-muted-foreground">Exigir preenchimento de formulário para liberar o vídeo</p>
+                    </div>
+                  </div>
+                )}
                 <Field label="CTA URL" value={editPage.cta_url} onChange={(v) => updateField("cta_url", v)} />
                 <Field label="Cupom" value={editPage.coupon_code} onChange={(v) => updateField("coupon_code", v)} />
                 <Field label="Desconto" value={editPage.coupon_discount} onChange={(v) => updateField("coupon_discount", v)} />
@@ -389,7 +425,8 @@ const DashQuizPages = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Lesson */}
+            {/* Lesson - only show if page has video */}
+            {(editPage.page_type || "video_quiz") !== "quiz_only" && (
             <AccordionItem value="lesson" className="border rounded-lg">
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">Aula / Vídeo</AccordionTrigger>
               <AccordionContent className="px-4 pb-4 space-y-3">
@@ -412,8 +449,10 @@ const DashQuizPages = () => {
                 </div>
               </AccordionContent>
             </AccordionItem>
+            )}
 
-            {/* Quiz info */}
+            {/* Quiz info - only show if page has quiz */}
+            {(editPage.page_type || "video_quiz") !== "video_only" && (
             <AccordionItem value="quizinfo" className="border rounded-lg">
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">Quiz (Info)</AccordionTrigger>
               <AccordionContent className="px-4 pb-4 space-y-3">
@@ -425,6 +464,7 @@ const DashQuizPages = () => {
                 <Field label="Duração" value={editPage.quiz_duration} onChange={(v) => updateField("quiz_duration", v)} />
               </AccordionContent>
             </AccordionItem>
+            )}
 
             {/* Lead capture */}
             <AccordionItem value="lead" className="border rounded-lg">
@@ -436,7 +476,9 @@ const DashQuizPages = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Results */}
+            {/* Results - only show if page has quiz */}
+            {(editPage.page_type || "video_quiz") !== "video_only" && (
+            <>
             <AccordionItem value="results" className="border rounded-lg">
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">Resultados</AccordionTrigger>
               <AccordionContent className="px-4 pb-4 space-y-4">
@@ -540,6 +582,8 @@ const DashQuizPages = () => {
                 </Button>
               </AccordionContent>
             </AccordionItem>
+            </>
+            )}
           </Accordion>
         </div>
       )}
