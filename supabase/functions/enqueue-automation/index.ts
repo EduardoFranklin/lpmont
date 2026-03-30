@@ -83,7 +83,10 @@ Deno.serve(async (req) => {
       (existingQueue || []).map((q: any) => `${q.step_key}:${q.channel}`)
     );
 
+    // Use Brazil/SP timezone for scheduling
     const now = new Date();
+    const spNow = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
+    const tzOffsetMs = now.getTime() - spNow.getTime(); // offset to convert SP local → UTC
     const toEnqueue: any[] = [];
 
     for (const seq of sequences) {
