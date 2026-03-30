@@ -374,6 +374,30 @@ const DashQuizPages = () => {
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">Geral</AccordionTrigger>
               <AccordionContent className="px-4 pb-4 space-y-3">
                 <Field label="Slug (URL)" value={editPage.slug} onChange={(v) => updateField("slug", v)} />
+                <div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tipo de Página</label>
+                  <select
+                    value={editPage.page_type || "video_quiz"}
+                    onChange={(e) => updateField("page_type", e.target.value)}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="video_quiz">Vídeo + Quiz</option>
+                    <option value="video_only">Apenas Vídeo</option>
+                    <option value="quiz_only">Apenas Quiz</option>
+                  </select>
+                </div>
+                {(editPage.page_type || "video_quiz") !== "quiz_only" && (
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border">
+                    <Switch
+                      checked={editPage.video_locked ?? false}
+                      onCheckedChange={(v) => updateField("video_locked", v)}
+                    />
+                    <div>
+                      <p className="text-sm font-medium">Vídeo bloqueado</p>
+                      <p className="text-[11px] text-muted-foreground">Exigir preenchimento de formulário para liberar o vídeo</p>
+                    </div>
+                  </div>
+                )}
                 <Field label="CTA URL" value={editPage.cta_url} onChange={(v) => updateField("cta_url", v)} />
                 <Field label="Cupom" value={editPage.coupon_code} onChange={(v) => updateField("coupon_code", v)} />
                 <Field label="Desconto" value={editPage.coupon_discount} onChange={(v) => updateField("coupon_discount", v)} />
