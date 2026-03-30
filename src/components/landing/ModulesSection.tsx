@@ -69,13 +69,22 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
   const slides = coverSlides.length > 0 ? coverSlides : defaultCoverSlides;
 
   const autoplayPlugin = useRef(
-    Autoplay({ delay: 2500, stopOnInteraction: false, stopOnMouseEnter: true })
+    Autoplay({ delay: 0, stopOnInteraction: false, stopOnMouseEnter: true })
   );
 
-  const [emblaRef] = useEmblaCarousel(
+  const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: "start", dragFree: true, slidesToScroll: 1 },
     [autoplayPlugin.current]
   );
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const engine = emblaApi.internalEngine();
+    if (engine && engine.scrollBody) {
+      // Reduce friction for smoother continuous scrolling
+      engine.scrollBody.useDuration(0);
+    }
+  }, [emblaApi]);
 
   return (
     <motion.div
