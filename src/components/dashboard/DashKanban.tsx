@@ -16,7 +16,7 @@ const COLUMNS: { status: LeadStatus; label: string; color: string }[] = [
   { status: "agendado", label: "Agendados", color: "border-t-amber-400" },
   { status: "compareceu", label: "Em negociação", color: "border-t-emerald-400" },
   { status: "nao_compareceu", label: "Não Compareceram", color: "border-t-red-400" },
-  { status: "convertido", label: "Convertidos", color: "border-t-primary" },
+  { status: "convertido", label: "Pagos", color: "border-t-primary" },
   { status: "perdido", label: "Perdidos", color: "border-t-gray-400" },
 ];
 
