@@ -160,18 +160,32 @@ const ContactFormSection = () => {
   const goToStep3 = async () => {
     if (!selectedSlot) return;
     try {
-      await supabase.from("leads").insert({
+      const { data: insertedLead } = await supabase.from("leads").insert({
         treatment: form.treatment, name: form.name, phone: form.phone, email: form.email,
         uf: form.uf, city: form.city, career: form.career,
         scheduled_day: selectedSlot.day, scheduled_time: selectedSlot.time, status: "agendado",
+        funnel_origin: "F1",
         utm_source: utmParams.utm_source || null, utm_medium: utmParams.utm_medium || null,
         utm_campaign: utmParams.utm_campaign || null, utm_term: utmParams.utm_term || null,
         utm_content: utmParams.utm_content || null,
-      } as any);
+      } as any).select("id").single();
+
+      const leadId = insertedLead?.id;
 
       // Save for tracking
       localStorage.setItem("lead_email", form.email.toLowerCase());
       localStorage.setItem("lead_phone", form.phone);
+
+      // Add reuniao_agendada tag and trigger F1 automation
+      if (leadId) {
+        supabase.from("lead_tags").insert({
+          lead_id: leadId, tag: "reuniao_agendada", source: "formulario",
+        } as any).then(() => {
+          supabase.functions.invoke("enqueue-automation", {
+            body: { lead_id: leadId, funnel: "F1", event: "reuniao_agendada" },
+          }).catch((err) => console.error("Enqueue automation error:", err));
+        });
+      }
 
       let calMeetLink: string | null = null;
       try {
