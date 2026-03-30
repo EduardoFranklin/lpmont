@@ -35,8 +35,10 @@ const Onboarding = () => {
   const c = useSection("onboarding");
   const footerContent = useSection("footer");
   const [scrollY, setScrollY] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
+  const instagramLinks = parseJSON<{ label: string; url: string }[]>(footerContent.instagram_links, []);
 
   const mochila = parseJSON<{ text: string; bold: string }[]>(c.mochila_items, []);
   const bonuses = parseJSON<{ name: string; author: string; url: string }[]>(c.bonuses, []);
@@ -67,17 +69,43 @@ const Onboarding = () => {
     return { day, month };
   };
 
+  const navLinks = [
+    { label: "A Trilha", href: "/#modulos", external: true },
+    { label: "Spoiler (grátis)", href: "/quiz/aula1", external: true },
+    { label: "O Guia", href: "/#guia", external: true },
+    { label: "Investimento", href: "/#preco", external: true },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-foreground/[0.06]">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-6" />
-            <span className="text-[11px] tracking-wide text-foreground/25 italic font-light">onboarding</span>
-          </div>
+      {/* Nav — always hamburger */}
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-background/60 border-b border-foreground/[0.04]"
+        style={{ backgroundImage: "linear-gradient(hsl(var(--background)), hsl(var(--background) / 0.3))" }}
+      >
+        <div className="section-container flex items-center justify-between h-[72px]">
+          <a href="/" className="flex items-center gap-2">
+            <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" decoding="async" />
+          </a>
+          <button
+            type="button"
+            aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+            onClick={() => setMenuOpen(prev => !prev)}
+            className="relative z-[70] text-foreground/70 p-2 -mr-2"
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu portal */}
+      {menuOpen && createPortal(
+        <OnboardingMobileMenu
+          links={navLinks}
+          instagramLinks={instagramLinks}
+          onClose={() => setMenuOpen(false)}
+        />,
+        document.body
+      )}
 
       {/* Hero with mountain bg */}
       <section ref={sectionRef} className="relative overflow-hidden">
