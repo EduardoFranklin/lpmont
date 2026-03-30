@@ -106,6 +106,10 @@ const QuizPage = () => {
       }
 
       setPage(pageData as QuizPageData);
+      // If video is not locked, start unlocked
+      if (!(pageData as any).video_locked) {
+        setUnlocked(true);
+      }
 
       const { data: qData } = await supabase
         .from("quiz_questions")
