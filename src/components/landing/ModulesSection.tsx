@@ -211,7 +211,7 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
               <div
                 key={i}
                 className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group/card"
-                onClick={handleClick(moduleNum)}
+                data-module-num={moduleNum}
               >
                 <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover/card:border-primary/20 transition-colors duration-300">
                   <img
