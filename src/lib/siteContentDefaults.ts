@@ -88,6 +88,7 @@ const defaults: AllContent = {
     caption: "O guia da expedição",
     title_first: "Prof. Breno",
     title_last: "Mont'Alverne",
+    image: "/images/thumbs/breno-thumb.webp",
     bio: JSON.stringify([
       "Dentista há mais de 20 anos, vivi intensamente a odontologia em todas as suas fases. Cada curso é fruto de milhares de horas no consultório, na pesquisa e na sala de aula.",
       "Doutor em Ciências Odontológicas pela FOB-USP. Mestre em Dentística pela FOB-USP. Professor da UFMA e fundador do Instituto Mont'Alverne.",
@@ -261,6 +262,7 @@ export const fieldLabels: Record<string, Record<string, string>> = {
     caption: "Etiqueta superior",
     title_first: "Nome (primeira parte)",
     title_last: "Sobrenome (destaque)",
+    image: "Foto do instrutor",
     bio: "Parágrafos da bio (JSON)",
     stats: "Estatísticas (JSON)",
   },
