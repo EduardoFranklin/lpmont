@@ -28,6 +28,15 @@ const TAG_EVENT_MAP: Record<string, { icon: typeof Mail; color: string; title: s
   entrou_no_curso: { icon: BookOpen, color: "text-blue-400", title: "Acessou o curso" },
   modulo_concluido: { icon: BookOpen, color: "text-purple-400", title: "Módulo concluído" },
   comprador: { icon: CreditCard, color: "text-emerald-400", title: "Marcado como comprador" },
+  visitou_site: { icon: Eye, color: "text-sky-400", title: "Visitou o site" },
+  quiz_concluido: { icon: Zap, color: "text-purple-400", title: "Quiz concluído" },
+  reuniao_agendada: { icon: CalendarCheck, color: "text-amber-400", title: "Reunião agendada" },
+  compra_cancelada: { icon: AlertTriangle, color: "text-red-400", title: "Compra cancelada" },
+  reembolso: { icon: AlertTriangle, color: "text-red-400", title: "Reembolso" },
+  chargeback: { icon: AlertTriangle, color: "text-red-500", title: "Chargeback" },
+  pagamento_atrasado: { icon: AlertTriangle, color: "text-orange-400", title: "Pagamento atrasado" },
+  assinatura_cancelada: { icon: AlertTriangle, color: "text-red-400", title: "Assinatura cancelada" },
+  troca_plano: { icon: BookOpen, color: "text-blue-400", title: "Troca de plano" },
 };
 
 const CHANNEL_ICON: Record<string, typeof Mail> = {
