@@ -38,7 +38,6 @@ const TAG_EVENT_MAP: Record<string, { icon: typeof Mail; color: string; title: s
   assinatura_cancelada: { icon: AlertTriangle, color: "text-red-400", title: "Assinatura cancelada" },
   troca_plano: { icon: BookOpen, color: "text-blue-400", title: "Troca de plano" },
 };
-};
 
 const CHANNEL_ICON: Record<string, typeof Mail> = {
   email: Mail,
