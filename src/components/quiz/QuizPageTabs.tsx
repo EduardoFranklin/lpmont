@@ -18,7 +18,8 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
 
   return (
     <div className="max-w-[860px] mx-auto px-0 sm:px-10 z-[1] relative">
-      {/* Tab Bar */}
+      {/* Tab Bar - only show if both types */}
+      {hasVideo && hasQuiz && (
       <div className="flex gap-2">
         <button
           onClick={() => setActiveTab(1)}
@@ -47,6 +48,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
           Checkpoint
         </button>
       </div>
+      )}
 
       {/* Panel 1: Lesson */}
       {activeTab === 1 && (
