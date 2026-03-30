@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Play, Lock, Clock, Eye, CheckSquare, ArrowRight, BookOpen, Brain } from "lucide-react";
 import type { QuizPageData } from "@/pages/QuizPage";
+import { getEmbedVideoSrc } from "@/lib/video";
 
 interface Props {
   page: QuizPageData;
@@ -15,6 +16,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
   const hasVideo = pageType !== "quiz_only";
   const hasQuiz = pageType !== "video_only";
   const videoFirst = (page as any).video_first ?? true;
+  const videoSrc = getEmbedVideoSrc(page.lesson_video_url);
   const [activeTab, setActiveTab] = useState(videoFirst ? (hasVideo ? 1 : 2) : (hasQuiz ? 2 : 1));
 
   return (
@@ -85,9 +87,9 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
             </div>
           ) : (
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-              {page.lesson_video_url ? (
+              {videoSrc ? (
                 <iframe
-                  src={page.lesson_video_url}
+                  src={videoSrc}
                   style={{ border: "none" }}
                   className="absolute inset-0 w-full h-full"
                   allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import type { QuizPageData } from "@/pages/QuizPage";
+import { getEmbedVideoSrc, getPandaVideoId, isPandaVideo } from "@/lib/video";
 
 interface Props {
   open: boolean;
@@ -10,16 +11,10 @@ interface Props {
 
 const VideoModal = ({ open, onClose, page }: Props) => {
   // Support Panda Video embed URLs
-  const isPanda = open && page.lesson_video_url.includes("pandavideo.com");
-  const embedUrl = !open ? "" : isPanda
-    ? page.lesson_video_url
-    : page.lesson_video_url.includes("youtube.com/watch")
-    ? page.lesson_video_url.replace("watch?v=", "embed/") + "?autoplay=1"
-    : page.lesson_video_url.includes("youtu.be/")
-    ? `https://www.youtube.com/embed/${page.lesson_video_url.split("youtu.be/")[1]}?autoplay=1`
-    : page.lesson_video_url;
+  const isPanda = open && isPandaVideo(page.lesson_video_url);
+  const embedUrl = !open ? "" : getEmbedVideoSrc(page.lesson_video_url);
 
-  const pandaId = isPanda ? (() => { const m = page.lesson_video_url.match(/[?&]v=([a-f0-9-]+)/i); return m ? m[1] : null; })() : null;
+  const pandaId = isPanda ? getPandaVideoId(page.lesson_video_url) : null;
   const playerId = pandaId ? `panda-${pandaId}` : undefined;
 
   useEffect(() => {
