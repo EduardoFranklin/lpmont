@@ -65,83 +65,102 @@ const defaultCoverSlides = [
 
 const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum: number) => void; coverSlides: string[] }) => {
   const slides = coverSlides.length > 0 ? coverSlides : defaultCoverSlides;
-  // Triple the slides for seamless infinite loop
   const tripled = [...slides, ...slides, ...slides];
 
   const trackRef = useRef<HTMLDivElement>(null);
   const isPaused = useRef(false);
-  const dragStart = useRef<{ x: number; scrollLeft: number; time: number } | null>(null);
+  const dragging = useRef(false);
   const wasDragging = useRef(false);
+  const startX = useRef(0);
+  const startScroll = useRef(0);
+  const velocitySamples = useRef<{ x: number; t: number }[]>([]);
+  const inertiaRaf = useRef(0);
 
-  // Keep the track centered on the middle set
+  // Center on middle set
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    const slideWidth = 184 + 12; // w-[180px] + gap-3 approx
-    const oneSetWidth = slides.length * slideWidth;
-    track.scrollLeft = oneSetWidth;
+    const oneSet = track.scrollWidth / 3;
+    track.scrollLeft = oneSet;
   }, [slides.length]);
 
-  // Smooth continuous auto-scroll via requestAnimationFrame
+  // Loop boundary fix
+  const wrapScroll = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const oneSet = track.scrollWidth / 3;
+    if (track.scrollLeft >= oneSet * 2) track.scrollLeft -= oneSet;
+    else if (track.scrollLeft <= 0) track.scrollLeft += oneSet;
+  }, []);
+
+  // Auto-scroll
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
     let raf: number;
-    const speed = 1.0; // px per frame — smooth and steady
-    const slideWidth = track.scrollWidth / 3;
-
+    const speed = 1.0;
     const step = () => {
-      if (!isPaused.current && !dragStart.current) {
+      if (!isPaused.current && !dragging.current) {
         track.scrollLeft += speed;
-        // Seamless loop reset
-        if (track.scrollLeft >= slideWidth * 2) {
-          track.scrollLeft -= slideWidth;
-        } else if (track.scrollLeft <= 0) {
-          track.scrollLeft += slideWidth;
-        }
+        wrapScroll();
       }
       raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [wrapScroll]);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const onDown = (e: React.PointerEvent) => {
     const track = trackRef.current;
     if (!track) return;
+    cancelAnimationFrame(inertiaRaf.current);
     track.setPointerCapture(e.pointerId);
-    dragStart.current = { x: e.clientX, scrollLeft: track.scrollLeft, time: Date.now() };
+    dragging.current = true;
     wasDragging.current = false;
     isPaused.current = true;
+    startX.current = e.clientX;
+    startScroll.current = track.scrollLeft;
+    velocitySamples.current = [{ x: e.clientX, t: Date.now() }];
   };
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (!dragStart.current || !trackRef.current) return;
-    const dx = e.clientX - dragStart.current.x;
-    if (Math.abs(dx) > 5) wasDragging.current = true;
-    trackRef.current.scrollLeft = dragStart.current.scrollLeft - dx;
+  const onMove = (e: React.PointerEvent) => {
+    if (!dragging.current || !trackRef.current) return;
+    const dx = e.clientX - startX.current;
+    if (Math.abs(dx) > 3) wasDragging.current = true;
+    trackRef.current.scrollLeft = startScroll.current - dx;
+    wrapScroll();
+    // Keep last 5 samples for velocity
+    const samples = velocitySamples.current;
+    samples.push({ x: e.clientX, t: Date.now() });
+    if (samples.length > 5) samples.shift();
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (!dragStart.current || !trackRef.current) return;
+  const onUp = (e: React.PointerEvent) => {
+    if (!dragging.current || !trackRef.current) return;
     const track = trackRef.current;
     track.releasePointerCapture(e.pointerId);
+    dragging.current = false;
 
-    // Inertia
-    const dx = e.clientX - dragStart.current.x;
-    const dt = Date.now() - dragStart.current.time;
-    const velocity = dx / Math.max(dt, 1);
-    dragStart.current = null;
+    // Calculate velocity from recent samples
+    const samples = velocitySamples.current;
+    let velocity = 0;
+    if (samples.length >= 2) {
+      const first = samples[0];
+      const last = samples[samples.length - 1];
+      const dt = last.t - first.t;
+      if (dt > 0) velocity = (last.x - first.x) / dt;
+    }
 
-    if (Math.abs(velocity) > 0.3) {
-      let v = velocity * 8;
+    if (Math.abs(velocity) > 0.15) {
+      let v = velocity * 12;
       const decel = () => {
-        v *= 0.95;
-        if (Math.abs(v) < 0.5) { isPaused.current = false; return; }
+        v *= 0.96;
+        if (Math.abs(v) < 0.3) { isPaused.current = false; return; }
         track.scrollLeft -= v;
-        requestAnimationFrame(decel);
+        wrapScroll();
+        inertiaRaf.current = requestAnimationFrame(decel);
       };
-      requestAnimationFrame(decel);
+      inertiaRaf.current = requestAnimationFrame(decel);
     } else {
       isPaused.current = false;
     }
@@ -166,13 +185,13 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
         <div
           ref={trackRef}
           className="overflow-hidden flex gap-3 cursor-grab active:cursor-grabbing select-none"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          onMouseEnter={() => { isPaused.current = true; }}
-          onMouseLeave={() => { if (!dragStart.current) isPaused.current = false; }}
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none", touchAction: "none" }}
+          onPointerDown={onDown}
+          onPointerMove={onMove}
+          onPointerUp={onUp}
+          onPointerCancel={onUp}
+          onMouseEnter={() => { if (!dragging.current) isPaused.current = true; }}
+          onMouseLeave={() => { if (!dragging.current) isPaused.current = false; }}
         >
           {tripled.map((src, i) => {
             const moduleNum = (i % slides.length) + 1;
