@@ -6,6 +6,15 @@ import { useSection, parseJSON } from "@/hooks/useSiteContent";
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = { Users, BookOpen, Radio };
 
 
+const extractVideoSrc = (value: string) => {
+  const trimmed = value.trim();
+  const iframeSrcMatch = trimmed.match(/<iframe[^>]+src=["']([^"']+)["']/i);
+  if (iframeSrcMatch?.[1]) {
+    return iframeSrcMatch[1].replace(/&amp;/g, "&");
+  }
+  return trimmed;
+};
+
 const HeroSection = () => {
   const c = useSection("hero");
   const [playing, setPlaying] = useState(false);
