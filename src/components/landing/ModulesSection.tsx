@@ -134,8 +134,6 @@ const ModulesSection = () => {
     const id = setInterval(clinicalNext, 3500);
     return () => clearInterval(id);
   }, [clinicalAutoPlay, clinicalNext]);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-
   useEffect(() => {
     const lockNavScroll = () => setNavScrollLocked(true);
     const unlockNavScroll = () => setNavScrollLocked(false);
@@ -149,33 +147,8 @@ const ModulesSection = () => {
     };
   }, []);
 
-  // Sequential scroll: only move ±1 at a time so no items get skipped
-  useEffect(() => {
-    if (navScrollLocked) return;
-
-    const observers: IntersectionObserver[] = [];
-    camps.forEach((_, i) => {
-      const el = itemRefs.current[i];
-      if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting && !navScrollLocked) {
-            setOpenIdx((prev) => {
-              if (prev === null) return i;
-              if (i === prev + 1 || i === prev - 1) return i;
-              if (i > (prev ?? 0)) return (prev ?? 0) + 1;
-              if (i < (prev ?? 0)) return (prev ?? 0) - 1;
-              return prev;
-            });
-          }
-        },
-        { threshold: 0.3 }
-      );
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, [camps, navScrollLocked]);
+  // 13 acampamentos: interação sempre manual para evitar conflito com scroll/clique
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     if (navScrollLocked) return;
