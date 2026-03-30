@@ -40,6 +40,12 @@ export const getEmbedVideoSrc = (value: string) => {
     return `https://www.youtube.com/embed/${cleanVideoId}?autoplay=1`;
   }
 
+  // PandaVideo: ensure autoplay is present if not already set
+  if ((src.includes("pandavideo.com") || src.includes("player-vz-")) && !src.includes("autoplay=")) {
+    const separator = src.includes("?") ? "&" : "?";
+    return src + separator + "autoplay=1";
+  }
+
   return src;
 };
 
