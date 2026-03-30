@@ -412,6 +412,64 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
           </div>
         </DialogContent>
       </Dialog>
+
+      <NewLeadDialog open={showNewLead} onOpenChange={(open) => { if (!open) { resetNewLeadForm(); setShowNewLead(false); } }}>
+        <NewLeadDialogContent className="max-w-md">
+          <NewLeadDialogHeader>
+            <NewLeadDialogTitle>Novo Lead</NewLeadDialogTitle>
+          </NewLeadDialogHeader>
+          <div className="grid gap-3">
+            <div className="grid grid-cols-[80px_1fr] gap-2">
+              <div>
+                <Label className="text-xs">Tratamento</Label>
+                <Select value={newLead.treatment} onValueChange={(v) => setNewLead({ ...newLead, treatment: v })}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Dr.">Dr.</SelectItem>
+                    <SelectItem value="Dra.">Dra.</SelectItem>
+                    <SelectItem value="Sr.">Sr.</SelectItem>
+                    <SelectItem value="Sra.">Sra.</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Nome *</Label>
+                <Input className="h-9" value={newLead.name} onChange={(e) => setNewLead({ ...newLead, name: e.target.value })} placeholder="Nome completo" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Telefone *</Label>
+                <Input className="h-9" value={newLead.phone} onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })} placeholder="(11) 99999-9999" />
+              </div>
+              <div>
+                <Label className="text-xs">E-mail *</Label>
+                <Input className="h-9" type="email" value={newLead.email} onChange={(e) => setNewLead({ ...newLead, email: e.target.value })} placeholder="email@exemplo.com" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <Label className="text-xs">UF *</Label>
+                <Input className="h-9" maxLength={2} value={newLead.uf} onChange={(e) => setNewLead({ ...newLead, uf: e.target.value.toUpperCase() })} placeholder="SP" />
+              </div>
+              <div>
+                <Label className="text-xs">Cidade *</Label>
+                <Input className="h-9" value={newLead.city} onChange={(e) => setNewLead({ ...newLead, city: e.target.value })} placeholder="São Paulo" />
+              </div>
+              <div>
+                <Label className="text-xs">Especialidade *</Label>
+                <Input className="h-9" value={newLead.career} onChange={(e) => setNewLead({ ...newLead, career: e.target.value })} placeholder="Dentista" />
+              </div>
+            </div>
+          </div>
+          <NewLeadDialogFooter>
+            <Button variant="outline" onClick={() => { resetNewLeadForm(); setShowNewLead(false); }}>Cancelar</Button>
+            <Button onClick={handleCreateLead} disabled={saving}>
+              {saving ? "Salvando..." : "Criar Lead"}
+            </Button>
+          </NewLeadDialogFooter>
+        </NewLeadDialogContent>
+      </NewLeadDialog>
     </div>
   );
 };
