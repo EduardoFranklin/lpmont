@@ -67,10 +67,10 @@ const defaultCoverSlides = [
 
 const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum: number) => void; coverSlides: string[] }) => {
   const slides = coverSlides.length > 0 ? coverSlides : defaultCoverSlides;
-  const doubled = [...slides, ...slides];
-  const itemWidth = 200;
-  const gapWidth = 16;
-  const totalWidth = slides.length * (itemWidth + gapWidth);
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true, dragFree: true, align: "start", containScroll: false },
+    [Autoplay({ delay: 0, stopOnInteraction: false, stopOnMouseEnter: true, playOnInit: true })]
+  );
 
   return (
     <motion.div
@@ -82,44 +82,31 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
       <div className="relative group">
         <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
-        
-        <motion.div
-          className="flex gap-4 w-max cursor-grab active:cursor-grabbing"
-          animate={{ x: [0, -totalWidth] }}
-          transition={{
-            x: {
-              repeat: Infinity,
-              repeatType: "loop",
-              duration: 40,
-              ease: "linear",
-            },
-          }}
-          drag="x"
-          dragConstraints={{ left: -totalWidth, right: 0 }}
-          dragElastic={0.1}
-          style={{ willChange: "transform" }}
-        >
-          {doubled.map((src, i) => {
-            const moduleNum = (i % slides.length) + 1;
-            const camp = camps[moduleNum - 1];
-            return (
-              <div
-                key={i}
-                className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group"
-                onClick={() => onCoverClick(moduleNum)}
-              >
-                <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover:border-primary/20 transition-colors duration-300">
-                  <img
-                    src={src}
-                    alt={camp?.title || `Acampamento ${moduleNum}`}
-                    className="w-full h-auto object-cover"
-                    loading="lazy"
-                  />
+
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-4">
+            {slides.map((src, i) => {
+              const moduleNum = i + 1;
+              const camp = camps[moduleNum - 1];
+              return (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group"
+                  onClick={() => onCoverClick(moduleNum)}
+                >
+                  <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover:border-primary/20 transition-colors duration-300">
+                    <img
+                      src={src}
+                      alt={camp?.title || `Acampamento ${moduleNum}`}
+                      className="w-full h-auto object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </motion.div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </motion.div>
   );
