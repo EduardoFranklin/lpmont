@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Play, Users, BookOpen, Radio } from "lucide-react";
+import { ArrowRight, Users, BookOpen, Radio } from "lucide-react";
 import { useSection, parseJSON } from "@/hooks/useSiteContent";
 import VideoEmbed from "@/components/video/VideoEmbed";
 
@@ -9,17 +9,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = { U
 
 const HeroSection = () => {
   const c = useSection("hero");
-  const [playing, setPlaying] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
 
   const toggles = parseJSON<{ label: string; icon: string }[]>(c.toggles, []);
   const reassurance = parseJSON<string[]>(c.reassurance, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setPlaying(true), 3000);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -100,23 +94,7 @@ const HeroSection = () => {
             <div className="gradient-card">
               <div className="gradient-card-inner overflow-hidden">
                 <div className="relative aspect-video bg-background">
-                  {!playing ? (
-                    <button onClick={() => setPlaying(true)} className="absolute inset-0 flex items-center justify-center group cursor-pointer">
-                      <div className="absolute inset-0">
-                        <img src="/images/thumbs/hero-mountain-thumb.webp" alt="" className="w-full h-full object-cover opacity-40" loading="lazy" decoding="async" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
-                      </div>
-                      <div className="relative z-10 flex flex-col items-center gap-4">
-                        <div className="w-20 h-20 rounded-full flex items-center justify-center border-2 border-foreground/10 group-hover:border-primary/40 transition-all duration-500 group-hover:scale-110" style={{ background: "linear-gradient(135deg, hsl(var(--brand-gold) / 0.15), hsl(var(--brand-gold) / 0.05))" }}>
-                          <Play className="w-8 h-8 text-primary fill-primary ml-1" />
-                        </div>
-                        <span className="text-[13px] text-foreground/30 font-medium tracking-wide uppercase">{c.video_cta}</span>
-                      </div>
-                      <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground/30 bg-foreground/[0.05] border border-foreground/[0.06]">{c.video_duration}</div>
-                    </button>
-                  ) : (
-                    <VideoEmbed value={c.video_url} title="VSL - Método Mont'" className="w-full h-full" />
-                  )}
+                  <VideoEmbed value={c.video_url} title="VSL - Método Mont'" className="w-full h-full" />
                 </div>
               </div>
             </div>
