@@ -67,7 +67,7 @@ const Onboarding = () => {
       <nav className="sticky top-0 z-50 bg-background/90 backdrop-blur-xl border-b border-foreground/[0.06]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-13 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-5" />
+            <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-6" />
             <span className="text-[11px] tracking-wide text-foreground/25 italic font-light">onboarding</span>
           </div>
         </div>
