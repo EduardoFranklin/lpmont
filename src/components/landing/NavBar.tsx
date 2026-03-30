@@ -110,7 +110,12 @@ const NavBar = () => {
           </GradientButton>
         </div>
 
-        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-foreground/70 p-1">
+        <button
+          type="button"
+          aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+          onClick={() => setMenuOpen((open) => !open)}
+          className="md:hidden relative z-[60] text-foreground/70 p-2 -mr-2 touch-manipulation"
+        >
           {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
