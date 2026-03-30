@@ -291,7 +291,7 @@ const SequenceCard = ({
   const [conditions, setConditions] = useState<any>(seq.conditions);
   const [showConditions, setShowConditions] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [customDelay, setCustomDelay] = useState("");
+  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isEmail = seq.channel === "email";
 
