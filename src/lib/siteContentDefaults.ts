@@ -185,9 +185,10 @@ const defaults: AllContent = {
     ]),
   },
   synopses: Object.fromEntries(
-    Object.entries(moduleSynopsis).map(([num, data]) => [
-      `synopsis_${num}`,
-      JSON.stringify(data),
+    Object.entries(moduleSynopsis).flatMap(([num, data]) => [
+      [`synopsis_${num}_title`, data.title],
+      [`synopsis_${num}_tagline`, data.tagline],
+      [`synopsis_${num}_content`, data.content.join("\n\n")],
     ])
   ),
 };
