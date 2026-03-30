@@ -687,6 +687,17 @@ const FunnelSection = ({ funnel, sequences, onUpdate }: {
     onUpdate();
   };
 
+  const handleDeleteFunnel = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`Excluir o fluxo "${funnel.label}" e todas as ${sequences.length} mensagens? Esta ação não pode ser desfeita.`)) return;
+    for (const seq of sequences) {
+      await supabase.from("automation_sequences" as any).delete().eq("id", seq.id);
+    }
+    await supabase.from("site_settings").delete().eq("key", `funnel_meta_${funnel.value}`);
+    toast.success(`Fluxo ${funnel.value} excluído`);
+    onUpdate();
+  };
+
   // Drag and drop handlers
   const handleDragStart = (idx: number) => (e: React.DragEvent) => {
     setDragIdx(idx);
