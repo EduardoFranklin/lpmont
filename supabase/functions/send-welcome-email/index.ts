@@ -1,5 +1,11 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.100.1";
 import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import { encode as base64Encode } from "https://deno.land/std@0.208.0/encoding/base64.ts";
+
+function encodeSubjectUtf8(subject: string): string {
+  const encoded = base64Encode(new TextEncoder().encode(subject));
+  return `=?UTF-8?B?${encoded}?=`;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -72,12 +78,14 @@ Deno.serve(async (req) => {
         },
       });
 
+      const wrappedHtml = rawHtml.startsWith("<!DOCTYPE") ? rawHtml : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`;
       await client.send({
-        from: `${senderName} <contato@metodomont.com.br>`,
+        from: `=?UTF-8?B?${base64Encode(new TextEncoder().encode(senderName))}?= <contato@metodomont.com.br>`,
         to: recipientEmail,
-        subject: rawSubject,
-        content: rawHtml.replace(/<[^>]*>/g, ""),
-        html: rawHtml,
+        subject: encodeSubjectUtf8(rawSubject),
+        content: wrappedHtml.replace(/<[^>]*>/g, ""),
+        html: wrappedHtml,
+        encoding: { "content": "quoted-printable" },
       });
 
       await client.close();
@@ -172,9 +180,9 @@ Deno.serve(async (req) => {
     });
 
     await client.send({
-      from: "Método Mont' <contato@metodomont.com.br>",
+      from: "=?UTF-8?B?" + base64Encode(new TextEncoder().encode("Método Mont'")) + "?= <contato@metodomont.com.br>",
       to: recipientEmail,
-      subject,
+      subject: encodeSubjectUtf8(subject),
       content: body,
       html: htmlBody,
     });
@@ -221,9 +229,9 @@ Deno.serve(async (req) => {
         });
 
         await notifClient.send({
-          from: "Método Mont' <contato@metodomont.com.br>",
+          from: "=?UTF-8?B?" + base64Encode(new TextEncoder().encode("Método Mont'")) + "?= <contato@metodomont.com.br>",
           to: adminTo,
-          subject: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
+          subject: encodeSubjectUtf8(`Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`),
           content: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
           html: adminHtml,
         });
