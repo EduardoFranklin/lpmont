@@ -27,8 +27,24 @@ const NavBar = () => {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    const root = document.documentElement;
+    const body = document.body;
+
+    if (menuOpen) {
+      root.style.overflow = "hidden";
+      body.style.overflow = "hidden";
+      body.style.touchAction = "none";
+    } else {
+      root.style.overflow = "";
+      body.style.overflow = "";
+      body.style.touchAction = "";
+    }
+
+    return () => {
+      root.style.overflow = "";
+      body.style.overflow = "";
+      body.style.touchAction = "";
+    };
   }, [menuOpen]);
 
   const links = [
