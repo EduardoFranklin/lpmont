@@ -108,7 +108,7 @@ const Onboarding = () => {
       )}
 
       {/* Hero with mountain bg */}
-      <section ref={sectionRef} className="relative overflow-hidden">
+      <section ref={sectionRef} className="relative overflow-hidden pt-[72px]">
         <div className="absolute inset-0">
           <img
             src="/images/thumbs/bg-montanha-thumb.webp"
