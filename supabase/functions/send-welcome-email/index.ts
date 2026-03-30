@@ -182,15 +182,31 @@ Deno.serve(async (req) => {
         </div>
       `;
 
-      await adminClient.send({
-        from: "Método Mont' <contato@metodomont.com.br>",
-        to: ADMIN_EMAIL,
-        subject: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
-        content: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
-        html: adminHtml,
-      });
+      // Send to both admin emails
+      const adminRecipients = [ADMIN_EMAIL, CONTATO_EMAIL];
+      for (const adminTo of adminRecipients) {
+        const notifClient = new SMTPClient({
+          connection: {
+            hostname: "smtp.hostinger.com",
+            port: 465,
+            tls: true,
+            auth: {
+              username: "contato@metodomont.com.br",
+              password: smtpPassword,
+            },
+          },
+        });
 
-      await adminClient.close();
+        await notifClient.send({
+          from: "Método Mont' <contato@metodomont.com.br>",
+          to: adminTo,
+          subject: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
+          content: `Novo agendamento: ${trt} ${name} - ${scheduledDay} ${scheduledDate} ${scheduledTime}`,
+          html: adminHtml,
+        });
+
+        await notifClient.close();
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), {
