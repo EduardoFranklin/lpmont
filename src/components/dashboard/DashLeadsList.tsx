@@ -7,7 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Trash2, Edit2, RefreshCw, MessageCircle, Plus, CalendarCheck, Snowflake, Flame, Zap } from "lucide-react";
+import { Search, Trash2, Edit2, RefreshCw, MessageCircle, Plus, CalendarCheck, Snowflake, Flame, Zap, UserPlus } from "lucide-react";
+import { Dialog as NewLeadDialog, DialogContent as NewLeadDialogContent, DialogHeader as NewLeadDialogHeader, DialogTitle as NewLeadDialogTitle, DialogFooter as NewLeadDialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -60,6 +64,39 @@ interface LeadNote {
 const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void }) => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [showNewLead, setShowNewLead] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [newLead, setNewLead] = useState({
+    treatment: "Dr.",
+    name: "",
+    phone: "",
+    email: "",
+    uf: "",
+    city: "",
+    career: "",
+  });
+  const resetNewLeadForm = () => setNewLead({ treatment: "Dr.", name: "", phone: "", email: "", uf: "", city: "", career: "" });
+
+  const handleCreateLead = async () => {
+    if (!newLead.name || !newLead.phone || !newLead.email || !newLead.uf || !newLead.city || !newLead.career) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("leads").insert({
+      ...newLead,
+      status: "novo" as const,
+      funnel_origin: "manual",
+    });
+    if (error) toast.error("Erro ao criar lead");
+    else {
+      toast.success("Lead criado com sucesso!");
+      resetNewLeadForm();
+      setShowNewLead(false);
+      onRefresh();
+    }
+    setSaving(false);
+  };
   const [filterStatus, setFilterStatus] = useState<LeadStatus | "">("");
   const [filterSource, setFilterSource] = useState("");
   const [filterCampaign, setFilterCampaign] = useState("");
@@ -197,6 +234,9 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
         </select>
         <Button variant="outline" size="icon" onClick={onRefresh}>
           <RefreshCw className="w-4 h-4" />
+        </Button>
+        <Button onClick={() => setShowNewLead(true)} size="sm" className="gap-1.5">
+          <UserPlus className="w-4 h-4" /> Novo Lead
         </Button>
       </div>
 
