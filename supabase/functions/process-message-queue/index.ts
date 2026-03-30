@@ -248,13 +248,10 @@ Deno.serve(async (req) => {
       }
     } catch {}
 
-    // ── Check sending window ─────────────────
-    if (!isWithinSendingWindow(windowStart, windowEnd)) {
-      console.log(`Outside sending window (${windowStart}h–${windowEnd}h SP). Skipping batch.`);
-      return new Response(
-        JSON.stringify({ processed: 0, reason: "outside_window", window: `${windowStart}h-${windowEnd}h` }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    // ── Check sending window (skip messages with skip_sending_window) ─
+    const withinWindow = isWithinSendingWindow(windowStart, windowEnd);
+    if (!withinWindow) {
+      console.log(`Outside sending window (${windowStart}h–${windowEnd}h SP). Will only process skip_sending_window messages.`);
     }
 
     // ── Check hourly WA rate (via message_history last 1h) ─
@@ -308,6 +305,12 @@ Deno.serve(async (req) => {
 
     // CONCURRENCY = 1: process one message at a time (anti-ban)
     for (const msg of pendingMessages) {
+      // ── Skip messages that must respect sending window ──
+      if (!withinWindow && !msg.skip_sending_window) {
+        skipped++;
+        continue;
+      }
+
       const lead = msg.leads;
       if (!lead) {
         await supabase
