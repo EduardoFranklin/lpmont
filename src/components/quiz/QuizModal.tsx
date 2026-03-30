@@ -111,7 +111,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
     setScores((s) => [...s, pts]);
     setConfirmed(true);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (qi >= questions.length - 1) {
         setPhase("result");
         // Save quiz score to the lead
