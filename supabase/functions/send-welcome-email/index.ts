@@ -157,17 +157,6 @@ Deno.serve(async (req) => {
         recipientEmail
       );
 
-      const adminClient = new SMTPClient({
-        connection: {
-          hostname: "smtp.hostinger.com",
-          port: 465,
-          tls: true,
-          auth: {
-            username: "contato@metodomont.com.br",
-            password: smtpPassword,
-          },
-        },
-      });
 
       const adminHtml = `
         <div style="font-family: Arial, sans-serif; max-width: 500px;">
