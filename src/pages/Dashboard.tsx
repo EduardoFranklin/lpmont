@@ -134,6 +134,9 @@ const Dashboard = () => {
                 <TabsTrigger value="settings" className="gap-1.5">
                   <Settings className="w-4 h-4" /> <span className="hidden sm:inline">Configurações</span><span className="sm:hidden">Config</span>
                 </TabsTrigger>
+                <TabsTrigger value="users" className="gap-1.5">
+                  <Users className="w-4 h-4" /> <span className="hidden sm:inline">Usuários</span><span className="sm:hidden">Users</span>
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="reports">
                 <DashReports leads={filteredLeads} />
