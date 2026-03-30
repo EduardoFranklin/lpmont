@@ -126,10 +126,9 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
   const onMove = (e: React.PointerEvent) => {
     if (!dragging.current || !trackRef.current) return;
     const dx = e.clientX - startX.current;
-    if (Math.abs(dx) > 3) wasDragging.current = true;
+    if (Math.abs(dx) > 10) wasDragging.current = true;
     trackRef.current.scrollLeft = startScroll.current - dx;
     wrapScroll();
-    // Keep last 5 samples for velocity
     const samples = velocitySamples.current;
     samples.push({ x: e.clientX, t: Date.now() });
     if (samples.length > 5) samples.shift();
@@ -141,6 +140,8 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
     track.releasePointerCapture(e.pointerId);
     dragging.current = false;
 
+    const totalDx = Math.abs(e.clientX - startX.current);
+
     // Calculate velocity from recent samples
     const samples = velocitySamples.current;
     let velocity = 0;
@@ -149,6 +150,13 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
       const last = samples[samples.length - 1];
       const dt = last.t - first.t;
       if (dt > 0) velocity = (last.x - first.x) / dt;
+    }
+
+    // If finger barely moved, treat as tap (not drag)
+    if (totalDx <= 10) {
+      wasDragging.current = false;
+      isPaused.current = false;
+      return;
     }
 
     if (Math.abs(velocity) > 0.15) {
