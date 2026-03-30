@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, Code2, AlertTriangle, CalendarCheck, CheckCircle2, ExternalLink, MessageCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Save, Code2, AlertTriangle, CalendarCheck, CheckCircle2, ExternalLink, MessageCircle, Eye, EyeOff, Loader2, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 interface SettingField {
@@ -240,7 +240,7 @@ const DashSettings = () => {
 
   const handleSaveAll = async () => {
     setSaving(true);
-    const allKeys = [...SETTINGS.map(s => s.key), ...ZAPI_FIELDS.map(f => f.key)];
+    const allKeys = [...SETTINGS.map(s => s.key), ...ZAPI_FIELDS.map(f => f.key), "sending_window_start", "sending_window_end"];
     for (const key of allKeys) {
       const value = values[key] || "";
       await supabase
