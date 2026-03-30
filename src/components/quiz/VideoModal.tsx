@@ -40,6 +40,8 @@ const VideoModal = ({ open, onClose, page }: Props) => {
     });
   }, [isPanda, playerId]);
 
+  if (!open) return null;
+
   return (
     <div
       className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-sm flex items-center justify-center p-5 animate-in fade-in duration-300"
