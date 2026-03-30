@@ -28,7 +28,7 @@ const EVENT_TAG_MAP: Record<string, string> = {
   CLUB_FIRST_ACCESS: "entrou_no_curso",
   CLUB_MODULE_COMPLETED: "modulo_concluido",
   // Checkout
-  PURCHASE_BILLET_PRINTED: "boleto_impresso",
+  PURCHASE_BILLET_PRINTED: "boleto_impresso", // overridden below for PIX
   PURCHASE_EXPIRED: "compra_expirada",
   SWITCH_PLAN: "troca_plano",
   UPDATE_SUBSCRIPTION_CHARGE_DATE: "atualizou_cobranca",
