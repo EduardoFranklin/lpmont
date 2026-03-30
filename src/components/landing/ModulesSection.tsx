@@ -49,7 +49,7 @@ const phaseColors: Record<string, string> = {
   Cume: "text-primary",
 };
 
-const coverSlides = [
+const defaultCoverSlides = [
   "/images/capa1.webp",
   "/images/capa2.webp",
   "/images/capa3.webp",
@@ -65,11 +65,12 @@ const coverSlides = [
   "/images/capa13.webp",
 ];
 
-const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => void }) => {
-  const doubled = [...coverSlides, ...coverSlides];
+const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum: number) => void; coverSlides: string[] }) => {
+  const slides = coverSlides.length > 0 ? coverSlides : defaultCoverSlides;
+  const doubled = [...slides, ...slides];
   const itemWidth = 200;
   const gapWidth = 16;
-  const totalWidth = coverSlides.length * (itemWidth + gapWidth);
+  const totalWidth = slides.length * (itemWidth + gapWidth);
 
   return (
     <motion.div
