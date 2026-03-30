@@ -17,7 +17,7 @@ import {
   Save, MessageCircle, Mail, Bold, Italic, Link2, Type,
   Variable, Strikethrough, Plus, Trash2, Clock, Trophy, Phone,
   Zap, Users, ShoppingCart, GraduationCap,
-  Send, CheckCircle2, XCircle, Loader2, RefreshCw,
+  Send, CheckCircle2, XCircle, Loader2, RefreshCw, X,
   GripVertical, Tag, Power, PowerOff, ChevronRight, Settings2,
 } from "lucide-react";
 import {
