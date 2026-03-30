@@ -383,16 +383,51 @@ const DashQuizPages = () => {
               <AccordionContent className="px-4 pb-4 space-y-3">
                 <Field label="Slug (URL)" value={editPage.slug} onChange={(v) => updateField("slug", v)} />
                 <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tipo de Página</label>
-                  <select
-                    value={editPage.page_type || "video_quiz"}
-                    onChange={(e) => updateField("page_type", e.target.value)}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  >
-                    <option value="video_quiz">Vídeo + Quiz</option>
-                    <option value="video_only">Apenas Vídeo</option>
-                    <option value="quiz_only">Apenas Quiz</option>
-                  </select>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 block">Conteúdo da Página</label>
+                  <div className="flex gap-3">
+                    {(() => {
+                      const pt = editPage.page_type || "video_quiz";
+                      const hasVideo = pt !== "quiz_only";
+                      const hasQuiz = pt !== "video_only";
+                      const toggle = (type: "video" | "quiz") => {
+                        if (type === "video") {
+                          if (hasVideo && hasQuiz) updateField("page_type", "quiz_only");
+                          else if (!hasVideo) updateField("page_type", hasQuiz ? "video_quiz" : "video_only");
+                        } else {
+                          if (hasQuiz && hasVideo) updateField("page_type", "video_only");
+                          else if (!hasQuiz) updateField("page_type", hasVideo ? "video_quiz" : "quiz_only");
+                        }
+                      };
+                      return (
+                        <>
+                          <label
+                            className={`flex-1 flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all ${
+                              hasVideo ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
+                            }`}
+                            onClick={() => toggle("video")}
+                          >
+                            <Checkbox checked={hasVideo} onCheckedChange={() => toggle("video")} disabled={hasVideo && !hasQuiz} />
+                            <div>
+                              <p className="text-sm font-medium leading-none">🎬 Vídeo</p>
+                              <p className="text-[10px] mt-0.5 opacity-70">Aula em vídeo</p>
+                            </div>
+                          </label>
+                          <label
+                            className={`flex-1 flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all ${
+                              hasQuiz ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
+                            }`}
+                            onClick={() => toggle("quiz")}
+                          >
+                            <Checkbox checked={hasQuiz} onCheckedChange={() => toggle("quiz")} disabled={hasQuiz && !hasVideo} />
+                            <div>
+                              <p className="text-sm font-medium leading-none">🧠 Quiz</p>
+                              <p className="text-[10px] mt-0.5 opacity-70">Questionário</p>
+                            </div>
+                          </label>
+                        </>
+                      );
+                    })()}
+                  </div>
                 </div>
                 {(editPage.page_type || "video_quiz") !== "quiz_only" && (
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border">
