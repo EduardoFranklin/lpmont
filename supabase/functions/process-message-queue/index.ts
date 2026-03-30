@@ -199,7 +199,7 @@ async function sendEmail(
         Authorization: `Bearer ${serviceKey}`,
       },
       body: JSON.stringify({
-        to,
+        recipientEmail: to,
         subject,
         html: body.replace(/\n/g, "<br>"),
         from_name: "Prof. Breno Mont'Alverne",

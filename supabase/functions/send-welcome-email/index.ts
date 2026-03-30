@@ -44,11 +44,45 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { recipientEmail, recipientName, treatment, scheduledDay, scheduledDate, scheduledTime, meetLink } = await req.json();
+    const payload = await req.json();
+    const { recipientEmail, recipientName, treatment, scheduledDay, scheduledDate, scheduledTime, meetLink, subject: rawSubject, html: rawHtml, from_name } = payload;
 
     if (!recipientEmail) {
       return new Response(JSON.stringify({ error: "recipientEmail is required" }), {
         status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── Generic email mode: subject + html provided directly ──
+    if (rawSubject && rawHtml) {
+      const smtpPassword = Deno.env.get("SMTP_PASSWORD");
+      if (!smtpPassword) throw new Error("SMTP_PASSWORD not configured");
+
+      const senderName = from_name || "Método Mont'";
+      const client = new SMTPClient({
+        connection: {
+          hostname: "smtp.hostinger.com",
+          port: 465,
+          tls: true,
+          auth: {
+            username: "contato@metodomont.com.br",
+            password: smtpPassword,
+          },
+        },
+      });
+
+      await client.send({
+        from: `${senderName} <contato@metodomont.com.br>`,
+        to: recipientEmail,
+        subject: rawSubject,
+        content: rawHtml.replace(/<[^>]*>/g, ""),
+        html: rawHtml,
+      });
+
+      await client.close();
+
+      return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
