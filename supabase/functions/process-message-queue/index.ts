@@ -234,11 +234,25 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // ── Check sending window (08h–21h SP) ─────────────────
-    if (!isWithinSendingWindow()) {
-      console.log("Outside sending window (08h–21h SP). Skipping batch.");
+    // ── Fetch sending window from site_settings ─────────────
+    let windowStart = 8;
+    let windowEnd = 21;
+    try {
+      const { data: windowSettings } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", ["sending_window_start", "sending_window_end"]);
+      for (const s of windowSettings || []) {
+        if (s.key === "sending_window_start" && s.value) windowStart = parseInt(s.value, 10);
+        if (s.key === "sending_window_end" && s.value) windowEnd = parseInt(s.value, 10);
+      }
+    } catch {}
+
+    // ── Check sending window ─────────────────
+    if (!isWithinSendingWindow(windowStart, windowEnd)) {
+      console.log(`Outside sending window (${windowStart}h–${windowEnd}h SP). Skipping batch.`);
       return new Response(
-        JSON.stringify({ processed: 0, reason: "outside_window" }),
+        JSON.stringify({ processed: 0, reason: "outside_window", window: `${windowStart}h-${windowEnd}h` }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
