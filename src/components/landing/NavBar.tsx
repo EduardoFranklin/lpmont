@@ -101,10 +101,7 @@ const NavBar = () => {
 
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="md:hidden fixed inset-0 top-[72px] bg-background z-40 overflow-hidden touch-none"
           >
             <div className="px-6 py-8 flex flex-col min-h-full">
@@ -141,7 +138,7 @@ const NavBar = () => {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </nav>
