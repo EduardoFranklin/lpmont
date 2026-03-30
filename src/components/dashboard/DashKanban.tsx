@@ -46,6 +46,13 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
     const leadId = e.dataTransfer.getData("leadId");
     if (!leadId) return;
     await supabase.from("leads").update({ status: newStatus }).eq("id", leadId);
+    // Add tag with the new stage name
+    const colLabel = COLUMNS.find((c) => c.status === newStatus)?.label || newStatus;
+    const tagName = `movido_${newStatus}`;
+    await supabase.from("lead_tags").upsert(
+      { lead_id: leadId, tag: tagName, source: "kanban" },
+      { onConflict: "lead_id,tag", ignoreDuplicates: true }
+    ).select();
     onRefresh();
   };
 
