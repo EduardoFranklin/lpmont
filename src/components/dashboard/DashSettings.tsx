@@ -76,7 +76,7 @@ const ZApiCard = ({ values, setValues }: { values: Record<string, string>; setVa
     setTesting(true);
     try {
       const instanceId = values["zapi_instance_id"];
-      const token = values["zapi_instance_token"];
+      const token = values["zapi_token"];
       const res = await fetch(`https://api.z-api.io/instances/${instanceId}/token/${token}/status`, {
         headers: { "Client-Token": values["zapi_client_token"] },
       });
