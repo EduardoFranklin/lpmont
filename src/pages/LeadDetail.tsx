@@ -376,6 +376,12 @@ const LeadDetail = () => {
           </Card>
         </div>
 
+        {/* Tags & Timeline */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <LeadTags leadId={lead.id} />
+          <LeadTimeline leadId={lead.id} lead={lead} />
+        </div>
+
         {/* Manage section */}
         <Card>
           <CardHeader className="pb-3">
