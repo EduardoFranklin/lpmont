@@ -811,16 +811,7 @@ const SaleNotificationsTab = () => {
           <CardHeader className="pb-3"><CardTitle className="text-sm">Contatos ({contacts.length})</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {contacts.map((c) => (
-              <div key={c.id} className={`flex items-center justify-between rounded-lg border p-3 ${!c.active ? "opacity-50" : ""}`}>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  <div><p className="text-sm font-medium">{c.name}</p><p className="text-xs text-muted-foreground">{c.phone}</p></div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch checked={c.active} onCheckedChange={() => handleToggle(c)} />
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(c)}><Trash2 className="w-3.5 h-3.5" /></Button>
-                </div>
-              </div>
+              <ContactRow key={c.id} contact={c} onToggle={() => handleToggle(c)} onDelete={() => handleDelete(c)} onUpdate={fetchContacts} />
             ))}
           </CardContent>
         </Card>
