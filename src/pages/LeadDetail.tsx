@@ -9,10 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
-  Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap
+  Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap,
+  Video, CreditCard
 } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import LeadTags from "@/components/dashboard/LeadTags";
+import LeadTimeline from "@/components/dashboard/LeadTimeline";
 
 const formatElapsed = (dateStr: string) => {
   const mins = differenceInMinutes(new Date(), new Date(dateStr));
@@ -194,9 +197,9 @@ const LeadDetail = () => {
                 <tempBtn.icon className="w-3 h-3 mr-1" />{tempBtn.label}
               </Badge>
             )}
-            {(lead as any).quiz_slug && (
+            {lead.quiz_slug && (
               <Badge variant="outline" className="bg-purple-500/15 text-purple-400 border-purple-500/25">
-                Quiz {(lead as any).quiz_score != null ? `${(lead as any).quiz_score}pts` : ""}
+                Quiz {lead.quiz_score != null ? `${lead.quiz_score}pts` : ""}
               </Badge>
             )}
             {lead.scheduled_day && lead.scheduled_time && (
@@ -258,22 +261,73 @@ const LeadDetail = () => {
           </Card>
 
           {/* Quiz info card */}
-          {(lead as any).quiz_slug && (
+          {lead.quiz_slug && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm flex items-center gap-2"><Zap className="w-4 h-4" /> Quiz</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
-                <div className="flex justify-between text-muted-foreground">
-                  <span className="text-xs uppercase tracking-wider">Página</span>
-                  <span className="text-foreground text-xs font-medium">{(lead as any).quiz_slug}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span className="text-xs uppercase tracking-wider">Pontuação</span>
-                  <span className="text-foreground text-xs font-medium">
-                    {(lead as any).quiz_score != null ? `${(lead as any).quiz_score} pts` : "Não respondeu"}
-                  </span>
-                </div>
+                {[
+                  { label: "Página", value: lead.quiz_slug },
+                  { label: "Pontuação", value: lead.quiz_score != null ? `${lead.quiz_score} pts` : "Não respondeu" },
+                  { label: "Diagnóstico", value: lead.quiz_diagnostico || "—" },
+                  { label: "Concluiu", value: lead.quiz_concluido ? "Sim" : "Não" },
+                ].map(r => (
+                  <div key={r.label} className="flex justify-between text-muted-foreground">
+                    <span className="text-xs uppercase tracking-wider">{r.label}</span>
+                    <span className="text-foreground text-xs font-medium">{r.value}</span>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Reunião card */}
+          {lead.reuniao_data_hora_iso && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2"><Video className="w-4 h-4" /> Reunião</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {[
+                  { label: "Data", value: lead.reuniao_data_extenso || "—" },
+                  { label: "Horário", value: lead.reuniao_hora_extenso || "—" },
+                  { label: "Consultor", value: lead.reuniao_consultor || "—" },
+                  { label: "Status", value: lead.reuniao_status || "pendente" },
+                ].map(r => (
+                  <div key={r.label} className="flex justify-between text-muted-foreground">
+                    <span className="text-xs uppercase tracking-wider">{r.label}</span>
+                    <span className="text-foreground text-xs font-medium">{r.value}</span>
+                  </div>
+                ))}
+                {lead.reuniao_link_google_meet && (
+                  <a href={lead.reuniao_link_google_meet} target="_blank" rel="noopener noreferrer"
+                    className="text-xs text-primary underline">Abrir Google Meet</a>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Hotmart / Compra card */}
+          {(lead.hotmart_transaction_id || lead.data_compra) && (
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm flex items-center gap-2"><CreditCard className="w-4 h-4" /> Compra</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                {[
+                  { label: "Status Hotmart", value: lead.hotmart_status || "—" },
+                  { label: "Transação", value: lead.hotmart_transaction_id || "—" },
+                  { label: "Valor pago", value: lead.valor_pago != null ? `R$ ${Number(lead.valor_pago).toFixed(2)}` : "—" },
+                  { label: "Forma pgto", value: lead.forma_pagamento || "—" },
+                  { label: "Cupom", value: lead.cupom_usado_compra || "—" },
+                  { label: "Data compra", value: lead.data_compra ? format(new Date(lead.data_compra), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "—" },
+                ].map(r => (
+                  <div key={r.label} className="flex justify-between text-muted-foreground">
+                    <span className="text-xs uppercase tracking-wider">{r.label}</span>
+                    <span className="text-foreground text-xs font-medium">{r.value}</span>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           )}
@@ -284,11 +338,11 @@ const LeadDetail = () => {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               {[
-                { label: "Source", value: (lead as any).utm_source },
-                { label: "Medium", value: (lead as any).utm_medium },
-                { label: "Campaign", value: (lead as any).utm_campaign },
-                { label: "Term", value: (lead as any).utm_term },
-                { label: "Content", value: (lead as any).utm_content },
+                { label: "Source", value: lead.utm_source },
+                { label: "Medium", value: lead.utm_medium },
+                { label: "Campaign", value: lead.utm_campaign },
+                { label: "Term", value: lead.utm_term },
+                { label: "Content", value: lead.utm_content },
               ].map((u) => (
                 <div key={u.label} className="flex justify-between text-muted-foreground">
                   <span className="text-xs uppercase tracking-wider">{u.label}</span>
@@ -320,6 +374,12 @@ const LeadDetail = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Tags & Timeline */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <LeadTags leadId={lead.id} />
+          <LeadTimeline leadId={lead.id} lead={lead} />
         </div>
 
         {/* Manage section */}
