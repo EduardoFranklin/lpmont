@@ -304,11 +304,50 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // ── Cancel sales funnel if lead already converted ───
-      if (lead.status === "convertido" && msg.funnel !== "F4") {
-        await supabase.from("message_queue").update({ status: "cancelled" }).eq("id", msg.id);
+      // ── Re-validate tags at send time ──────────────────
+      const { data: leadTagsRows } = await supabase
+        .from("lead_tags")
+        .select("tag")
+        .eq("lead_id", lead.id);
+      const leadTags = new Set((leadTagsRows || []).map((t: any) => t.tag));
+
+      // Cancel sales funnels if lead already paid
+      const hasPaid = leadTags.has("pagou") || leadTags.has("comprador") || lead.status === "convertido";
+      if (hasPaid && msg.funnel !== "F4") {
+        await supabase.from("message_queue").update({ status: "cancelled", last_error: "Lead já comprou" }).eq("id", msg.id);
+        // Also cancel ALL remaining pending messages in this funnel for this lead
+        await supabase.from("message_queue")
+          .update({ status: "cancelled", last_error: "Lead já comprou" })
+          .eq("lead_id", lead.id).eq("funnel", msg.funnel).eq("status", "pending");
         skipped++;
         continue;
+      }
+
+      // Cancel if lead is perdido (except F4 onboarding)
+      if (lead.status === "perdido" && msg.funnel !== "F4") {
+        await supabase.from("message_queue").update({ status: "cancelled", last_error: "Lead perdido" }).eq("id", msg.id);
+        skipped++;
+        continue;
+      }
+
+      // Re-check sequence conditions (required_tags / excluded_tags)
+      if (msg.sequence_id) {
+        const { data: seqRow } = await supabase.from("automation_sequences").select("conditions").eq("id", msg.sequence_id).single();
+        const cond = seqRow?.conditions as any || {};
+        if (cond.required_tags?.length) {
+          const missing = cond.required_tags.some((t: string) => !leadTags.has(t));
+          if (missing) {
+            await supabase.from("message_queue").update({ status: "cancelled", last_error: "Tag obrigatória ausente" }).eq("id", msg.id);
+            skipped++; continue;
+          }
+        }
+        if (cond.excluded_tags?.length) {
+          const blocked = cond.excluded_tags.some((t: string) => leadTags.has(t));
+          if (blocked) {
+            await supabase.from("message_queue").update({ status: "cancelled", last_error: "Tag de exclusão presente" }).eq("id", msg.id);
+            skipped++; continue;
+          }
+        }
       }
 
       // ── WA-specific anti-ban checks ─────────────────────

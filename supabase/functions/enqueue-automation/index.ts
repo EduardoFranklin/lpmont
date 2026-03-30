@@ -91,15 +91,26 @@ Deno.serve(async (req) => {
       if (existingKeys.has(`${seq.step_key}:${seq.channel}`)) continue;
 
       // Evaluate conditions
-      const conditions = seq.conditions || {};
+      const conditions = seq.conditions || {} as any;
 
-      // Check quiz_diagnostico condition
-      if (conditions.quiz_diagnostico && lead.quiz_diagnostico !== conditions.quiz_diagnostico) continue;
+      // Check required_tags (new format — array)
+      if (conditions.required_tags?.length) {
+        const missing = conditions.required_tags.some((t: string) => !tags.has(t));
+        if (missing) continue;
+      }
+      // Check excluded_tags (new format — array)
+      if (conditions.excluded_tags?.length) {
+        const blocked = conditions.excluded_tags.some((t: string) => tags.has(t));
+        if (blocked) continue;
+      }
 
-      // Check tag requirements
+      // Legacy single-tag conditions (backwards compat)
       if (conditions.tag && !tags.has(conditions.tag)) continue;
       if (conditions.not_tag && tags.has(conditions.not_tag)) continue;
       if (conditions.not_tag2 && tags.has(conditions.not_tag2)) continue;
+
+      // Check quiz_diagnostico condition
+      if (conditions.quiz_diagnostico && lead.quiz_diagnostico !== conditions.quiz_diagnostico) continue;
 
       // Check status requirements
       if (conditions.requires_status && lead.status !== conditions.requires_status) continue;
