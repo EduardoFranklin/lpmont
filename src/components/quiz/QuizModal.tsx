@@ -35,6 +35,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
   const [confirmed, setConfirmed] = useState(false);
   const [scores, setScores] = useState<number[]>([]);
   const [travaTrigger, setTravaTrigger] = useState(false);
+  const [leadId, setLeadId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
