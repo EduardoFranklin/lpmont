@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import PublicLayout from "@/components/PublicLayout";
 import Index from "./pages/Index.tsx";
 import Agendar from "./pages/Agendar.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
@@ -26,18 +27,22 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/agendar" element={<Agendar />} />
+          {/* Public routes — tracking pixels + UTM capture */}
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<Index />} />
+            <Route path="/agendar" element={<Agendar />} />
+            <Route path="/quiz/:slug" element={<QuizPage />} />
+            <Route path="/pagar-agora" element={<Checkout />} />
+            <Route path="/falar-equipe" element={<FalarEquipe />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+          </Route>
+          {/* Dashboard routes — no tracking */}
           <Route path="/dash" element={<Dashboard />} />
           <Route path="/dash/lead/:id" element={<LeadDetail />} />
           <Route path="/dash/login" element={<DashLogin />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/lead/:id" element={<LeadDetail />} />
-          <Route path="/quiz/:slug" element={<QuizPage />} />
-          <Route path="/pagar-agora" element={<Checkout />} />
-          <Route path="/falar-equipe" element={<FalarEquipe />} />
-          <Route path="/onboarding" element={<Onboarding />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
