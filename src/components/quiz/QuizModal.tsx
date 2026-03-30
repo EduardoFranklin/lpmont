@@ -95,11 +95,18 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
     setLeadStep((s) => s + 1);
   }, [leadStep, leadName, leadPhone, leadEmail, page.slug]);
 
+  // Helper: check if option is the correct one
+  const isCorrectOption = useCallback((q: QuizQuestion, optIndex: number) => {
+    const opt = q.options[optIndex];
+    if (opt?.correct !== undefined) return opt.correct === true;
+    return opt?.points === q.weight;
+  }, []);
+
   const confirmAnswer = useCallback(() => {
     if (selected === null) return;
     const q = questions[qi];
     const pts = q.options[selected]?.points ?? 0;
-    const isIdeal = pts === q.weight;
+    const isIdeal = isCorrectOption(q, selected);
     if (q.is_critical && !isIdeal) setTravaTrigger(true);
     setScores((s) => [...s, pts]);
     setConfirmed(true);
