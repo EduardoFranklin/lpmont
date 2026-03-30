@@ -305,6 +305,12 @@ Deno.serve(async (req) => {
 
     // CONCURRENCY = 1: process one message at a time (anti-ban)
     for (const msg of pendingMessages) {
+      // ── Skip messages that must respect sending window ──
+      if (!withinWindow && !msg.skip_sending_window) {
+        skipped++;
+        continue;
+      }
+
       const lead = msg.leads;
       if (!lead) {
         await supabase
