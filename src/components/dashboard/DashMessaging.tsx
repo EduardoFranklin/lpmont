@@ -17,7 +17,7 @@ import {
   Save, MessageCircle, Mail, Bold, Italic, Link2, Type,
   Variable, Strikethrough, Plus, Trash2, Clock, Trophy, Phone,
   Zap, Users, ShoppingCart, GraduationCap,
-  Send, CheckCircle2, XCircle, Loader2, RefreshCw,
+  Send, CheckCircle2, XCircle, Loader2, RefreshCw, X,
   GripVertical, Tag, Power, PowerOff, ChevronRight, Settings2,
 } from "lucide-react";
 import {
@@ -51,12 +51,14 @@ const VARIABLES = [
 ];
 
 const AVAILABLE_TAGS = [
-  "quiz_diagnostico_a", "quiz_diagnostico_b", "quiz_diagnostico_c",
-  "quiz_concluido", "quiz_abandonou",
+  "pagou", "comprador", "reembolso", "chargeback",
   "reuniao_agendada", "reuniao_confirmada", "reuniao_nao_compareceu",
+  "quiz_concluido", "quiz_abandonou",
+  "abandonou_checkout", "visitou_site", "visitou_pagina_vendas",
+  "clicou_falar_equipe", "cupom_enviado",
   "wa_sem_resposta_1", "wa_sem_resposta_2", "wa_sem_resposta_3",
-  "comprou", "nao_comprou", "abandonou_checkout",
   "onboarding_pendente", "onboarding_completo",
+  "boleto_impresso", "compra_expirada", "entrou_no_curso", "modulo_concluido",
 ];
 
 const DELAY_UNITS = [
@@ -203,11 +205,15 @@ const ConditionsEditor = ({ conditions, onChange }: { conditions: any; onChange:
   const cond = conditions || {};
   const requiredTags: string[] = cond.required_tags || [];
   const excludedTags: string[] = cond.excluded_tags || [];
+  const [customReq, setCustomReq] = useState("");
+  const [customExc, setCustomExc] = useState("");
 
   const addTag = (type: "required_tags" | "excluded_tags", tag: string) => {
+    const t = tag.trim().toLowerCase();
+    if (!t) return;
     const list = [...(cond[type] || [])];
-    if (!list.includes(tag)) {
-      list.push(tag);
+    if (!list.includes(t)) {
+      list.push(t);
       onChange({ ...cond, [type]: list });
     }
   };
@@ -217,51 +223,64 @@ const ConditionsEditor = ({ conditions, onChange }: { conditions: any; onChange:
     onChange({ ...cond, [type]: list });
   };
 
-  const availableForRequired = AVAILABLE_TAGS.filter(t => !requiredTags.includes(t) && !excludedTags.includes(t));
-  const availableForExcluded = AVAILABLE_TAGS.filter(t => !excludedTags.includes(t) && !requiredTags.includes(t));
+  const usedTags = new Set([...requiredTags, ...excludedTags]);
+  const availableTags = AVAILABLE_TAGS.filter(t => !usedTags.has(t));
+
+  const TagSection = ({ type, label, icon, tags, color, custom, setCustom }: {
+    type: "required_tags" | "excluded_tags"; label: string; icon: string;
+    tags: string[]; color: string; custom: string; setCustom: (v: string) => void;
+  }) => (
+    <div className="space-y-2">
+      <Label className="text-xs font-medium flex items-center gap-1.5">
+        <span>{icon}</span> {label}
+      </Label>
+      <div className="flex flex-wrap gap-1 items-center">
+        {tags.map(tag => (
+          <Badge key={tag} variant="outline" className={`text-[10px] gap-1 cursor-pointer hover:opacity-70 ${color}`} onClick={() => removeTag(type, tag)}>
+            {tag} <X className="w-2.5 h-2.5" />
+          </Badge>
+        ))}
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-6 text-[10px] px-1.5 gap-0.5">
+              <Plus className="w-2.5 h-2.5" /> Tag
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-60 p-2 space-y-2" align="start">
+            <div className="flex gap-1">
+              <Input
+                placeholder="Tag personalizada..."
+                value={custom}
+                onChange={(e) => setCustom(e.target.value)}
+                className="h-7 text-xs"
+                onKeyDown={(e) => { if (e.key === "Enter") { addTag(type, custom); setCustom(""); }}}
+              />
+              <Button size="sm" className="h-7 px-2 text-xs" onClick={() => { addTag(type, custom); setCustom(""); }} disabled={!custom.trim()}>
+                +
+              </Button>
+            </div>
+            {availableTags.length > 0 && (
+              <div className="max-h-32 overflow-y-auto space-y-0.5">
+                {availableTags.map(tag => (
+                  <button key={tag} onClick={() => addTag(type, tag)} className="w-full text-left px-2 py-1 rounded text-xs hover:bg-muted/50 truncate">
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            )}
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="space-y-3 p-3 bg-muted/30 rounded-lg border border-dashed">
-      <div className="space-y-1.5">
-        <Label className="text-xs font-medium flex items-center gap-1.5"><Tag className="w-3 h-3 text-green-500" /> Tags obrigatórias (lead DEVE ter)</Label>
-        <div className="flex flex-wrap gap-1">
-          {requiredTags.map(tag => (
-            <Badge key={tag} className="text-[10px] gap-1 bg-green-500/10 text-green-700 border-green-500/30 hover:bg-green-500/20 cursor-pointer" onClick={() => removeTag("required_tags", tag)}>
-              {tag} <XCircle className="w-2.5 h-2.5" />
-            </Badge>
-          ))}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-5 text-[10px] px-1.5 gap-0.5"><Plus className="w-2.5 h-2.5" /></Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-1.5 max-h-48 overflow-y-auto" align="start">
-              {availableForRequired.length === 0 ? <p className="text-xs text-muted-foreground p-2">Todas as tags já adicionadas</p> : availableForRequired.map(tag => (
-                <button key={tag} onClick={() => addTag("required_tags", tag)} className="w-full text-left px-2 py-1 rounded text-xs hover:bg-muted/50">{tag}</button>
-              ))}
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label className="text-xs font-medium flex items-center gap-1.5"><Tag className="w-3 h-3 text-red-500" /> Tags de exclusão (lead NÃO pode ter)</Label>
-        <div className="flex flex-wrap gap-1">
-          {excludedTags.map(tag => (
-            <Badge key={tag} className="text-[10px] gap-1 bg-red-500/10 text-red-700 border-red-500/30 hover:bg-red-500/20 cursor-pointer" onClick={() => removeTag("excluded_tags", tag)}>
-              {tag} <XCircle className="w-2.5 h-2.5" />
-            </Badge>
-          ))}
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-5 text-[10px] px-1.5 gap-0.5"><Plus className="w-2.5 h-2.5" /></Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-1.5 max-h-48 overflow-y-auto" align="start">
-              {availableForExcluded.length === 0 ? <p className="text-xs text-muted-foreground p-2">Todas as tags já adicionadas</p> : availableForExcluded.map(tag => (
-                <button key={tag} onClick={() => addTag("excluded_tags", tag)} className="w-full text-left px-2 py-1 rounded text-xs hover:bg-muted/50">{tag}</button>
-              ))}
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
+    <div className="space-y-3 p-3 bg-muted/20 rounded-lg border border-border">
+      <TagSection type="required_tags" label="Lead DEVE ter" icon="✓" tags={requiredTags}
+        color="bg-emerald-500/10 text-emerald-600 border-emerald-500/30" custom={customReq} setCustom={setCustomReq} />
+      <div className="border-t border-border" />
+      <TagSection type="excluded_tags" label="Lead NÃO pode ter" icon="✕" tags={excludedTags}
+        color="bg-red-500/10 text-red-500 border-red-500/30" custom={customExc} setCustom={setCustomExc} />
     </div>
   );
 };
