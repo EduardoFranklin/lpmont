@@ -16,7 +16,7 @@ const statusLabels: Record<string, string> = {
   agendado: "Agendados",
   compareceu: "Em negociação",
   nao_compareceu: "Não compareceram",
-  convertido: "Convertidos",
+  convertido: "Pagos",
   perdido: "Perdidos",
 };
 
@@ -90,7 +90,7 @@ const DashReports = ({ leads }: { leads: Lead[] }) => {
     { label: "Total de Leads", value: total, icon: Users, color: "text-blue-400" },
     { label: "Agendamentos", value: `${agendados} (${taxaAgendamento}%)`, icon: CalendarCheck, color: "text-amber-400" },
     { label: "Comparecimento", value: `${compareceram} (${taxaComparecimento}%)`, icon: UserCheck, color: "text-emerald-400" },
-    { label: "Conversões", value: `${convertidos} (${taxaConversao}%)`, icon: TrendingUp, color: "text-primary" },
+    { label: "Pagos", value: `${convertidos} (${taxaConversao}%)`, icon: TrendingUp, color: "text-primary" },
   ];
 
   // Temperature rank

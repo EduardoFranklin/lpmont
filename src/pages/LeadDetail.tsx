@@ -45,7 +45,7 @@ const STATUS_OPTIONS: { value: LeadStatus; label: string; color: string }[] = [
   { value: "agendado", label: "Agendado", color: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
   { value: "compareceu", label: "Em negociação", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
   { value: "nao_compareceu", label: "Não compareceu", color: "bg-red-500/20 text-red-400 border-red-500/30" },
-  { value: "convertido", label: "Convertido", color: "bg-primary/20 text-primary border-primary/30" },
+  { value: "convertido", label: "Pago", color: "bg-primary/20 text-primary border-primary/30" },
   { value: "perdido", label: "Perdido", color: "bg-gray-500/20 text-gray-400 border-gray-500/30" },
 ];
 

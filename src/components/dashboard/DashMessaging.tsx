@@ -793,7 +793,7 @@ const SaleNotificationsTab = () => {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">Cadastre os números que devem receber uma notificação via WhatsApp quando um lead for convertido.</p>
+      <p className="text-sm text-muted-foreground">Cadastre os números que devem receber uma notificação via WhatsApp quando um lead efetuar o pagamento.</p>
       <Card>
         <CardHeader className="pb-3"><CardTitle className="text-sm flex items-center gap-2"><Plus className="w-4 h-4" /> Adicionar contato</CardTitle></CardHeader>
         <CardContent>
