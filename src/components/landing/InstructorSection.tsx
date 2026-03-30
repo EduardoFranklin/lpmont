@@ -10,7 +10,7 @@ const InstructorSection = () => {
   const stats = parseJSON<{ value: string; label: string; icon: string }[]>(c.stats, []);
 
   return (
-    <section id="guia" className="py-16 sm:py-36 relative overflow-hidden">
+    <section id="guia" className="py-14 sm:py-24 relative overflow-hidden">
       <div className="glow-gold" style={{ width: 600, height: 600, top: "20%", right: "-20%", opacity: 0.3 }} />
       <div className="section-container relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
