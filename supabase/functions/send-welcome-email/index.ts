@@ -72,12 +72,14 @@ Deno.serve(async (req) => {
         },
       });
 
+      const wrappedHtml = rawHtml.startsWith("<!DOCTYPE") ? rawHtml : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${rawHtml}</body></html>`;
       await client.send({
         from: `${senderName} <contato@metodomont.com.br>`,
         to: recipientEmail,
         subject: rawSubject,
-        content: rawHtml.replace(/<[^>]*>/g, ""),
-        html: rawHtml,
+        content: wrappedHtml.replace(/<[^>]*>/g, ""),
+        html: wrappedHtml,
+        encoding: { "content": "quoted-printable" },
       });
 
       await client.close();
