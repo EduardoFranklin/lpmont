@@ -2,24 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Users, BookOpen, Radio } from "lucide-react";
 import { useSection, parseJSON } from "@/hooks/useSiteContent";
+import VideoEmbed from "@/components/video/VideoEmbed";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = { Users, BookOpen, Radio };
 
-
-const extractVideoSrc = (value: string) => {
-  const trimmed = value.trim();
-  const iframeSrcMatch = trimmed.match(/<iframe[^>]+src=["']([^"']+)["']/i);
-  if (iframeSrcMatch?.[1]) {
-    return iframeSrcMatch[1].replace(/&amp;/g, "&");
-  }
-  return trimmed;
-};
 
 const HeroSection = () => {
   const c = useSection("hero");
   const [playing, setPlaying] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  const videoSrc = extractVideoSrc(c.video_url);
   const sectionRef = useRef<HTMLElement>(null);
 
   const toggles = parseJSON<{ label: string; icon: string }[]>(c.toggles, []);
@@ -124,14 +115,7 @@ const HeroSection = () => {
                       <div className="absolute bottom-4 right-4 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground/30 bg-foreground/[0.05] border border-foreground/[0.06]">{c.video_duration}</div>
                     </button>
                   ) : (
-                    <iframe
-                      src={videoSrc}
-                      title="VSL - Método Mont'"
-                      className="w-full h-full"
-                      style={{ border: "none" }}
-                      allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-                      allowFullScreen
-                    />
+                    <VideoEmbed value={c.video_url} title="VSL - Método Mont'" className="w-full h-full" />
                   )}
                 </div>
               </div>

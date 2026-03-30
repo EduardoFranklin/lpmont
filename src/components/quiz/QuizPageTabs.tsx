@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Play, Lock, Clock, Eye, CheckSquare, ArrowRight, BookOpen, Brain } from "lucide-react";
 import type { QuizPageData } from "@/pages/QuizPage";
+import VideoEmbed from "@/components/video/VideoEmbed";
 
 interface Props {
   page: QuizPageData;
@@ -86,15 +87,7 @@ const QuizPageTabs = ({ page, unlocked, onOpenVideo, onOpenQuiz, onUnlock }: Pro
           ) : (
             <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
               {page.lesson_video_url ? (
-                <iframe
-                  src={page.lesson_video_url}
-                  style={{ border: "none" }}
-                  className="absolute inset-0 w-full h-full"
-                  allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-                  allowFullScreen
-                  // @ts-ignore
-                  fetchPriority="high"
-                />
+                <VideoEmbed value={page.lesson_video_url} title={page.lesson_title} className="absolute inset-0 w-full h-full" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-foreground/5 text-muted-foreground text-sm">
                   Vídeo não configurado

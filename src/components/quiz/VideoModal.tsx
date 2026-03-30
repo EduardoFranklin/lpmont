@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import type { QuizPageData } from "@/pages/QuizPage";
+import VideoEmbed from "@/components/video/VideoEmbed";
 
 interface Props {
   open: boolean;
@@ -9,37 +10,6 @@ interface Props {
 }
 
 const VideoModal = ({ open, onClose, page }: Props) => {
-  // Support Panda Video embed URLs
-  const isPanda = open && page.lesson_video_url.includes("pandavideo.com");
-  const embedUrl = !open ? "" : isPanda
-    ? page.lesson_video_url
-    : page.lesson_video_url.includes("youtube.com/watch")
-    ? page.lesson_video_url.replace("watch?v=", "embed/") + "?autoplay=1"
-    : page.lesson_video_url.includes("youtu.be/")
-    ? `https://www.youtube.com/embed/${page.lesson_video_url.split("youtu.be/")[1]}?autoplay=1`
-    : page.lesson_video_url;
-
-  const pandaId = isPanda ? (() => { const m = page.lesson_video_url.match(/[?&]v=([a-f0-9-]+)/i); return m ? m[1] : null; })() : null;
-  const playerId = pandaId ? `panda-${pandaId}` : undefined;
-
-  useEffect(() => {
-    if (!isPanda || !playerId) return;
-    if (!document.querySelector('script[src="https://player.pandavideo.com.br/api.v2.js"]')) {
-      const s = document.createElement("script");
-      s.src = "https://player.pandavideo.com.br/api.v2.js";
-      s.async = true;
-      document.head.appendChild(s);
-    }
-    (window as any).pandascripttag = (window as any).pandascripttag || [];
-    (window as any).pandascripttag.push(function () {
-      const p = new (window as any).PandaPlayer(playerId, {
-        onReady() {
-          p.loadWindowScreen({ panda_id_player: playerId });
-        },
-      });
-    });
-  }, [isPanda, playerId]);
-
   if (!open) return null;
 
   return (
@@ -58,13 +28,7 @@ const VideoModal = ({ open, onClose, page }: Props) => {
           <X className="w-4 h-4" />
         </button>
         <div className="relative pb-[56.25%] bg-black">
-          <iframe
-            id={playerId}
-            src={embedUrl}
-            className="absolute inset-0 w-full h-full border-0"
-            allowFullScreen
-            allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture"
-          />
+          <VideoEmbed value={page.lesson_video_url} title={page.lesson_title} className="absolute inset-0 w-full h-full border-0" />
         </div>
         <div className="p-6">
           <h3 className="text-lg font-semibold mb-1.5">{page.lesson_title}</h3>
