@@ -37,12 +37,12 @@ function formatPhoneE164(phone: string): string {
   return `55${digits}`;
 }
 
-// ── SENDING WINDOW CHECK (08h–21h São Paulo) ──────────────
-function isWithinSendingWindow(): boolean {
+// ── SENDING WINDOW CHECK (dynamic from site_settings) ──────────────
+function isWithinSendingWindow(startHour: number, endHour: number): boolean {
   const now = new Date();
   const spTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
   const hour = spTime.getHours();
-  return hour >= 8 && hour < 21;
+  return hour >= startHour && hour < endHour;
 }
 
 // ── DETERMINISTIC HASH FOR VARIATION ──────────────────────
