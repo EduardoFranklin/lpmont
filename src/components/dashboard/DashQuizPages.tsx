@@ -468,7 +468,9 @@ const DashQuizPages = () => {
               </AccordionContent>
             </AccordionItem>
 
-            {/* Results */}
+            {/* Results - only show if page has quiz */}
+            {(editPage.page_type || "video_quiz") !== "video_only" && (
+            <>
             <AccordionItem value="results" className="border rounded-lg">
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">Resultados</AccordionTrigger>
               <AccordionContent className="px-4 pb-4 space-y-4">
@@ -572,6 +574,8 @@ const DashQuizPages = () => {
                 </Button>
               </AccordionContent>
             </AccordionItem>
+            </>
+            )}
           </Accordion>
         </div>
       )}
