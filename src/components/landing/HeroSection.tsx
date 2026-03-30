@@ -9,17 +9,11 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = { U
 
 const HeroSection = () => {
   const c = useSection("hero");
-  const [playing, setPlaying] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
 
   const toggles = parseJSON<{ label: string; icon: string }[]>(c.toggles, []);
   const reassurance = parseJSON<string[]>(c.reassurance, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setPlaying(true), 3000);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
