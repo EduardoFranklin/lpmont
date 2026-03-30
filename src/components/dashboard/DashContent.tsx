@@ -5,17 +5,18 @@ import { invalidateSiteContentCache } from "@/hooks/useSiteContent";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Save, RotateCcw, Loader2, Plus, Trash2, ChevronDown, ChevronUp, Settings, Mountain, BookOpen, FileText, GraduationCap, Heart, MessageCircle, DollarSign, HelpCircle, Footprints, Zap, Menu, X } from "lucide-react";
+import { Save, RotateCcw, Loader2, Plus, Trash2, ChevronDown, ChevronUp, Settings, Mountain, BookOpen, FileText, GraduationCap, Heart, MessageCircle, DollarSign, HelpCircle, Footprints, Zap, Menu, X, Compass } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploadCrop from "./ImageUploadCrop";
 import RichTextEditor from "./RichTextEditor";
 import DashQuizPages from "./DashQuizPages";
 import DashModulesEditor from "./DashModulesEditor";
 import { DashFAQEditor, DashTestimonialsEditor, DashBenefitsEditor } from "./DashListEditors";
+import DashOnboarding from "./DashOnboarding";
 
 type ContentMap = Record<string, Record<string, string>>;
 
-const sectionOrder = ["hero", "problem", "modules", "method", "instructor", "benefits", "testimonials", "pricing", "faq", "footer"];
+const sectionOrder = ["hero", "problem", "modules", "method", "instructor", "benefits", "testimonials", "pricing", "faq", "footer", "onboarding"];
 
 const sectionIcons: Record<string, any> = {
   hero: Settings,
@@ -28,6 +29,7 @@ const sectionIcons: Record<string, any> = {
   pricing: DollarSign,
   faq: HelpCircle,
   footer: Footprints,
+  onboarding: Compass,
 };
 
 // Fields that should use the rich text editor
@@ -401,6 +403,19 @@ const DashContent = () => {
 
         {activeSection === "quizpages" ? (
           <DashQuizPages />
+        ) : activeSection === "onboarding" ? (
+          <div className="space-y-8">
+            <SectionPanel
+              section="onboarding"
+              content={content}
+              dirtyKeys={dirtyKeys}
+              updateField={updateField}
+              resetField={resetField}
+            />
+            <div className="border-t border-border pt-6">
+              <DashOnboarding />
+            </div>
+          </div>
         ) : activeSection === "modules" ? (
           <DashModulesEditor
             content={content}
