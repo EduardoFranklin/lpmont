@@ -108,7 +108,7 @@ const NavBar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="md:hidden fixed inset-0 top-[72px] bg-background z-40 overflow-y-auto"
+            className="md:hidden fixed inset-0 top-[72px] bg-background z-40 overflow-hidden touch-none"
           >
             <div className="px-6 py-8 flex flex-col min-h-full">
               <div className="space-y-5 mb-8">
