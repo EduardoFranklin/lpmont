@@ -49,7 +49,7 @@ const phaseColors: Record<string, string> = {
   Cume: "text-primary",
 };
 
-const coverSlides = [
+const defaultCoverSlides = [
   "/images/capa1.webp",
   "/images/capa2.webp",
   "/images/capa3.webp",
@@ -65,11 +65,12 @@ const coverSlides = [
   "/images/capa13.webp",
 ];
 
-const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => void }) => {
-  const doubled = [...coverSlides, ...coverSlides];
+const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum: number) => void; coverSlides: string[] }) => {
+  const slides = coverSlides.length > 0 ? coverSlides : defaultCoverSlides;
+  const doubled = [...slides, ...slides];
   const itemWidth = 200;
   const gapWidth = 16;
-  const totalWidth = coverSlides.length * (itemWidth + gapWidth);
+  const totalWidth = slides.length * (itemWidth + gapWidth);
 
   return (
     <motion.div
@@ -99,7 +100,7 @@ const CampsCarousel = ({ onCoverClick }: { onCoverClick: (moduleNum: number) => 
           style={{ willChange: "transform" }}
         >
           {doubled.map((src, i) => {
-            const moduleNum = (i % coverSlides.length) + 1;
+            const moduleNum = (i % slides.length) + 1;
             const camp = camps[moduleNum - 1];
             return (
               <div
@@ -247,7 +248,7 @@ const ModulesSection = () => {
         </motion.div>
 
         {/* Covers Carousel */}
-        <CampsCarousel onCoverClick={(num) => setSynopsisModule(num)} />
+        <CampsCarousel onCoverClick={(num) => setSynopsisModule(num)} coverSlides={camps.map((c) => (c as any).cover || "").filter(Boolean)} />
 
         {/* Trail */}
         <div className="max-w-3xl mx-auto relative">
