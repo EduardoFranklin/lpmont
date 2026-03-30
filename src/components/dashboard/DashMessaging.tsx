@@ -759,6 +759,15 @@ const FunnelSection = ({ funnel, sequences, onUpdate }: {
             {allActive ? <Power className="w-3 h-3" /> : <PowerOff className="w-3 h-3" />}
             {allActive ? "ON" : "OFF"}
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 text-[10px] px-2 gap-1 ml-1 text-destructive/60 hover:text-destructive"
+            onClick={handleDeleteFunnel}
+            title="Excluir fluxo inteiro"
+          >
+            <Trash2 className="w-3 h-3" />
+          </Button>
         </div>
       </AccordionTrigger>
       <AccordionContent className="pb-4 space-y-2">
