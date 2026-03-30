@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Lead } from "@/pages/Dashboard";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,17 @@ import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+const UFS = [
+  "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
+  "PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"
+];
+
+const getCareers = (treatment: string) => [
+  { label: "Sou Dentista", value: "dentista" },
+  { label: treatment === "Dra." ? "Sou Dona de Clínica" : "Sou Dono de Clínica", value: "dono_clinica" },
+  { label: "Sou Estudante", value: "estudante" },
+];
 
 const formatElapsed = (dateStr: string) => {
   const mins = differenceInMinutes(new Date(), new Date(dateStr));
@@ -75,7 +86,49 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
     city: "",
     career: "",
   });
-  const resetNewLeadForm = () => setNewLead({ treatment: "Dr.", name: "", phone: "", email: "", uf: "", city: "", career: "" });
+  const resetNewLeadForm = () => { setNewLead({ treatment: "Dr.", name: "", phone: "", email: "", uf: "", city: "", career: "" }); setNewLeadCities([]); setNewLeadCitySearch(""); };
+  const [newLeadCities, setNewLeadCities] = useState<string[]>([]);
+  const [newLeadLoadingCities, setNewLeadLoadingCities] = useState(false);
+  const [newLeadCitySearch, setNewLeadCitySearch] = useState("");
+  const [newLeadCityDropdownOpen, setNewLeadCityDropdownOpen] = useState(false);
+  const newLeadCityRef = useRef<HTMLDivElement>(null);
+  const newLeadCitiesCacheRef = useRef<Record<string, string[]>>({});
+
+  useEffect(() => {
+    if (!newLead.uf) { setNewLeadCities([]); return; }
+    setNewLead(prev => ({ ...prev, city: "" }));
+    setNewLeadCitySearch("");
+    if (newLeadCitiesCacheRef.current[newLead.uf]) {
+      const cached = newLeadCitiesCacheRef.current[newLead.uf];
+      setNewLeadCities(cached);
+      if (cached.length > 0) setNewLead(prev => ({ ...prev, city: cached[0] }));
+      return;
+    }
+    setNewLeadLoadingCities(true);
+    const controller = new AbortController();
+    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${newLead.uf}/municipios?orderBy=nome`, { signal: controller.signal })
+      .then((res) => res.json())
+      .then((data: { nome: string }[]) => {
+        const names = data.map((c) => c.nome);
+        newLeadCitiesCacheRef.current[newLead.uf] = names;
+        setNewLeadCities(names);
+        if (names.length > 0) setNewLead(prev => ({ ...prev, city: names[0] }));
+      })
+      .catch((err) => { if (err.name !== "AbortError") setNewLeadCities([]); })
+      .finally(() => setNewLeadLoadingCities(false));
+    return () => controller.abort();
+  }, [newLead.uf]);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (newLeadCityRef.current && !newLeadCityRef.current.contains(e.target as Node)) setNewLeadCityDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const normalizeStr = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const filteredNewLeadCities = newLeadCitySearch ? newLeadCities.filter((c) => normalizeStr(c).includes(normalizeStr(newLeadCitySearch))) : newLeadCities;
 
   const handleCreateLead = async () => {
     if (!newLead.name || !newLead.phone || !newLead.email || !newLead.uf || !newLead.city || !newLead.career) {
@@ -418,10 +471,11 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
           <NewLeadDialogHeader>
             <NewLeadDialogTitle>Novo Lead</NewLeadDialogTitle>
           </NewLeadDialogHeader>
-          <div className="grid gap-3">
-            <div className="grid grid-cols-[80px_1fr] gap-2">
+          <div className="grid gap-4">
+            {/* Tratamento + Nome */}
+            <div className="grid grid-cols-[100px_1fr] gap-2">
               <div>
-                <Label className="text-xs">Tratamento</Label>
+                <Label className="text-xs text-muted-foreground">Tratamento</Label>
                 <Select value={newLead.treatment} onValueChange={(v) => setNewLead({ ...newLead, treatment: v })}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -433,32 +487,81 @@ const DashLeadsList = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => v
                 </Select>
               </div>
               <div>
-                <Label className="text-xs">Nome *</Label>
+                <Label className="text-xs text-muted-foreground">Nome <span className="text-primary">*</span></Label>
                 <Input className="h-9" value={newLead.name} onChange={(e) => setNewLead({ ...newLead, name: e.target.value })} placeholder="Nome completo" />
               </div>
             </div>
+
+            {/* Telefone + Email */}
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label className="text-xs">Telefone *</Label>
+                <Label className="text-xs text-muted-foreground">Telefone <span className="text-primary">*</span></Label>
                 <Input className="h-9" value={newLead.phone} onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })} placeholder="(11) 99999-9999" />
               </div>
               <div>
-                <Label className="text-xs">E-mail *</Label>
+                <Label className="text-xs text-muted-foreground">E-mail <span className="text-primary">*</span></Label>
                 <Input className="h-9" type="email" value={newLead.email} onChange={(e) => setNewLead({ ...newLead, email: e.target.value })} placeholder="email@exemplo.com" />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <Label className="text-xs">UF *</Label>
-                <Input className="h-9" maxLength={2} value={newLead.uf} onChange={(e) => setNewLead({ ...newLead, uf: e.target.value.toUpperCase() })} placeholder="SP" />
+
+            {/* Cidade + UF */}
+            <div className="grid grid-cols-[1fr_80px] gap-2">
+              <div ref={newLeadCityRef} className="relative">
+                <Label className="text-xs text-muted-foreground">Cidade <span className="text-primary">*</span></Label>
+                <Input
+                  className="h-9"
+                  value={newLeadCityDropdownOpen ? newLeadCitySearch : newLead.city}
+                  onChange={(e) => { setNewLeadCitySearch(e.target.value); setNewLeadCityDropdownOpen(true); }}
+                  onFocus={() => { if (newLeadCities.length > 0) setNewLeadCityDropdownOpen(true); }}
+                  placeholder={newLeadLoadingCities ? "Carregando..." : newLead.uf ? "Buscar cidade..." : "Selecione o UF"}
+                  disabled={!newLead.uf || newLeadLoadingCities}
+                />
+                {newLeadCityDropdownOpen && filteredNewLeadCities.length > 0 && (
+                  <div className="absolute z-50 top-full left-0 right-0 mt-1 max-h-40 overflow-y-auto bg-popover border border-border rounded-md shadow-lg">
+                    {filteredNewLeadCities.slice(0, 50).map((city) => (
+                      <button
+                        key={city}
+                        type="button"
+                        className={`w-full text-left px-3 py-1.5 text-sm hover:bg-accent transition-colors ${newLead.city === city ? "bg-accent text-accent-foreground" : ""}`}
+                        onClick={() => { setNewLead({ ...newLead, city }); setNewLeadCitySearch(""); setNewLeadCityDropdownOpen(false); }}
+                      >
+                        {city}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
               <div>
-                <Label className="text-xs">Cidade *</Label>
-                <Input className="h-9" value={newLead.city} onChange={(e) => setNewLead({ ...newLead, city: e.target.value })} placeholder="São Paulo" />
+                <Label className="text-xs text-muted-foreground">UF <span className="text-primary">*</span></Label>
+                <Select value={newLead.uf} onValueChange={(v) => setNewLead({ ...newLead, uf: v, city: "" })}>
+                  <SelectTrigger className="h-9"><SelectValue placeholder="UF" /></SelectTrigger>
+                  <SelectContent>
+                    {UFS.map((uf) => (
+                      <SelectItem key={uf} value={uf}>{uf}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <Label className="text-xs">Especialidade *</Label>
-                <Input className="h-9" value={newLead.career} onChange={(e) => setNewLead({ ...newLead, career: e.target.value })} placeholder="Dentista" />
+            </div>
+
+            {/* Carreira */}
+            <div>
+              <Label className="text-xs text-muted-foreground">Carreira <span className="text-primary">*</span></Label>
+              <div className="flex gap-2 mt-1.5">
+                {getCareers(newLead.treatment).map((c) => (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setNewLead({ ...newLead, career: c.value })}
+                    className={`flex-1 py-2 rounded-lg text-xs font-medium border transition-all duration-200 ${
+                      newLead.career === c.value
+                        ? "border-primary/50 bg-primary/15 text-primary"
+                        : "border-border bg-muted/50 text-muted-foreground hover:border-foreground/25"
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
