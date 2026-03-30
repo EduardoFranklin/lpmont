@@ -73,7 +73,7 @@ const HeroSection = () => {
           </motion.p>
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55 }} className="flex items-center justify-center gap-3 mb-5 sm:mb-10">
-            <img src="/images/foto-breno.png" alt={c.author_name} className="w-14 h-14 sm:w-11 sm:h-11 rounded-full object-cover border border-foreground/[0.08]" decoding="async" />
+            <img src={c.author_avatar || "/images/foto-breno.png"} alt={c.author_name} className="w-14 h-14 sm:w-11 sm:h-11 rounded-full object-cover border border-foreground/[0.08]" decoding="async" />
             <div className="text-left">
               <p className="text-[13px] font-medium text-foreground/60">{c.author_name}</p>
               <p className="text-[11px] text-foreground/25">{c.author_role}</p>
