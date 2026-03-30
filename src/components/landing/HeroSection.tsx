@@ -18,6 +18,7 @@ const extractVideoSrc = (value: string) => {
 const HeroSection = () => {
   const c = useSection("hero");
   const [playing, setPlaying] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const videoSrc = extractVideoSrc(c.video_url);
   const sectionRef = useRef<HTMLElement>(null);
 
