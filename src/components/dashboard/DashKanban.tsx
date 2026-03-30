@@ -34,6 +34,40 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [showNewLead, setShowNewLead] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [newLead, setNewLead] = useState({
+    treatment: "Dr.",
+    name: "",
+    phone: "",
+    email: "",
+    uf: "",
+    city: "",
+    career: "",
+  });
+
+  const resetForm = () => setNewLead({ treatment: "Dr.", name: "", phone: "", email: "", uf: "", city: "", career: "" });
+
+  const handleCreateLead = async () => {
+    if (!newLead.name || !newLead.phone || !newLead.email || !newLead.uf || !newLead.city || !newLead.career) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase.from("leads").insert({
+      ...newLead,
+      status: "novo" as const,
+      funnel_origin: "manual",
+    });
+    if (error) toast.error("Erro ao criar lead");
+    else {
+      toast.success("Lead criado com sucesso!");
+      resetForm();
+      setShowNewLead(false);
+      onRefresh();
+    }
+    setSaving(false);
+  };
 
   const handleDelete = async () => {
     if (!deleteId) return;
