@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { moduleSynopsis } from "./moduleSynopsis";
-import { useSection, parseJSON } from "@/hooks/useSiteContent";
+import { useSection } from "@/hooks/useSiteContent";
 
 interface SynopsisModalProps {
   moduleNum: number | null;
@@ -13,14 +13,17 @@ const SynopsisModal = ({ moduleNum, open, onOpenChange }: SynopsisModalProps) =>
   if (!moduleNum) return null;
 
   const synopsesContent = useSection("synopses");
-  const cmsRaw = synopsesContent[`synopsis_${moduleNum}`];
   const fallback = moduleSynopsis[moduleNum];
-  const data = cmsRaw
-    ? parseJSON<{ title: string; tagline: string; content: string[] }>(cmsRaw, fallback)
-    : fallback;
 
-  if (!data) return null;
+  // Read separate fields (new format) or fall back to defaults
+  const title = synopsesContent[`synopsis_${moduleNum}_title`] || fallback?.title || "";
+  const tagline = synopsesContent[`synopsis_${moduleNum}_tagline`] || fallback?.tagline || "";
+  const rawContent = synopsesContent[`synopsis_${moduleNum}_content`];
+  const content = rawContent
+    ? rawContent.split(/\n\n+/).filter(Boolean)
+    : fallback?.content || [];
 
+  const data = { title, tagline, content };
   const coverSrc = `/images/capa${moduleNum}.webp`;
 
   return (

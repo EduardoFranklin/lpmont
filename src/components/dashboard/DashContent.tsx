@@ -31,16 +31,13 @@ const sectionIcons: Record<string, any> = {
 
 // Fields that should use the rich text editor
 const richTextFields = new Set([
-  "synopsis_1", "synopsis_2", "synopsis_3", "synopsis_4", "synopsis_5",
-  "synopsis_6", "synopsis_7", "synopsis_8", "synopsis_9", "synopsis_10",
-  "synopsis_11", "synopsis_12", "synopsis_13",
   "bio", "description", "desc", "content", "body", "text",
   "result_closing_text",
 ]);
 
 function isRichTextField(key: string, value: string): boolean {
   if (richTextFields.has(key)) return true;
-  if (key.startsWith("synopsis_")) return true;
+  if (key.match(/^synopsis_\d+_content$/)) return true;
   if (value && /<[a-z][\s\S]*>/i.test(value) && !value.startsWith("[") && !value.startsWith("{")) return true;
   return false;
 }
