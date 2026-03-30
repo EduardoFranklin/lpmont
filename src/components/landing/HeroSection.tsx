@@ -28,7 +28,7 @@ const HeroSection = () => {
   return (
     <section ref={sectionRef} className="relative min-h-screen flex flex-col justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src="/images/thumbs/bg-montanha-thumb.webp" alt="" className="w-full h-full object-cover will-change-transform" decoding="async" fetchPriority="high" style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.1)` }} />
+        <img src="/images/thumbs/bg-montanha-thumb.webp" alt="" className="w-full h-full object-cover object-[center_30%] will-change-transform" decoding="async" fetchPriority="high" style={{ transform: `translateY(${scrollY * 0.3}px) scale(1.1)` }} />
       </div>
       <div className="absolute inset-0 bg-background/50 sm:bg-background/70" />
       <div className="absolute top-0 left-0 right-0 h-32 sm:h-24 z-[1] bg-gradient-to-b from-background via-background/80 to-transparent" />
