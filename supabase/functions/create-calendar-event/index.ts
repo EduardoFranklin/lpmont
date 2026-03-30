@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 const ADMIN_EMAIL = "mktmetodomont@gmail.com";
+const CONTATO_EMAIL = "contato@metodomont.com.br";
 
 async function refreshAccessToken(refreshToken: string): Promise<{ access_token: string; expires_in: number }> {
   const clientId = Deno.env.get("GOOGLE_CLIENT_ID")!;
@@ -117,6 +118,7 @@ Deno.serve(async (req) => {
         attendees: [
           { email: guestEmail },
           { email: ADMIN_EMAIL },
+          { email: CONTATO_EMAIL },
         ],
         conferenceData: {
           createRequest: {

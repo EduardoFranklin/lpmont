@@ -8,6 +8,7 @@ const corsHeaders = {
 };
 
 const ADMIN_EMAIL = "mktmetodomont@gmail.com";
+const CONTATO_EMAIL = "contato@metodomont.com.br";
 
 // Generate Google Calendar URL
 function buildCalendarUrl(
