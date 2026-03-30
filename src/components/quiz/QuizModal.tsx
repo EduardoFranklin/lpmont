@@ -63,7 +63,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
 
   const totalSteps = 3 + questions.length;
 
-  const confirmLead = useCallback(() => {
+  const confirmLead = useCallback(async () => {
     const vals = [leadName, leadPhone, leadEmail];
     if (!vals[leadStep]?.trim()) {
       if (inputRef.current) inputRef.current.style.borderColor = "hsl(var(--destructive))";
