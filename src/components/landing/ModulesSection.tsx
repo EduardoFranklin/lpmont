@@ -87,7 +87,7 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
     const track = trackRef.current;
     if (!track) return;
     let raf: number;
-    const speed = 0.6; // px per frame — smooth and steady
+    const speed = 1.0; // px per frame — smooth and steady
     const slideWidth = track.scrollWidth / 3;
 
     const step = () => {
