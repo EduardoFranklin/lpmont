@@ -111,8 +111,13 @@ serve(async (req: Request) => {
       );
     }
 
-    // Insert tag
-    const tag = EVENT_TAG_MAP[event] ?? event.toLowerCase();
+    // Determine tag — distinguish PIX from boleto
+    const paymentType: string = body.data?.purchase?.payment?.type ?? "";
+    let tag = EVENT_TAG_MAP[event] ?? event.toLowerCase();
+    if (event === "PURCHASE_BILLET_PRINTED" && paymentType.toUpperCase() === "PIX") {
+      tag = "pix_gerado";
+    }
+
     await supabase.from("lead_tags").insert({
       lead_id: lead.id,
       tag,
