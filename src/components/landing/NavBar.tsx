@@ -91,7 +91,7 @@ const NavBar = () => {
           <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" decoding="async" />
         </a>
 
-        <div className="hidden md:flex items-center gap-10">
+        <div className="hidden lg:flex items-center gap-10">
           {links.map((l) => (
             <a
               key={l.href}
@@ -104,7 +104,7 @@ const NavBar = () => {
           ))}
         </div>
 
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <GradientButton href="#falar-equipe" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, "#falar-equipe")}>
             Falar com a Equipe <ArrowRight className="w-3.5 h-3.5" />
           </GradientButton>
@@ -114,7 +114,7 @@ const NavBar = () => {
           type="button"
           aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
           onClick={() => setMenuOpen((open) => !open)}
-          className="md:hidden relative z-[60] text-foreground/70 p-2 -mr-2 touch-manipulation"
+          className="lg:hidden relative z-[60] text-foreground/70 p-2 -mr-2 touch-manipulation"
         >
           {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -123,7 +123,7 @@ const NavBar = () => {
       <AnimatePresence>
         {menuOpen && (
           <div
-            className="md:hidden fixed inset-0 top-[72px] bg-background z-40 overflow-hidden touch-none"
+            className="lg:hidden fixed inset-0 top-[72px] bg-background z-40 overflow-hidden touch-none"
           >
             <div className="px-6 py-8 flex flex-col min-h-full">
               <div className="space-y-5 mb-8">
