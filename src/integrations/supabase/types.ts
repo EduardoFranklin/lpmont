@@ -485,6 +485,7 @@ export type Database = {
           lesson_thumbnail: string
           lesson_title: string
           lesson_video_url: string
+          page_type: string
           quiz_desc: string
           quiz_duration: string
           quiz_icon: string
@@ -507,6 +508,7 @@ export type Database = {
           slug: string
           status: string
           updated_at: string
+          video_locked: boolean
         }
         Insert: {
           coupon_code?: string
@@ -531,6 +533,7 @@ export type Database = {
           lesson_thumbnail?: string
           lesson_title?: string
           lesson_video_url?: string
+          page_type?: string
           quiz_desc?: string
           quiz_duration?: string
           quiz_icon?: string
@@ -553,6 +556,7 @@ export type Database = {
           slug: string
           status?: string
           updated_at?: string
+          video_locked?: boolean
         }
         Update: {
           coupon_code?: string
@@ -577,6 +581,7 @@ export type Database = {
           lesson_thumbnail?: string
           lesson_title?: string
           lesson_video_url?: string
+          page_type?: string
           quiz_desc?: string
           quiz_duration?: string
           quiz_icon?: string
@@ -599,6 +604,7 @@ export type Database = {
           slug?: string
           status?: string
           updated_at?: string
+          video_locked?: boolean
         }
         Relationships: []
       }
