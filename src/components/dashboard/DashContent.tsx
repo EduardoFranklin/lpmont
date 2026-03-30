@@ -20,7 +20,6 @@ const sectionIcons: Record<string, any> = {
   hero: Settings,
   problem: Mountain,
   modules: BookOpen,
-  synopses: FileText,
   method: GraduationCap,
   instructor: Heart,
   benefits: Heart,
