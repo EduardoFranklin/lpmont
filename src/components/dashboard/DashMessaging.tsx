@@ -59,27 +59,56 @@ const AVAILABLE_TAGS = [
   "onboarding_pendente", "onboarding_completo",
 ];
 
-const DELAY_PRESETS = [
-  { label: "Imediato", minutes: 0 },
-  { label: "5 min", minutes: 5 },
-  { label: "15 min", minutes: 15 },
-  { label: "30 min", minutes: 30 },
-  { label: "1 hora", minutes: 60 },
-  { label: "2 horas", minutes: 120 },
-  { label: "4 horas", minutes: 240 },
-  { label: "12 horas", minutes: 720 },
-  { label: "24 horas", minutes: 1440 },
-  { label: "48 horas", minutes: 2880 },
-  { label: "72 horas", minutes: 4320 },
-  { label: "5 dias", minutes: 7200 },
-  { label: "7 dias", minutes: 10080 },
+const DELAY_UNITS = [
+  { label: "Min", multiplier: 1 },
+  { label: "Hora", multiplier: 60 },
+  { label: "Dia", multiplier: 1440 },
 ];
 
 function minutesToLabel(m: number): string {
   if (m === 0) return "Imediato";
-  if (m < 60) return `${m} min`;
-  if (m < 1440) return `${Math.round(m / 60)} hora${Math.round(m / 60) > 1 ? "s" : ""}`;
-  return `${Math.round(m / 1440)} dia${Math.round(m / 1440) > 1 ? "s" : ""}`;
+  if (m >= 1440 && m % 1440 === 0) return `${m / 1440} dia${m / 1440 > 1 ? "s" : ""}`;
+  if (m >= 60 && m % 60 === 0) return `${m / 60} hora${m / 60 > 1 ? "s" : ""}`;
+  return `${m} min`;
+}
+
+function minutesToUnit(m: number): { value: number; unit: string } {
+  if (m === 0) return { value: 0, unit: "Min" };
+  if (m >= 1440 && m % 1440 === 0) return { value: m / 1440, unit: "Dia" };
+  if (m >= 60 && m % 60 === 0) return { value: m / 60, unit: "Hora" };
+  return { value: m, unit: "Min" };
+}
+
+function DelayInput({ minutes, onChange }: { minutes: number; onChange: (m: number) => void }) {
+  const parsed = minutesToUnit(minutes);
+  const [value, setValue] = useState(String(parsed.value));
+  const [unit, setUnit] = useState(parsed.unit);
+
+  const apply = (v: string, u: string) => {
+    const num = parseInt(v) || 0;
+    const mult = DELAY_UNITS.find(d => d.label === u)?.multiplier || 1;
+    onChange(num * mult);
+  };
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <Input
+        type="number"
+        min={0}
+        value={value}
+        onChange={(e) => { setValue(e.target.value); apply(e.target.value, unit); }}
+        className="h-8 w-20 text-sm"
+        placeholder="0"
+      />
+      <select
+        value={unit}
+        onChange={(e) => { setUnit(e.target.value); apply(value, e.target.value); }}
+        className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+      >
+        {DELAY_UNITS.map(u => <option key={u.label} value={u.label}>{u.label}</option>)}
+      </select>
+    </div>
+  );
 }
 
 /* ─── types ─── */
@@ -262,7 +291,7 @@ const SequenceCard = ({
   const [conditions, setConditions] = useState<any>(seq.conditions);
   const [showConditions, setShowConditions] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [customDelay, setCustomDelay] = useState("");
+  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isEmail = seq.channel === "email";
 
@@ -352,33 +381,7 @@ const SequenceCard = ({
           {/* Delay editor */}
           <div className="flex items-center gap-2 flex-wrap">
             <Label className="text-xs font-medium flex items-center gap-1"><Clock className="w-3 h-3" /> Tempo de espera:</Label>
-            <div className="flex flex-wrap gap-1">
-              {DELAY_PRESETS.map(p => (
-                <button
-                  key={p.minutes}
-                  onClick={() => { setDelayMinutes(p.minutes); setCustomDelay(""); }}
-                  className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
-                    delayMinutes === p.minutes && !customDelay
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-muted/30 hover:bg-muted/60 border-border"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-              <Input
-                placeholder="Personalizado (min)"
-                value={customDelay}
-                onChange={(e) => {
-                  setCustomDelay(e.target.value);
-                  const v = parseInt(e.target.value);
-                  if (!isNaN(v) && v >= 0) setDelayMinutes(v);
-                }}
-                className="h-5 w-28 text-[10px] px-1.5"
-                type="number"
-                min={0}
-              />
-            </div>
+            <DelayInput minutes={delayMinutes} onChange={setDelayMinutes} />
           </div>
 
           {/* Subject for email */}
@@ -487,20 +490,8 @@ const AddMessageDialog = ({ funnel, existingCount, onAdded }: { funnel: string; 
             </div>
             <div>
               <Label className="text-xs">Tempo de espera</Label>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {DELAY_PRESETS.slice(0, 9).map(p => (
-                  <button
-                    key={p.minutes}
-                    onClick={() => setDelayMinutes(p.minutes)}
-                    className={`px-2 py-0.5 rounded text-[10px] border transition-colors ${
-                      delayMinutes === p.minutes
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-muted/30 hover:bg-muted/60 border-border"
-                    }`}
-                  >
-                    {p.label}
-                  </button>
-                ))}
+              <div className="mt-1">
+                <DelayInput minutes={delayMinutes} onChange={setDelayMinutes} />
               </div>
             </div>
             {channel === "email" && (
