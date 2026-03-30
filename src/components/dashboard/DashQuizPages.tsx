@@ -443,7 +443,8 @@ const DashQuizPages = () => {
             </AccordionItem>
             )}
 
-            {/* Quiz info */}
+            {/* Quiz info - only show if page has quiz */}
+            {(editPage.page_type || "video_quiz") !== "video_only" && (
             <AccordionItem value="quizinfo" className="border rounded-lg">
               <AccordionTrigger className="px-4 py-3 hover:no-underline font-medium">Quiz (Info)</AccordionTrigger>
               <AccordionContent className="px-4 pb-4 space-y-3">
@@ -455,6 +456,7 @@ const DashQuizPages = () => {
                 <Field label="Duração" value={editPage.quiz_duration} onChange={(v) => updateField("quiz_duration", v)} />
               </AccordionContent>
             </AccordionItem>
+            )}
 
             {/* Lead capture */}
             <AccordionItem value="lead" className="border rounded-lg">
