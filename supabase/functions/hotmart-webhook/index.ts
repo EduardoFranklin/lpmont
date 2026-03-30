@@ -28,7 +28,7 @@ const EVENT_TAG_MAP: Record<string, string> = {
   CLUB_FIRST_ACCESS: "entrou_no_curso",
   CLUB_MODULE_COMPLETED: "modulo_concluido",
   // Checkout
-  PURCHASE_BILLET_PRINTED: "boleto_impresso",
+  PURCHASE_BILLET_PRINTED: "boleto_impresso", // overridden below for PIX
   PURCHASE_EXPIRED: "compra_expirada",
   SWITCH_PLAN: "troca_plano",
   UPDATE_SUBSCRIPTION_CHARGE_DATE: "atualizou_cobranca",
@@ -111,8 +111,13 @@ serve(async (req: Request) => {
       );
     }
 
-    // Insert tag
-    const tag = EVENT_TAG_MAP[event] ?? event.toLowerCase();
+    // Determine tag — distinguish PIX from boleto
+    const paymentType: string = body.data?.purchase?.payment?.type ?? "";
+    let tag = EVENT_TAG_MAP[event] ?? event.toLowerCase();
+    if (event === "PURCHASE_BILLET_PRINTED" && paymentType.toUpperCase() === "PIX") {
+      tag = "pix_gerado";
+    }
+
     await supabase.from("lead_tags").insert({
       lead_id: lead.id,
       tag,
