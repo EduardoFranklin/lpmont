@@ -108,7 +108,9 @@ const DashQuizPages = () => {
     const slug = `quiz${pages.length + 1}`;
     const { data, error } = await supabase.from("quiz_pages").insert({
       slug,
-      hero_title: "Novo Quiz",
+      page_type: "video_quiz",
+      video_locked: false,
+      hero_title: "Nova Página",
       hero_message: "",
       hero_author_name: "Dr. Breno Mont'Alverne",
       hero_author_role: "Fundador do Instituto Mont'Alverne",
@@ -126,7 +128,7 @@ const DashQuizPages = () => {
       result_low_title: "",
       result_low_diagnostic: "",
       result_closing_text: "",
-    }).select().single();
+    } as any).select().single();
     if (error) { toast.error(error.message); return; }
     if (data) {
       await loadPages();
