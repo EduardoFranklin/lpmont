@@ -67,7 +67,15 @@ const defaultCoverSlides = [
 
 const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum: number) => void; coverSlides: string[] }) => {
   const slides = coverSlides.length > 0 ? coverSlides : defaultCoverSlides;
-  const doubled = [...slides, ...slides];
+
+  const autoplayPlugin = useRef(
+    Autoplay({ delay: 2500, stopOnInteraction: false, stopOnMouseEnter: true })
+  );
+
+  const [emblaRef] = useEmblaCarousel(
+    { loop: true, align: "start", dragFree: true, slidesToScroll: 1 },
+    [autoplayPlugin.current]
+  );
 
   return (
     <motion.div
@@ -80,27 +88,29 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
         <div className="absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-background to-transparent pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent pointer-events-none" />
 
-        <div className="camps-carousel-track flex gap-4 w-max">
-          {doubled.map((src, i) => {
-            const moduleNum = (i % slides.length) + 1;
-            const camp = camps[moduleNum - 1];
-            return (
-              <div
-                key={i}
-                className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group/card"
-                onClick={() => onCoverClick(moduleNum)}
-              >
-                <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover/card:border-primary/20 transition-colors duration-300">
-                  <img
-                    src={src}
-                    alt={camp?.title || `Acampamento ${moduleNum}`}
-                    className="w-full h-auto object-cover"
-                    loading="lazy"
-                  />
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex gap-4">
+            {slides.map((src, i) => {
+              const moduleNum = i + 1;
+              const camp = camps[moduleNum - 1];
+              return (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group/card"
+                  onClick={() => onCoverClick(moduleNum)}
+                >
+                  <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover/card:border-primary/20 transition-colors duration-300">
+                    <img
+                      src={src}
+                      alt={camp?.title || `Acampamento ${moduleNum}`}
+                      className="w-full h-auto object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </motion.div>
