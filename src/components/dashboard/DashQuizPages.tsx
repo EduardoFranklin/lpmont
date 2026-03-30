@@ -80,6 +80,7 @@ const DashQuizPages = () => {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [expandedQ, setExpandedQ] = useState<number | null>(null);
 
   const loadPages = async () => {
     const { data } = await supabase.from("quiz_pages").select("*").order("created_at", { ascending: false });
