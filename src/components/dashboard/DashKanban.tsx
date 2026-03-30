@@ -98,7 +98,13 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
   };
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Button onClick={() => setShowNewLead(true)} size="sm" className="gap-1.5">
+          <Plus className="w-4 h-4" /> Novo Lead
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {COLUMNS.map((col) => {
         const colLeads = leads.filter((l) => l.status === col.status);
         return (
