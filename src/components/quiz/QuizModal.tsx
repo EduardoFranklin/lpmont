@@ -86,6 +86,8 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
             await supabase.from("lead_tags").insert({ lead_id: leadId, tag: "quiz", source: "quiz" } as any);
           }
         });
+        localStorage.setItem("lead_email", leadEmail.trim().toLowerCase());
+        localStorage.setItem("lead_phone", leadPhone.trim());
       } catch {}
       setPhase("quiz");
       return;
