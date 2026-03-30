@@ -11,6 +11,7 @@ import ImageUploadCrop from "./ImageUploadCrop";
 import RichTextEditor from "./RichTextEditor";
 import DashQuizPages from "./DashQuizPages";
 import DashModulesEditor from "./DashModulesEditor";
+import { DashFAQEditor, DashTestimonialsEditor, DashBenefitsEditor } from "./DashListEditors";
 
 type ContentMap = Record<string, Record<string, string>>;
 
