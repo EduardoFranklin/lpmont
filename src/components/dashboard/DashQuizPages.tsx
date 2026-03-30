@@ -386,65 +386,110 @@ const DashQuizPages = () => {
               <AccordionContent className="px-4 pb-4 space-y-3">
                 <Field label="Slug (URL)" value={editPage.slug} onChange={(v) => updateField("slug", v)} />
                 <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 block">Conteúdo da Página</label>
-                  <div className="flex gap-3">
-                    {(() => {
-                      const pt = editPage.page_type || "video_quiz";
-                      const hasVideo = pt !== "quiz_only";
-                      const hasQuiz = pt !== "video_only";
-                      const toggle = (type: "video" | "quiz") => {
-                        if (type === "video") {
-                          if (hasVideo && hasQuiz) updateField("page_type", "quiz_only");
-                          else if (!hasVideo) updateField("page_type", hasQuiz ? "video_quiz" : "video_only");
-                        } else {
-                          if (hasQuiz && hasVideo) updateField("page_type", "video_only");
-                          else if (!hasQuiz) updateField("page_type", hasVideo ? "video_quiz" : "quiz_only");
-                        }
-                      };
-                      return (
-                        <>
-                          <div
-                            className={`flex-1 rounded-lg border transition-all ${
-                              hasVideo ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
-                            }`}
-                          >
-                            <div
-                              className="flex items-center gap-2.5 p-3 cursor-pointer"
-                              onClick={(e) => { e.preventDefault(); toggle("video"); }}
-                            >
-                              <Checkbox checked={hasVideo} disabled={hasVideo && !hasQuiz} />
-                              <div className="flex-1">
-                                <p className="text-sm font-medium leading-none">🎬 Vídeo</p>
-                                <p className="text-[10px] mt-0.5 opacity-70">Aula em vídeo</p>
-                              </div>
-                              {hasVideo && (
-                                <div className="flex items-center gap-1.5 ml-auto" onClick={(e) => e.stopPropagation()}>
-                                  <span className="text-[10px] text-muted-foreground">Bloquear</span>
-                                  <Switch
-                                    checked={editPage.video_locked ?? false}
-                                    onCheckedChange={(v) => updateField("video_locked", v)}
-                                    className="scale-75"
-                                  />
-                                </div>
-                              )}
-                            </div>
+                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2 block">Conteúdo da Página <span className="normal-case text-foreground/30">(arraste para reordenar)</span></label>
+                  {(() => {
+                    const pt = editPage.page_type || "video_quiz";
+                    const hasVideo = pt !== "quiz_only";
+                    const hasQuiz = pt !== "video_only";
+                    const vFirst = editPage.video_first ?? true;
+                    const toggle = (type: "video" | "quiz") => {
+                      if (type === "video") {
+                        if (hasVideo && hasQuiz) updateField("page_type", "quiz_only");
+                        else if (!hasVideo) updateField("page_type", hasQuiz ? "video_quiz" : "video_only");
+                      } else {
+                        if (hasQuiz && hasVideo) updateField("page_type", "video_only");
+                        else if (!hasQuiz) updateField("page_type", hasVideo ? "video_quiz" : "quiz_only");
+                      }
+                    };
+
+                    const videoCard = (
+                      <div
+                        key="video"
+                        draggable={hasVideo && hasQuiz}
+                        onDragStart={(e) => e.dataTransfer.setData("text/plain", "video")}
+                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("ring-2", "ring-primary/40"); }}
+                        onDragLeave={(e) => e.currentTarget.classList.remove("ring-2", "ring-primary/40")}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          e.currentTarget.classList.remove("ring-2", "ring-primary/40");
+                          const from = e.dataTransfer.getData("text/plain");
+                          if (from === "quiz") updateField("video_first", false);
+                        }}
+                        className={`flex-1 rounded-lg border transition-all ${
+                          hasVideo ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
+                        } ${hasVideo && hasQuiz ? "cursor-grab active:cursor-grabbing" : ""}`}
+                      >
+                        <div
+                          className="flex items-center gap-2.5 p-3 cursor-pointer"
+                          onClick={(e) => { e.preventDefault(); toggle("video"); }}
+                        >
+                          {hasVideo && hasQuiz && <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />}
+                          <Checkbox checked={hasVideo} disabled={hasVideo && !hasQuiz} />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium leading-none">🎬 Vídeo</p>
+                            <p className="text-[10px] mt-0.5 opacity-70">Aula em vídeo</p>
                           </div>
-                          <div
-                            className={`flex-1 flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition-all ${
-                              hasQuiz ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
-                            }`}
-                            onClick={(e) => { e.preventDefault(); toggle("quiz"); }}
-                          >
-                            <Checkbox checked={hasQuiz} disabled={hasQuiz && !hasVideo} />
-                            <div>
-                              <p className="text-sm font-medium leading-none">🧠 Quiz</p>
-                              <p className="text-[10px] mt-0.5 opacity-70">Questionário</p>
+                          {hasVideo && (
+                            <div className="flex items-center gap-1.5 ml-auto" onClick={(e) => e.stopPropagation()}>
+                              <span className="text-[10px] text-muted-foreground">Bloquear</span>
+                              <Switch
+                                checked={editPage.video_locked ?? false}
+                                onCheckedChange={(v) => updateField("video_locked", v)}
+                                className="scale-75"
+                              />
                             </div>
-                          </div>
-                        </>
-                      );
-                    })()}
-                  </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+
+                    const quizCard = (
+                      <div
+                        key="quiz"
+                        draggable={hasVideo && hasQuiz}
+                        onDragStart={(e) => e.dataTransfer.setData("text/plain", "quiz")}
+                        onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add("ring-2", "ring-primary/40"); }}
+                        onDragLeave={(e) => e.currentTarget.classList.remove("ring-2", "ring-primary/40")}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          e.currentTarget.classList.remove("ring-2", "ring-primary/40");
+                          const from = e.dataTransfer.getData("text/plain");
+                          if (from === "video") updateField("video_first", true);
+                        }}
+                        className={`flex-1 flex items-center gap-2.5 p-3 rounded-lg border transition-all ${
+                          hasQuiz ? "border-primary bg-primary/8 text-foreground" : "border-border bg-muted/20 text-muted-foreground"
+                        } ${hasVideo && hasQuiz ? "cursor-grab active:cursor-grabbing" : ""}`}
+                        onClick={(e) => { e.preventDefault(); toggle("quiz"); }}
+                      >
+                        {hasVideo && hasQuiz && <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />}
+                        <Checkbox checked={hasQuiz} disabled={hasQuiz && !hasVideo} />
+                        <div>
+                          <p className="text-sm font-medium leading-none">🧠 Quiz</p>
+                          <p className="text-[10px] mt-0.5 opacity-70">Questionário</p>
+                        </div>
+                      </div>
+                    );
+
+                    const cards = vFirst ? [videoCard, quizCard] : [quizCard, videoCard];
+
+                    return (
+                      <div className="flex gap-3">
+                        {cards[0]}
+                        <div className="flex items-center">
+                          <button
+                            type="button"
+                            onClick={() => updateField("video_first", !vFirst)}
+                            disabled={!(hasVideo && hasQuiz)}
+                            className="p-1.5 rounded-lg border border-border hover:border-primary/30 hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all disabled:opacity-20 disabled:pointer-events-none"
+                            title="Inverter ordem"
+                          >
+                            <ArrowUpDown className="w-4 h-4" />
+                          </button>
+                        </div>
+                        {cards[1]}
+                      </div>
+                    );
+                  })()}
                 </div>
                 <Field label="CTA URL" value={editPage.cta_url} onChange={(v) => updateField("cta_url", v)} />
                 <Field label="Cupom" value={editPage.coupon_code} onChange={(v) => updateField("coupon_code", v)} />
