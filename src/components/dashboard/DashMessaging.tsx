@@ -67,9 +67,48 @@ const DELAY_UNITS = [
 
 function minutesToLabel(m: number): string {
   if (m === 0) return "Imediato";
-  if (m < 60) return `${m} min`;
-  if (m < 1440) return `${Math.round(m / 60)} hora${Math.round(m / 60) > 1 ? "s" : ""}`;
-  return `${Math.round(m / 1440)} dia${Math.round(m / 1440) > 1 ? "s" : ""}`;
+  if (m >= 1440 && m % 1440 === 0) return `${m / 1440} dia${m / 1440 > 1 ? "s" : ""}`;
+  if (m >= 60 && m % 60 === 0) return `${m / 60} hora${m / 60 > 1 ? "s" : ""}`;
+  return `${m} min`;
+}
+
+function minutesToUnit(m: number): { value: number; unit: string } {
+  if (m === 0) return { value: 0, unit: "Min" };
+  if (m >= 1440 && m % 1440 === 0) return { value: m / 1440, unit: "Dia" };
+  if (m >= 60 && m % 60 === 0) return { value: m / 60, unit: "Hora" };
+  return { value: m, unit: "Min" };
+}
+
+function DelayInput({ minutes, onChange }: { minutes: number; onChange: (m: number) => void }) {
+  const parsed = minutesToUnit(minutes);
+  const [value, setValue] = useState(String(parsed.value));
+  const [unit, setUnit] = useState(parsed.unit);
+
+  const apply = (v: string, u: string) => {
+    const num = parseInt(v) || 0;
+    const mult = DELAY_UNITS.find(d => d.label === u)?.multiplier || 1;
+    onChange(num * mult);
+  };
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <Input
+        type="number"
+        min={0}
+        value={value}
+        onChange={(e) => { setValue(e.target.value); apply(e.target.value, unit); }}
+        className="h-8 w-20 text-sm"
+        placeholder="0"
+      />
+      <select
+        value={unit}
+        onChange={(e) => { setUnit(e.target.value); apply(value, e.target.value); }}
+        className="h-8 rounded-md border border-input bg-background px-2 text-sm"
+      >
+        {DELAY_UNITS.map(u => <option key={u.label} value={u.label}>{u.label}</option>)}
+      </select>
+    </div>
+  );
 }
 
 /* ─── types ─── */
