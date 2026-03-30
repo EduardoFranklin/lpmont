@@ -118,11 +118,36 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
         const allScores = [...scores, pts];
         const rawTotal = allScores.reduce((a, b) => a + b, 0);
         const finalTotal = (travaTrigger || (q.is_critical && !isIdeal)) ? Math.min(rawTotal, 70) : rawTotal;
+        // Determine diagnostic level
+        let diagLevel = page.result_low_level;
+        if (finalTotal >= page.result_high_min) diagLevel = page.result_high_level;
+        else if (finalTotal >= page.result_mid_min) diagLevel = page.result_mid_level;
+
         try {
-          supabase.from("leads")
-            .update({ quiz_score: finalTotal, quiz_slug: page.slug } as any)
-            .eq("email", leadEmail.trim())
-            .then(() => {});
+          const email = leadEmail.trim().toLowerCase();
+          // Update lead with quiz results
+          const { data: updatedLeads } = await supabase.from("leads")
+            .update({
+              quiz_score: finalTotal,
+              quiz_slug: page.slug,
+              quiz_concluido: true,
+              quiz_diagnostico: diagLevel,
+            } as any)
+            .eq("email", email)
+            .select("id");
+
+          if (updatedLeads && updatedLeads[0]?.id) {
+            const leadId = updatedLeads[0].id;
+            // Add quiz_concluido tag
+            await supabase.from("lead_tags").upsert(
+              { lead_id: leadId, tag: "quiz_concluido", source: "quiz" } as any,
+              { onConflict: "lead_id,tag" }
+            );
+            // Trigger automation for quiz completion
+            supabase.functions.invoke("enqueue-automation", {
+              body: { lead_id: leadId, funnel: "F2", event: "quiz_concluido" },
+            });
+          }
         } catch {}
       } else {
         setQi((i) => i + 1);
