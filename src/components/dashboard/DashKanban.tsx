@@ -108,9 +108,16 @@ const DashKanban = ({ leads, onRefresh }: { leads: Lead[]; onRefresh: () => void
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => handleDrop(e, col.status)}
           >
-            <div className="p-3 border-b border-border">
-              <h3 className="text-xs font-semibold text-foreground">{col.label}</h3>
-              <span className="text-xs text-muted-foreground">{colLeads.length}</span>
+            <div className="p-3 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-xs font-semibold text-foreground">{col.label}</h3>
+                <span className="text-xs text-muted-foreground">{colLeads.length}</span>
+              </div>
+              {col.status === "novo" && (
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowNewLead(true)} title="Novo lead">
+                  <Plus className="w-3.5 h-3.5" />
+                </Button>
+              )}
             </div>
             <div className="p-2 space-y-2">
               {colLeads.map((lead) => {
