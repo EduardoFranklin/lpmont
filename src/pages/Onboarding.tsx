@@ -410,4 +410,88 @@ function AccessCard({ icon, iconBg, label, sub, url }: { icon: React.ReactNode; 
   );
 }
 
+/* ── Mobile Menu (always visible, all resolutions) ── */
+const OnboardingMobileMenu = ({
+  links,
+  instagramLinks,
+  onClose,
+}: {
+  links: { label: string; href: string; external?: boolean }[];
+  instagramLinks: { label: string; url: string }[];
+  onClose: () => void;
+}) => {
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-[60] bg-background" role="dialog" aria-modal="true">
+      <div className="section-container flex items-center justify-between h-[72px]">
+        <a href="/" className="flex items-center gap-2" onClick={onClose}>
+          <img src="/images/logo-metodo-mont.svg" alt="Método Mont'" className="h-8" decoding="async" />
+        </a>
+        <button type="button" aria-label="Fechar menu" onClick={onClose} className="text-foreground/70 p-2 -mr-2">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+      <div className="px-6 py-8 flex flex-col">
+        <div className="space-y-5 mb-8">
+          {links.map((l) => (
+            <a
+              key={l.href}
+              href={l.href}
+              onClick={onClose}
+              className="block text-lg text-foreground/60 hover:text-foreground transition-colors"
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
+        <div className="space-y-3">
+          <a
+            href="https://pay.hotmart.com/F97566234Y"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onClose}
+            className="btn-summit w-full justify-center py-3 text-sm"
+          >
+            Comprar Agora <ArrowRight className="w-3.5 h-3.5" />
+          </a>
+          <a href="/#falar-equipe" onClick={onClose} className="btn-gradient w-full">
+            <div className="btn-gradient-wrapper w-full">
+              <div className="btn-gradient-inner w-full">
+                <div className="btn-gradient-bg" />
+                <span className="btn-gradient-text justify-center w-full">Falar com a Equipe</span>
+              </div>
+            </div>
+          </a>
+        </div>
+        {instagramLinks.length > 0 && (
+          <div className="flex items-center justify-center gap-5 mt-10">
+            {instagramLinks.map((l) => (
+              <a key={l.url} href={l.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-foreground/25 hover:text-primary transition-colors text-xs">
+                <Instagram className="w-4 h-4" />
+                <span>{l.label}</span>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 export default Onboarding;
