@@ -152,10 +152,18 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
       if (dt > 0) velocity = (last.x - first.x) / dt;
     }
 
-    // If finger barely moved, treat as tap (not drag)
+    // If finger barely moved, treat as tap → find which card was tapped
     if (totalDx <= 10) {
-      wasDragging.current = false;
       isPaused.current = false;
+      // Find the clicked card element
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (el) {
+        const card = el.closest<HTMLElement>("[data-module-num]");
+        if (card) {
+          const num = parseInt(card.dataset.moduleNum || "0", 10);
+          if (num > 0) onCoverClick(num);
+        }
+      }
       return;
     }
 
@@ -172,11 +180,6 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
     } else {
       isPaused.current = false;
     }
-  };
-
-  const handleClick = (moduleNum: number) => (e: React.MouseEvent) => {
-    if (wasDragging.current) { e.preventDefault(); return; }
-    onCoverClick(moduleNum);
   };
 
   return (
@@ -208,7 +211,7 @@ const CampsCarousel = ({ onCoverClick, coverSlides }: { onCoverClick: (moduleNum
               <div
                 key={i}
                 className="flex-shrink-0 w-[180px] sm:w-[200px] cursor-pointer group/card"
-                onClick={handleClick(moduleNum)}
+                data-module-num={moduleNum}
               >
                 <div className="rounded-xl overflow-hidden border border-foreground/[0.06] group-hover/card:border-primary/20 transition-colors duration-300">
                   <img
