@@ -282,8 +282,8 @@ const ImageUploadCrop = ({
     <div className="space-y-3">
       {/* Current image preview */}
       {value && !preview && (
-        <div className="relative group rounded-xl overflow-hidden border border-border">
-          <img src={value} alt={localAltText || "Preview"} className="w-full max-h-48 object-cover" />
+        <div className="relative group rounded-xl overflow-hidden border border-border bg-foreground/[0.03]">
+          <img src={value} alt={localAltText || "Preview"} className="w-full object-contain max-h-64" />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
             <button
               onClick={() => fileInputRef.current?.click()}
