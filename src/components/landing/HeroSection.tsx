@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Play, Users, BookOpen, Radio } from "lucide-react";
+import { ArrowRight, Users, BookOpen, Radio } from "lucide-react";
 import { useSection, parseJSON } from "@/hooks/useSiteContent";
 import VideoEmbed from "@/components/video/VideoEmbed";
 
