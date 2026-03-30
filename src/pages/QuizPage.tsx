@@ -71,7 +71,7 @@ export interface QuizQuestion {
   weight: number;
   explanation: string;
   image_url: string;
-  options: { text: string; points: number }[];
+  options: { text: string; points: number; correct?: boolean }[];
 }
 
 const QuizPage = () => {
