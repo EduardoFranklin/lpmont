@@ -278,7 +278,7 @@ const ConditionsEditor = ({ conditions, onChange }: { conditions: any; onChange:
     <div className="space-y-3 p-3 bg-muted/20 rounded-lg border border-border">
       <TagSection type="required_tags" label="Lead DEVE ter" icon="✓" tags={requiredTags}
         color="bg-emerald-500/10 text-emerald-600 border-emerald-500/30" custom={customReq} setCustom={setCustomReq} />
-      <Separator />
+      <div className="border-t border-border" />
       <TagSection type="excluded_tags" label="Lead NÃO pode ter" icon="✕" tags={excludedTags}
         color="bg-red-500/10 text-red-500 border-red-500/30" custom={customExc} setCustom={setCustomExc} />
     </div>
