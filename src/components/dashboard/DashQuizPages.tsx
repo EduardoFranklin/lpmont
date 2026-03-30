@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Plus, Trash2, Save, Loader2, ExternalLink, ChevronUp, ChevronDown, Copy, Eye } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, ExternalLink, ChevronUp, ChevronDown, Copy, Eye, Check } from "lucide-react";
 import { toast } from "sonner";
 import ImageUploadCrop from "./ImageUploadCrop";
 import RichTextEditor from "./RichTextEditor";
@@ -68,7 +68,7 @@ interface QuizQuestion {
   weight: number;
   explanation: string;
   image_url: string;
-  options: { text: string; points: number }[];
+  options: { text: string; points: number; correct?: boolean }[];
   _isNew?: boolean;
   _deleted?: boolean;
 }
@@ -609,7 +609,19 @@ const DashQuizPages = () => {
                           <div className="space-y-2">
                             <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Opções</span>
                             {q.options.map((opt, oi) => (
-                              <div key={oi} className="flex items-center gap-2">
+                              <div key={oi} className={`flex items-center gap-2 p-1.5 rounded-lg border transition-all ${opt.correct ? "border-green-500/40 bg-green-500/5" : "border-transparent"}`}>
+                                <button
+                                  type="button"
+                                  title={opt.correct ? "Resposta correta" : "Marcar como correta"}
+                                  onClick={() => {
+                                    // Set this option as correct, unmark others
+                                    const newOpts = q.options.map((o, j) => ({ ...o, correct: j === oi }));
+                                    setQuestions((qs) => qs.map((qq, i) => (i === qi ? { ...qq, options: newOpts } : qq)));
+                                  }}
+                                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${opt.correct ? "border-green-500 bg-green-500 text-white" : "border-muted-foreground/30 hover:border-green-500/60"}`}
+                                >
+                                  {opt.correct && <Check className="w-3 h-3" />}
+                                </button>
                                 <Input value={opt.text} onChange={(e) => updateOption(qi, oi, "text", e.target.value)} placeholder={`Opção ${oi + 1}`} className="flex-1 text-sm" />
                                 <Input type="number" value={String(opt.points)} onChange={(e) => updateOption(qi, oi, "points", parseInt(e.target.value) || 0)} className="w-20 text-sm" placeholder="Pts" />
                                 <button onClick={() => removeOption(qi, oi)} className="text-destructive/60 hover:text-destructive p-1"><Trash2 className="w-3 h-3" /></button>
