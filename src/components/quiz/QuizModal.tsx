@@ -128,10 +128,10 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
         const allScores = [...scores, pts];
         const rawTotal = allScores.reduce((a, b) => a + b, 0);
         const finalTotal = (travaTrigger || (q.is_critical && !isIdeal)) ? Math.min(rawTotal, 70) : rawTotal;
-        // Determine diagnostic level
-        let diagLevel = page.result_low_level;
-        if (finalTotal >= page.result_high_min) diagLevel = page.result_high_level;
-        else if (finalTotal >= page.result_mid_min) diagLevel = page.result_mid_level;
+        // Determine diagnostic level code for automation matching
+        let diagCode = "C"; // low
+        if (finalTotal >= page.result_high_min) diagCode = "A";
+        else if (finalTotal >= page.result_mid_min) diagCode = "B";
 
         if (leadId) {
           try {
@@ -141,7 +141,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
                 quiz_score: finalTotal,
                 quiz_slug: page.slug,
                 quiz_concluido: true,
-                quiz_diagnostico: diagLevel,
+                quiz_diagnostico: diagCode,
               } as any)
               .eq("id", leadId);
 
