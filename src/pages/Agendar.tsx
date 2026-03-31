@@ -234,6 +234,18 @@ const Agendar = () => {
     if (!selectedSlot) return;
     setCalendarCreating(true);
     try {
+      // Cancel pending F1 messages from previous appointments with same email
+      const { data: existingLeads } = await supabase.from("leads")
+        .select("id").eq("email", form.email.toLowerCase());
+      if (existingLeads && existingLeads.length > 0) {
+        const oldIds = existingLeads.map((l: any) => l.id);
+        await supabase.from("message_queue")
+          .update({ status: "cancelled", last_error: "Reagendamento — novo agendamento criado" } as any)
+          .in("lead_id", oldIds)
+          .eq("status", "pending")
+          .eq("funnel", "F1");
+      }
+
       const { data: insertedLead } = await supabase.from("leads").insert({
         treatment: form.treatment,
         name: form.name,
