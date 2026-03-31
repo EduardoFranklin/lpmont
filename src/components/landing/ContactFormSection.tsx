@@ -197,7 +197,21 @@ const ContactFormSection = () => {
             guestName: form.name, treatment: form.treatment,
           },
         });
-        if (calData?.meetLink) { calMeetLink = calData.meetLink; setMeetLink(calData.meetLink); setCalendarCreated(true); }
+        if (calData?.meetLink) {
+          calMeetLink = calData.meetLink;
+          setMeetLink(calData.meetLink);
+          setCalendarCreated(true);
+          // Save meet link to lead record
+          if (leadId) {
+            await supabase.from("leads").update({
+              reuniao_link_google_meet: calData.meetLink,
+              reuniao_link_google_calendar: calData.calendarLink || null,
+              reuniao_data_hora_iso: calData.startDateTime || null,
+              reuniao_data_extenso: selectedSlot.day,
+              reuniao_hora_extenso: selectedSlot.time,
+            } as any).eq("id", leadId);
+          }
+        }
       } catch (calErr) { console.error("Calendar event error:", calErr); }
 
       supabase.functions.invoke("send-welcome-email", {
