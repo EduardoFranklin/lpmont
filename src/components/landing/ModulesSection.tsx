@@ -371,7 +371,7 @@ const ModulesSection = () => {
                   transition={{ delay: i * 0.03 }}
                 >
                   <button
-                    onClick={() => setOpenIdx(isOpen ? null : i)}
+                    onClick={() => handleManualClick(setOpenIdx, isOpen, i)}
                     className={`w-full rounded-2xl px-5 sm:px-6 py-5 flex items-center gap-4 sm:gap-5 text-left group transition-all duration-300
                       ${isLast ? "gradient-card" : "mountain-card"}
                       ${isOpen ? "border-primary/15" : ""}`}
