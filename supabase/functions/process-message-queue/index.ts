@@ -303,6 +303,9 @@ Deno.serve(async (req) => {
     let errors = 0;
     let skipped = 0;
 
+    // Track leads we already sent WA to in THIS batch to prevent duplicates
+    const sentToLeadInBatch = new Set<string>();
+
     // CONCURRENCY = 1: process one message at a time (anti-ban)
     for (const msg of pendingMessages) {
       // ── Skip messages that must respect sending window ──
@@ -311,8 +314,14 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const lead = msg.leads;
-      if (!lead) {
+      // ── Re-fetch lead data fresh for EVERY message ──────
+      const { data: lead, error: leadErr } = await supabase
+        .from("leads")
+        .select("*")
+        .eq("id", msg.lead_id)
+        .single();
+
+      if (leadErr || !lead) {
         await supabase
           .from("message_queue")
           .update({ status: "failed", last_error: "Lead not found", attempts: msg.attempts + 1 })
