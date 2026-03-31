@@ -378,6 +378,15 @@ Deno.serve(async (req) => {
 
       // ── WA-specific anti-ban checks ─────────────────────
       if (msg.channel === "whatsapp") {
+        // CHECK 0: Already sent WA to this lead in THIS batch → reschedule
+        if (sentToLeadInBatch.has(lead.id)) {
+          const newTime = new Date(Date.now() + 90 * 1000).toISOString(); // 90s later
+          await supabase.from("message_queue").update({ scheduled_for: newTime }).eq("id", msg.id);
+          console.log(`Lead ${lead.id}: already sent in this batch, rescheduling`);
+          skipped++;
+          continue;
+        }
+
         // CHECK 1: wa_sem_resposta_count >= 3 → block WA
         if ((lead.wa_sem_resposta_count || 0) >= 3) {
           await supabase
@@ -389,18 +398,14 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // CHECK 2: Min 60s between WA to same lead
+        // CHECK 2: Min 60s between WA to same lead (fresh data)
         if (lead.last_wa_sent_at) {
           const lastSent = new Date(lead.last_wa_sent_at).getTime();
           const elapsed = (Date.now() - lastSent) / 1000;
           if (elapsed < MIN_SAME_LEAD_INTERVAL_SEC) {
             console.log(`Lead ${lead.id}: skipping, only ${elapsed.toFixed(0)}s since last WA`);
-            // Reschedule for 60s from last send
             const newTime = new Date(lastSent + MIN_SAME_LEAD_INTERVAL_SEC * 1000).toISOString();
-            await supabase
-              .from("message_queue")
-              .update({ scheduled_for: newTime })
-              .eq("id", msg.id);
+            await supabase.from("message_queue").update({ scheduled_for: newTime }).eq("id", msg.id);
             skipped++;
             continue;
           }
@@ -412,14 +417,10 @@ Deno.serve(async (req) => {
           lead.daily_wa_date === today ? lead.daily_wa_count || 0 : 0;
         if (dailyCount >= MAX_DAILY_WA) {
           console.log(`Lead ${lead.id}: daily WA limit (${MAX_DAILY_WA}) reached`);
-          // Reschedule to tomorrow 08:05
           const tomorrow = new Date();
           tomorrow.setDate(tomorrow.getDate() + 1);
-          tomorrow.setHours(11, 5, 0, 0); // UTC 11:05 = SP 08:05
-          await supabase
-            .from("message_queue")
-            .update({ scheduled_for: tomorrow.toISOString() })
-            .eq("id", msg.id);
+          tomorrow.setHours(11, 5, 0, 0);
+          await supabase.from("message_queue").update({ scheduled_for: tomorrow.toISOString() }).eq("id", msg.id);
           skipped++;
           continue;
         }
