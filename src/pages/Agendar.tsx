@@ -234,7 +234,7 @@ const Agendar = () => {
     if (!selectedSlot) return;
     setCalendarCreating(true);
     try {
-      await supabase.from("leads").insert({
+      const { data: insertedLead } = await supabase.from("leads").insert({
         treatment: form.treatment,
         name: form.name,
         phone: form.phone,
@@ -250,7 +250,9 @@ const Agendar = () => {
         utm_campaign: utmParams.utm_campaign || null,
         utm_term: utmParams.utm_term || null,
         utm_content: utmParams.utm_content || null,
-      } as any);
+      } as any).select("id").single();
+
+      const leadId = insertedLead?.id;
 
       // Create Google Calendar event with Meet link FIRST
       let calMeetLink: string | null = null;
@@ -270,6 +272,16 @@ const Agendar = () => {
           calMeetLink = calData.meetLink;
           setMeetLink(calData.meetLink);
           setCalendarCreated(true);
+          // Save meet link to lead record
+          if (leadId) {
+            await supabase.from("leads").update({
+              reuniao_link_google_meet: calData.meetLink,
+              reuniao_link_google_calendar: calData.calendarLink || null,
+              reuniao_data_hora_iso: calData.startDateTime || null,
+              reuniao_data_extenso: selectedSlot.day,
+              reuniao_hora_extenso: selectedSlot.time,
+            } as any).eq("id", leadId);
+          }
         }
       } catch (calErr) {
         console.error("Calendar event error:", calErr);
