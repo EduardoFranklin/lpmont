@@ -272,6 +272,7 @@ const ModulesSection = () => {
   }, []);
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const manualClickCooldown = useRef(false);
 
   // Auto-open camps (01-13) on scroll
   useEffect(() => {
@@ -282,7 +283,7 @@ const ModulesSection = () => {
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting && !navScrollLocked) {
+          if (entry.isIntersecting && !navScrollLocked && !manualClickCooldown.current) {
             setOpenIdx(i);
           }
         },
@@ -303,7 +304,7 @@ const ModulesSection = () => {
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting && !navScrollLocked) {
+          if (entry.isIntersecting && !navScrollLocked && !manualClickCooldown.current) {
             setOpenHandsOn(i);
           }
         },
@@ -314,6 +315,12 @@ const ModulesSection = () => {
     });
     return () => observers.forEach((o) => o.disconnect());
   }, [handsOn, navScrollLocked]);
+
+  const handleManualClick = (setter: React.Dispatch<React.SetStateAction<number | null>>, isOpen: boolean, i: number) => {
+    manualClickCooldown.current = true;
+    setter(isOpen ? null : i);
+    setTimeout(() => { manualClickCooldown.current = false; }, 800);
+  };
 
   return (
     <section id="modulos" className="py-14 sm:py-24 relative">
@@ -364,7 +371,7 @@ const ModulesSection = () => {
                   transition={{ delay: i * 0.03 }}
                 >
                   <button
-                    onClick={() => setOpenIdx(isOpen ? null : i)}
+                    onClick={() => handleManualClick(setOpenIdx, isOpen, i)}
                     className={`w-full rounded-2xl px-5 sm:px-6 py-5 flex items-center gap-4 sm:gap-5 text-left group transition-all duration-300
                       ${isLast ? "gradient-card" : "mountain-card"}
                       ${isOpen ? "border-primary/15" : ""}`}
@@ -534,7 +541,7 @@ const ModulesSection = () => {
                   transition={{ delay: i * 0.03 }}
                 >
                   <button
-                    onClick={() => setOpenHandsOn(isOpen ? null : i)}
+                    onClick={() => handleManualClick(setOpenHandsOn, isOpen, i)}
                     className={`w-full rounded-2xl px-5 sm:px-6 py-5 flex items-center gap-4 sm:gap-5 text-left group transition-all duration-300
                       ${isExtra ? "gradient-card" : "mountain-card"}
                       ${isOpen ? "border-primary/15" : ""}`}
