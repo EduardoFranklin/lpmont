@@ -271,12 +271,32 @@ const ModulesSection = () => {
     };
   }, []);
 
-  // 13 acampamentos: interação sempre manual para evitar conflito com scroll/clique
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Auto-open camps (01-13) on scroll
   useEffect(() => {
     if (navScrollLocked) return;
+    const observers: IntersectionObserver[] = [];
+    camps.forEach((_, i) => {
+      const el = itemRefs.current[i];
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && !navScrollLocked) {
+            setOpenIdx(i);
+          }
+        },
+        { threshold: 0.4 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+    return () => observers.forEach((o) => o.disconnect());
+  }, [camps, navScrollLocked]);
 
+  // Auto-open hands-on (H1-H5) on scroll
+  useEffect(() => {
+    if (navScrollLocked) return;
     const observers: IntersectionObserver[] = [];
     handsOn.forEach((_, i) => {
       const el = handsOnRefs.current[i];
@@ -284,16 +304,10 @@ const ModulesSection = () => {
       const obs = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting && !navScrollLocked) {
-            setOpenHandsOn((prev) => {
-              if (prev === null) return i;
-              if (i === prev + 1 || i === prev - 1) return i;
-              if (i > (prev ?? 0)) return (prev ?? 0) + 1;
-              if (i < (prev ?? 0)) return (prev ?? 0) - 1;
-              return prev;
-            });
+            setOpenHandsOn(i);
           }
         },
-        { threshold: 0.3 }
+        { threshold: 0.4 }
       );
       obs.observe(el);
       observers.push(obs);
