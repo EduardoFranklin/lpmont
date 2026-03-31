@@ -272,6 +272,7 @@ const ModulesSection = () => {
   }, []);
 
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const manualClickCooldown = useRef(false);
 
   // Auto-open camps (01-13) on scroll
   useEffect(() => {
@@ -282,7 +283,7 @@ const ModulesSection = () => {
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting && !navScrollLocked) {
+          if (entry.isIntersecting && !navScrollLocked && !manualClickCooldown.current) {
             setOpenIdx(i);
           }
         },
@@ -303,7 +304,7 @@ const ModulesSection = () => {
       if (!el) return;
       const obs = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting && !navScrollLocked) {
+          if (entry.isIntersecting && !navScrollLocked && !manualClickCooldown.current) {
             setOpenHandsOn(i);
           }
         },
@@ -314,6 +315,12 @@ const ModulesSection = () => {
     });
     return () => observers.forEach((o) => o.disconnect());
   }, [handsOn, navScrollLocked]);
+
+  const handleManualClick = (setter: React.Dispatch<React.SetStateAction<number | null>>, isOpen: boolean, i: number) => {
+    manualClickCooldown.current = true;
+    setter(isOpen ? null : i);
+    setTimeout(() => { manualClickCooldown.current = false; }, 800);
+  };
 
   return (
     <section id="modulos" className="py-14 sm:py-24 relative">
