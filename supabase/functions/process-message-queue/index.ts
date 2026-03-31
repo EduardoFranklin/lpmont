@@ -430,11 +430,6 @@ Deno.serve(async (req) => {
       let body = substituteVariables(msg.body, lead);
       const subject = msg.subject ? substituteVariables(msg.subject, lead) : null;
 
-      // ── Add variation for WhatsApp (anti-ban: no identical texts)
-      if (msg.channel === "whatsapp") {
-        body = addVariation(body, lead);
-      }
-
       let result: { success: boolean; error?: string };
 
       if (msg.channel === "whatsapp") {
