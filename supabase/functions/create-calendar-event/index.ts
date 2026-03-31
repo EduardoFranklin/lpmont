@@ -157,7 +157,9 @@ Deno.serve(async (req) => {
         success: true,
         eventId: calData.id,
         htmlLink: calData.htmlLink,
+        calendarLink: calData.htmlLink,
         meetLink,
+        startDateTime,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
