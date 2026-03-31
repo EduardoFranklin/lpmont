@@ -275,7 +275,7 @@ Deno.serve(async (req) => {
     // ── Fetch pending messages due now ─────────────────────
     const { data: pendingMessages, error: fetchError } = await supabase
       .from("message_queue")
-      .select("*, leads(*)")
+      .select("*")
       .eq("status", "pending")
       .lte("scheduled_for", new Date().toISOString())
       .order("scheduled_for")
