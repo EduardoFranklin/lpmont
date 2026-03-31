@@ -474,6 +474,8 @@ Deno.serve(async (req) => {
 
         // ── WA anti-ban post-send updates ──────────────────
         if (msg.channel === "whatsapp") {
+          sentToLeadInBatch.add(lead.id);
+
           const today = new Date().toISOString().split("T")[0];
           const newDailyCount =
             lead.daily_wa_date === today ? (lead.daily_wa_count || 0) + 1 : 1;
