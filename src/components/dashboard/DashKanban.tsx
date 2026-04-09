@@ -125,9 +125,12 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
         // Variable substitution
         body = replaceVars(body, {
           "{{nome}}": lead.name || "",
+          "{{tratamento}}": lead.treatment || "",
           "{{email}}": lead.email || "",
           "{{telefone}}": lead.phone || "",
           "{{cidade}}": lead.city || "",
+          "{{uf}}": lead.uf || "",
+          "{{lead_number}}": String(lead.lead_number ?? ""),
           "{{score}}": String(lead.quiz_score ?? ""),
           "{{status}}": status,
         });
