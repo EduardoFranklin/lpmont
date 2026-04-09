@@ -446,9 +446,9 @@ const DashChatMont = () => {
                     <p className="text-xs text-muted-foreground truncate">
                       {conv.last_message || "..."}
                     </p>
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-2.5 shrink-0">
                       {conv.unread_count > 0 && (
-                        <span className="w-4.5 h-4.5 rounded-full bg-primary text-primary-foreground text-[9px] flex items-center justify-center font-bold min-w-[18px] px-1">
+                        <span className="h-5 min-w-[20px] px-1.5 rounded-full bg-primary text-primary-foreground text-[11px] flex items-center justify-center font-bold">
                           {conv.unread_count}
                         </span>
                       )}
