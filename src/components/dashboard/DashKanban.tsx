@@ -50,11 +50,14 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
   };
 
   // Map status → funnel for automation triggers
+  // Every stage maps to a funnel — Kanban movement is sovereign
   const STATUS_FUNNEL_MAP: Partial<Record<LeadStatus, string>> = {
+    novo: "F2",
     agendado: "F1",
     compareceu: "F3",
+    nao_compareceu: "F3",
     convertido: "F4",
-    perdido: "F3", // retargeting
+    perdido: "F3",
   };
 
   const handleDrop = async (e: React.DragEvent, newStatus: LeadStatus) => {
@@ -86,22 +89,27 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
       ).select();
     }
 
-    // 2. Add Kanban movement tag
+    // 2. CANCEL ALL pending messages from previous stage (Kanban is sovereign)
+    await supabase
+      .from("message_queue")
+      .update({ status: "cancelled", last_error: `Kanban: movido de ${oldStatus} para ${newStatus}` })
+      .eq("lead_id", leadId)
+      .eq("status", "pending");
+
+    // 3. Add Kanban movement tag
     const tagName = `movido_${newStatus}`;
     await supabase.from("lead_tags").upsert(
       { lead_id: leadId, tag: tagName, source: "kanban" },
       { onConflict: "lead_id,tag", ignoreDuplicates: true }
     ).select();
 
-    // 3. Trigger automation funnel (enqueue-automation)
+    // 4. Trigger automation funnel for new stage
     const funnel = STATUS_FUNNEL_MAP[newStatus];
     if (funnel) {
       supabase.functions.invoke("enqueue-automation", {
         body: { lead_id: leadId, funnel, event: `kanban_${newStatus}` },
       }).catch((err) => console.error("Enqueue automation error:", err));
     }
-
-    // 4. Trigger team notifications (team_automation_sequences)
     triggerTeamNotifications(leadId, newStatus, lead);
 
     // 5. Trigger sale notifications when moved to convertido
