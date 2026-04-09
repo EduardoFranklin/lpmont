@@ -814,6 +814,54 @@ export type Database = {
         }
         Relationships: []
       }
+      team_automation_sequences: {
+        Row: {
+          active: boolean
+          body: string
+          channel: string
+          created_at: string
+          delay_description: string
+          delay_minutes: number
+          id: string
+          recipient_phones: Json
+          step_order: number
+          subject: string | null
+          title: string
+          trigger_status: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          body?: string
+          channel?: string
+          created_at?: string
+          delay_description?: string
+          delay_minutes?: number
+          id?: string
+          recipient_phones?: Json
+          step_order?: number
+          subject?: string | null
+          title?: string
+          trigger_status: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          channel?: string
+          created_at?: string
+          delay_description?: string
+          delay_minutes?: number
+          id?: string
+          recipient_phones?: Json
+          step_order?: number
+          subject?: string | null
+          title?: string
+          trigger_status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
