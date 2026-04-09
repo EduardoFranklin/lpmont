@@ -966,15 +966,25 @@ const ContactRow = ({ contact: c, onToggle, onDelete, onUpdate }: {
 
 /* ─── Sale Notifications Tab ─── */
 
+const SALE_TEMPLATE_VARS = ["{{nome}}", "{{email}}", "{{valor}}", "{{pagamento}}", "{{oferta}}"];
+const DEFAULT_SALE_TEMPLATE = "🎉 *NOVA VENDA!*\n\n👤 {{nome}}\n📧 {{email}}\n💰 R$ {{valor}}\n💳 {{pagamento}}\n📦 Oferta: {{oferta}}";
+
 const SaleNotificationsTab = () => {
   const [contacts, setContacts] = useState<SaleContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
+  const [template, setTemplate] = useState("");
+  const [templateDirty, setTemplateDirty] = useState(false);
+  const [savingTemplate, setSavingTemplate] = useState(false);
 
   const fetchContacts = useCallback(async () => {
-    const { data } = await supabase.from("sale_notification_contacts").select("*").order("created_at");
-    setContacts((data as any[]) || []);
+    const [{ data: contactsData }, { data: tplData }] = await Promise.all([
+      supabase.from("sale_notification_contacts").select("*").order("created_at"),
+      supabase.from("site_settings").select("value").eq("key", "sale_notification_template").maybeSingle(),
+    ]);
+    setContacts((contactsData as any[]) || []);
+    setTemplate(tplData?.value || DEFAULT_SALE_TEMPLATE);
     setLoading(false);
   }, []);
 
@@ -995,6 +1005,17 @@ const SaleNotificationsTab = () => {
     fetchContacts();
   };
 
+  const handleSaveTemplate = async () => {
+    setSavingTemplate(true);
+    await supabase.from("site_settings").upsert(
+      { key: "sale_notification_template", value: template },
+      { onConflict: "key" }
+    );
+    setSavingTemplate(false);
+    setTemplateDirty(false);
+    toast.success("Mensagem salva!");
+  };
+
   const handleToggle = async (c: SaleContact) => {
     if (!c.id) return;
     await supabase.from("sale_notification_contacts").update({ active: !c.active }).eq("id", c.id);
@@ -1013,6 +1034,37 @@ const SaleNotificationsTab = () => {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">Cadastre os números que devem receber uma notificação via WhatsApp quando um lead efetuar o pagamento.</p>
+
+      {/* Message template editor */}
+      <Card>
+        <CardHeader className="pb-3"><CardTitle className="text-sm flex items-center gap-2"><MessageSquare className="w-4 h-4" /> Mensagem de notificação</CardTitle></CardHeader>
+        <CardContent className="space-y-3">
+          <textarea
+            value={template}
+            onChange={(e) => { setTemplate(e.target.value); setTemplateDirty(true); }}
+            className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
+            placeholder="Mensagem enviada ao time quando houver uma venda..."
+          />
+          <div className="flex flex-wrap gap-1.5">
+            {SALE_TEMPLATE_VARS.map((v) => (
+              <button
+                key={v}
+                type="button"
+                className="px-2 py-0.5 rounded text-[10px] font-mono bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                onClick={() => { setTemplate((prev) => prev + v); setTemplateDirty(true); }}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+          {templateDirty && (
+            <Button size="sm" className="gap-1.5" onClick={handleSaveTemplate} disabled={savingTemplate}>
+              {savingTemplate ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />} Salvar mensagem
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader className="pb-3"><CardTitle className="text-sm flex items-center gap-2"><Plus className="w-4 h-4" /> Adicionar contato</CardTitle></CardHeader>
         <CardContent>
