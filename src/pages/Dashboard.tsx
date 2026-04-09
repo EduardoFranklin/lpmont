@@ -27,6 +27,8 @@ const Dashboard = () => {
   const [datePreset, setDatePreset] = useState<DatePreset>("tudo");
   const [customRange, setCustomRange] = useState<{ from?: Date; to?: Date }>({});
   const [topTab, setTopTab] = useState<"dashboard" | "content">("dashboard");
+  const [activeTab, setActiveTab] = useState("kanban");
+  const [chatPhone, setChatPhone] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -119,7 +121,7 @@ const Dashboard = () => {
               />
             </div>
 
-            <Tabs defaultValue="kanban" className="space-y-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
               <TabsList className="flex flex-wrap h-auto gap-1">
                 <TabsTrigger value="kanban" className="gap-1.5">
                   <Columns3 className="w-4 h-4" /> Kanban
@@ -147,13 +149,13 @@ const Dashboard = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="kanban">
-                <DashKanban leads={filteredLeads} onRefresh={fetchLeads} />
+                <DashKanban leads={filteredLeads} onRefresh={fetchLeads} onOpenChat={(phone) => { setChatPhone(phone); setActiveTab("chat"); }} />
               </TabsContent>
               <TabsContent value="agenda">
                 <DashAgenda leads={leads} onRefresh={fetchLeads} />
               </TabsContent>
               <TabsContent value="chat">
-                <DashChatMont />
+                <DashChatMont initialPhone={chatPhone} onPhoneConsumed={() => setChatPhone(null)} />
               </TabsContent>
               <TabsContent value="leads">
                 <DashLeadsList leads={filteredLeads} onRefresh={fetchLeads} />
