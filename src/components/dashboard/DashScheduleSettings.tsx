@@ -94,16 +94,14 @@ const DashScheduleSettings = () => {
   const toggleDay = (consultantId: string, dayIdx: number) => {
     const existing = availability.filter(a => a.consultant_id === consultantId && a.day_of_week === dayIdx);
     if (existing.length > 0) {
-      // Remove all slots for this day
       setAvailability(prev => prev.filter(a => !(a.consultant_id === consultantId && a.day_of_week === dayIdx)));
     } else {
-      // Add default slot
       setAvailability(prev => [...prev, {
         id: `new-${Date.now()}-${dayIdx}`,
         consultant_id: consultantId,
         day_of_week: dayIdx,
-        start_time: "09:00:00",
-        end_time: "18:00:00",
+        start_time: "08:00:00",
+        end_time: "12:00:00",
       }]);
     }
   };
@@ -113,20 +111,17 @@ const DashScheduleSettings = () => {
     return days;
   };
 
-  const getSlotsForConsultant = (consultantId: string) => {
-    return availability.filter(a => a.consultant_id === consultantId);
+  const getSlotsByDay = (consultantId: string, dayIdx: number) => {
+    return availability.filter(a => a.consultant_id === consultantId && a.day_of_week === dayIdx);
   };
 
-  const addSlot = (consultantId: string) => {
-    // Find a day that's already active, default to Monday
-    const activeDays = getSlots(consultantId);
-    const day = activeDays.size > 0 ? [...activeDays][0] : 1;
+  const addSlotToDay = (consultantId: string, dayIdx: number) => {
     setAvailability(prev => [...prev, {
-      id: `new-${Date.now()}`,
+      id: `new-${Date.now()}-${Math.random()}`,
       consultant_id: consultantId,
-      day_of_week: day,
-      start_time: "09:00:00",
-      end_time: "10:00:00",
+      day_of_week: dayIdx,
+      start_time: "13:00:00",
+      end_time: "18:00:00",
     }]);
   };
 
