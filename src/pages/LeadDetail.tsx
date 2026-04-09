@@ -151,6 +151,8 @@ const LeadDetail = () => {
       scheduled_day: editFields.scheduled_day || null,
       scheduled_time: editFields.scheduled_time || null,
       notes: editFields.notes || null,
+      reuniao_status: editFields.reuniao_status || "pendente",
+      reuniao_consultor: editFields.reuniao_consultor || null,
     }).eq("id", lead.id);
     await fetchLead();
     setHasChanges(false);
