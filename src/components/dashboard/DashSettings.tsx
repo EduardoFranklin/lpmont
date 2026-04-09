@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Save, Code2, AlertTriangle, CalendarCheck, CheckCircle2, ExternalLink, MessageCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import DashScheduleSettings from "./DashScheduleSettings";
 
 interface SettingField {
   key: string;
