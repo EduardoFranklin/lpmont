@@ -212,6 +212,17 @@ const DashChatMont = ({ initialPhone, onPhoneConsumed }: { initialPhone?: string
     fetchConversations();
   }, [fetchConversations]);
 
+
+  // Auto-open conversation when initialPhone is provided (e.g. from Kanban)
+  useEffect(() => {
+    if (!initialPhone || conversations.length === 0) return;
+    const match = conversations.find((c) => phonesMatch(c.phone, initialPhone));
+    if (match) {
+      selectConversation(match);
+    }
+    onPhoneConsumed?.();
+  }, [initialPhone, conversations]);
+
   // Realtime conversations
   useEffect(() => {
     const channel = supabase
