@@ -81,7 +81,7 @@ const LeadDetail = () => {
   const [newNote, setNewNote] = useState("");
   const [editStatus, setEditStatus] = useState<LeadStatus>("novo");
   const [editTemp, setEditTemp] = useState<LeadTemperature>("frio");
-  const [saving, setSaving] = useState(false);
+  const [_saving, _setSaving] = useState(false);
   const [rescheduling, setRescheduling] = useState(false);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
