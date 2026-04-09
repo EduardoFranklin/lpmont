@@ -7,16 +7,13 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
 } from "@/components/ui/dialog";
 import {
-  Save, MessageCircle, Mail, Bold, Italic,
+  Save, MessageCircle, Bold, Italic,
   Variable, Strikethrough, Plus, Trash2, Clock,
-  Zap, Loader2, X, GripVertical, Phone,
-  Power, PowerOff, Link2, Type, Users,
+  Loader2, X, GripVertical, Phone, Users,
+  Power, PowerOff,
 } from "lucide-react";
 import {
   Popover, PopoverContent, PopoverTrigger,
@@ -148,28 +145,22 @@ const VariablesPopover = ({ textareaRef }: { textareaRef: React.RefObject<HTMLTe
   </Popover>
 );
 
-const MessageToolbar = ({ textareaRef, isEmail }: { textareaRef: React.RefObject<HTMLTextAreaElement>; isEmail: boolean }) => (
+const MessageToolbar = ({ textareaRef }: { textareaRef: React.RefObject<HTMLTextAreaElement> }) => (
   <div className="flex items-center gap-0.5 border border-border rounded-md p-0.5 bg-muted/20">
-    {isEmail ? (
-      <>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="Negrito" onClick={() => wrapSelection(textareaRef, "<b>", "</b>")}><Bold className="w-3.5 h-3.5" /></Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="Itálico" onClick={() => wrapSelection(textareaRef, "<i>", "</i>")}><Italic className="w-3.5 h-3.5" /></Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="Título" onClick={() => wrapSelection(textareaRef, '<h2 style="font-size:20px">', "</h2>")}><Type className="w-3.5 h-3.5" /></Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="Link" onClick={() => { const url = prompt("URL:"); if (url) wrapSelection(textareaRef, `<a href="${url}" style="color:#c8a97e">`, "</a>"); }}><Link2 className="w-3.5 h-3.5" /></Button>
-      </>
-    ) : (
-      <>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="*Negrito*" onClick={() => wrapSelection(textareaRef, "*", "*")}><Bold className="w-3.5 h-3.5" /></Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="_Itálico_" onClick={() => wrapSelection(textareaRef, "_", "_")}><Italic className="w-3.5 h-3.5" /></Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" title="~Tachado~" onClick={() => wrapSelection(textareaRef, "~", "~")}><Strikethrough className="w-3.5 h-3.5" /></Button>
-      </>
-    )}
+    <Button variant="ghost" size="icon" className="h-7 w-7" title="*Negrito*" onClick={() => wrapSelection(textareaRef, "*", "*")}><Bold className="w-3.5 h-3.5" /></Button>
+    <Button variant="ghost" size="icon" className="h-7 w-7" title="_Itálico_" onClick={() => wrapSelection(textareaRef, "_", "_")}><Italic className="w-3.5 h-3.5" /></Button>
+    <Button variant="ghost" size="icon" className="h-7 w-7" title="~Tachado~" onClick={() => wrapSelection(textareaRef, "~", "~")}><Strikethrough className="w-3.5 h-3.5" /></Button>
     <div className="w-px h-5 bg-border mx-0.5" />
     <VariablesPopover textareaRef={textareaRef} />
   </div>
 );
 
 /* ─── types ─── */
+
+interface Recipient {
+  name: string;
+  phone: string;
+}
 
 interface TeamSequence {
   id: string;
@@ -181,13 +172,14 @@ interface TeamSequence {
   delay_description: string;
   subject: string | null;
   body: string;
-  recipient_phones: string[];
+  recipient_phones: Recipient[];
   active: boolean;
 }
 
 /* ─── Recipients Editor ─── */
 
-const RecipientsEditor = ({ phones, onChange }: { phones: string[]; onChange: (p: string[]) => void }) => {
+const RecipientsEditor = ({ recipients, onChange }: { recipients: Recipient[]; onChange: (r: Recipient[]) => void }) => {
+  const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
 
   const formatPhone = (value: string) => {
@@ -197,11 +189,13 @@ const RecipientsEditor = ({ phones, onChange }: { phones: string[]; onChange: (p
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
   };
 
-  const addPhone = () => {
+  const addRecipient = () => {
     const digits = newPhone.replace(/\D/g, "");
     if (digits.length < 10) { toast.error("Telefone inválido"); return; }
-    if (phones.includes(digits)) { toast.error("Telefone já adicionado"); return; }
-    onChange([...phones, digits]);
+    if (!newName.trim()) { toast.error("Preencha o nome"); return; }
+    if (recipients.some(r => r.phone === digits)) { toast.error("Telefone já adicionado"); return; }
+    onChange([...recipients, { name: newName.trim(), phone: digits }]);
+    setNewName("");
     setNewPhone("");
   };
 
@@ -211,22 +205,28 @@ const RecipientsEditor = ({ phones, onChange }: { phones: string[]; onChange: (p
         <Phone className="w-3 h-3" /> Destinatários da equipe
       </Label>
       <div className="flex flex-wrap gap-1">
-        {phones.map((p, i) => (
-          <Badge key={i} variant="outline" className="text-[10px] gap-1 cursor-pointer hover:opacity-70" onClick={() => onChange(phones.filter((_, j) => j !== i))}>
-            {p.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")} <X className="w-2.5 h-2.5" />
+        {recipients.map((r, i) => (
+          <Badge key={i} variant="outline" className="text-[10px] gap-1 cursor-pointer hover:opacity-70" onClick={() => onChange(recipients.filter((_, j) => j !== i))}>
+            {r.name} · {r.phone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")} <X className="w-2.5 h-2.5" />
           </Badge>
         ))}
       </div>
-      <div className="flex gap-1">
+      <div className="flex gap-1 flex-wrap">
+        <Input
+          placeholder="Nome"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          className="h-7 text-xs w-32"
+        />
         <Input
           placeholder="(00) 00000-0000"
           value={newPhone}
           onChange={(e) => setNewPhone(formatPhone(e.target.value))}
           className="h-7 text-xs w-40"
           maxLength={15}
-          onKeyDown={(e) => { if (e.key === "Enter") addPhone(); }}
+          onKeyDown={(e) => { if (e.key === "Enter") addRecipient(); }}
         />
-        <Button size="sm" className="h-7 px-2 text-xs" onClick={addPhone} disabled={!newPhone.trim()}>
+        <Button size="sm" className="h-7 px-2 text-xs" onClick={addRecipient} disabled={!newPhone.trim() || !newName.trim()}>
           <Plus className="w-3 h-3" />
         </Button>
       </div>
@@ -252,19 +252,16 @@ const TeamSequenceCard = ({
 }) => {
   const [editing, setEditing] = useState(false);
   const [body, setBody] = useState(seq.body);
-  const [subject, setSubject] = useState(seq.subject || "");
   const [active, setActive] = useState(seq.active);
   const [delayMinutes, setDelayMinutes] = useState(seq.delay_minutes);
-  const [recipients, setRecipients] = useState<string[]>(seq.recipient_phones || []);
+  const [recipients, setRecipients] = useState<Recipient[]>(seq.recipient_phones || []);
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const isEmail = seq.channel === "email";
 
   const handleSave = async () => {
     setSaving(true);
     const { error } = await supabase.from("team_automation_sequences" as any).update({
       body,
-      subject: isEmail ? subject : null,
       active,
       delay_minutes: delayMinutes,
       delay_description: minutesToLabel(delayMinutes),
@@ -298,11 +295,11 @@ const TeamSequenceCard = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab active:cursor-grabbing shrink-0" />
-          {isEmail ? <Mail className="w-4 h-4 text-blue-400" /> : <MessageCircle className="w-4 h-4 text-green-400" />}
+          <MessageCircle className="w-4 h-4 text-green-400" />
           <span className="text-sm font-medium">{seq.title}</span>
           {recipients.length > 0 && (
             <Badge variant="outline" className="text-[10px] gap-0.5">
-              <Users className="w-2.5 h-2.5" /> {recipients.length}
+              <Users className="w-2.5 h-2.5" /> {recipients.map(r => r.name).join(", ")}
             </Badge>
           )}
         </div>
@@ -324,9 +321,6 @@ const TeamSequenceCard = ({
 
       {!editing ? (
         <div className="cursor-pointer" onClick={() => setEditing(true)}>
-          {isEmail && seq.subject && (
-            <p className="text-xs text-muted-foreground mb-1"><strong>Assunto:</strong> {seq.subject}</p>
-          )}
           <pre className="text-xs text-muted-foreground whitespace-pre-wrap line-clamp-3 font-mono bg-muted/30 rounded p-2">
             {seq.body.slice(0, 200)}{seq.body.length > 200 ? "..." : ""}
           </pre>
@@ -339,11 +333,7 @@ const TeamSequenceCard = ({
             <DelayInput minutes={delayMinutes} onChange={setDelayMinutes} />
           </div>
 
-          {isEmail && (
-            <Input placeholder="Assunto do e-mail" value={subject} onChange={(e) => setSubject(e.target.value)} className="text-sm" />
-          )}
-
-          <MessageToolbar textareaRef={textareaRef} isEmail={isEmail} />
+          <MessageToolbar textareaRef={textareaRef} />
           <textarea
             ref={textareaRef}
             value={body}
@@ -352,10 +342,10 @@ const TeamSequenceCard = ({
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
           />
 
-          <RecipientsEditor phones={recipients} onChange={setRecipients} />
+          <RecipientsEditor recipients={recipients} onChange={setRecipients} />
 
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setEditing(false); setBody(seq.body); setSubject(seq.subject || ""); setDelayMinutes(seq.delay_minutes); setRecipients(seq.recipient_phones || []); }}>
+            <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => { setEditing(false); setBody(seq.body); setDelayMinutes(seq.delay_minutes); setRecipients(seq.recipient_phones || []); }}>
               Cancelar
             </Button>
             <Button size="sm" className="h-7 text-xs gap-1" onClick={handleSave} disabled={saving}>
@@ -373,11 +363,9 @@ const TeamSequenceCard = ({
 const AddTeamMessageDialog = ({ triggerStatus, existingCount, onAdded }: { triggerStatus: string; existingCount: number; onAdded: () => void }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
-  const [channel, setChannel] = useState("whatsapp");
   const [delayMinutes, setDelayMinutes] = useState(0);
   const [body, setBody] = useState("");
-  const [subject, setSubject] = useState("");
-  const [recipients, setRecipients] = useState<string[]>([]);
+  const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [saving, setSaving] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -389,10 +377,9 @@ const AddTeamMessageDialog = ({ triggerStatus, existingCount, onAdded }: { trigg
       trigger_status: triggerStatus,
       step_order: existingCount + 1,
       title: title.trim(),
-      channel,
+      channel: "whatsapp",
       delay_minutes: delayMinutes,
       delay_description: minutesToLabel(delayMinutes),
-      subject: channel === "email" ? subject : null,
       body: body.trim(),
       recipient_phones: recipients,
       active: true,
@@ -401,7 +388,7 @@ const AddTeamMessageDialog = ({ triggerStatus, existingCount, onAdded }: { trigg
     if (error) { toast.error("Erro ao criar mensagem"); return; }
     toast.success("Mensagem adicionada!");
     setOpen(false);
-    setTitle(""); setBody(""); setSubject(""); setRecipients([]);
+    setTitle(""); setBody(""); setRecipients([]);
     onAdded();
   };
 
@@ -418,21 +405,9 @@ const AddTeamMessageDialog = ({ triggerStatus, existingCount, onAdded }: { trigg
             <DialogTitle className="text-base">Nova notificação — {stage?.emoji} {stage?.label}</DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs">Título</Label>
-                <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Aviso de novo lead" className="text-sm" />
-              </div>
-              <div>
-                <Label className="text-xs">Canal</Label>
-                <Select value={channel} onValueChange={setChannel}>
-                  <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                    <SelectItem value="email">E-mail</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <div>
+              <Label className="text-xs">Título</Label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex: Aviso de novo lead" className="text-sm" />
             </div>
             <div>
               <Label className="text-xs">Tempo de espera após mudança de status</Label>
@@ -440,15 +415,9 @@ const AddTeamMessageDialog = ({ triggerStatus, existingCount, onAdded }: { trigg
                 <DelayInput minutes={delayMinutes} onChange={setDelayMinutes} />
               </div>
             </div>
-            {channel === "email" && (
-              <div>
-                <Label className="text-xs">Assunto</Label>
-                <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Assunto do e-mail" className="text-sm" />
-              </div>
-            )}
             <div>
               <Label className="text-xs">Corpo da mensagem</Label>
-              <MessageToolbar textareaRef={textareaRef} isEmail={channel === "email"} />
+              <MessageToolbar textareaRef={textareaRef} />
               <textarea
                 ref={textareaRef}
                 value={body}
@@ -458,7 +427,7 @@ const AddTeamMessageDialog = ({ triggerStatus, existingCount, onAdded }: { trigg
                 placeholder="Escreva a notificação aqui..."
               />
             </div>
-            <RecipientsEditor phones={recipients} onChange={setRecipients} />
+            <RecipientsEditor recipients={recipients} onChange={setRecipients} />
           </div>
           <DialogFooter>
             <DialogClose asChild><Button variant="ghost" size="sm">Cancelar</Button></DialogClose>
@@ -602,11 +571,9 @@ const DashTeamMessaging = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-muted-foreground">
-            Configure notificações automáticas para membros da equipe quando leads mudarem de estágio no Kanban.
-          </p>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          Configure notificações automáticas via WhatsApp para membros da equipe quando leads mudarem de estágio no Kanban.
+        </p>
         <Badge variant="outline" className="text-xs">
           {sequences.filter(s => s.active).length}/{sequences.length} ativos
         </Badge>
