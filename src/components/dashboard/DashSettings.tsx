@@ -297,6 +297,9 @@ const DashSettings = () => {
       {/* Z-API WhatsApp integration */}
       <ZApiCard values={values} setValues={setValues} />
 
+      {/* Schedule Settings */}
+      <DashScheduleSettings />
+
 
       <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
         <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
