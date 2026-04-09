@@ -457,9 +457,9 @@ const DashChatMont = () => {
                         className="text-muted-foreground hover:text-amber-400 transition-colors"
                       >
                         {conv.is_favorite ? (
-                          <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                         ) : (
-                          <StarOff className="w-3 h-3" />
+                          <StarOff className="w-3.5 h-3.5" />
                         )}
                       </button>
                     </div>
