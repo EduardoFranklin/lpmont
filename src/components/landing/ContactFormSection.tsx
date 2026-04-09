@@ -220,17 +220,7 @@ const ContactFormSection = () => {
       localStorage.setItem("lead_email", form.email.toLowerCase());
       localStorage.setItem("lead_phone", form.phone);
 
-      // Add reuniao_agendada tag and trigger F1 automation
-      if (leadId) {
-        supabase.from("lead_tags").insert({
-          lead_id: leadId, tag: "reuniao_agendada", source: "formulario",
-        } as any).then(() => {
-          supabase.functions.invoke("enqueue-automation", {
-            body: { lead_id: leadId, funnel: "F1", event: "reuniao_agendada" },
-          }).catch((err) => console.error("Enqueue automation error:", err));
-        });
-      }
-
+      // Create Google Calendar event FIRST so reuniao_data_hora_iso is set before enqueue
       let calMeetLink: string | null = null;
       try {
         const { data: calData } = await supabase.functions.invoke("create-calendar-event", {
@@ -245,7 +235,6 @@ const ContactFormSection = () => {
           calMeetLink = calData.meetLink;
           setMeetLink(calData.meetLink);
           setCalendarCreated(true);
-          // Save meet link to lead record
           if (leadId) {
             await supabase.from("leads").update({
               reuniao_link_google_meet: calData.meetLink,
@@ -257,6 +246,16 @@ const ContactFormSection = () => {
           }
         }
       } catch (calErr) { console.error("Calendar event error:", calErr); }
+
+      // Add tag and trigger F1 automation AFTER calendar data is saved
+      if (leadId) {
+        await supabase.from("lead_tags").insert({
+          lead_id: leadId, tag: "reuniao_agendada", source: "formulario",
+        } as any);
+        await supabase.functions.invoke("enqueue-automation", {
+          body: { lead_id: leadId, funnel: "F1", event: "reuniao_agendada" },
+        }).catch((err) => console.error("Enqueue automation error:", err));
+      }
 
       supabase.functions.invoke("send-welcome-email", {
         body: {

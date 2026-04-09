@@ -327,15 +327,14 @@ const Agendar = () => {
         console.error("Calendar event error:", calErr);
       }
 
-      // Trigger F1 automation
+      // Add tag and trigger F1 automation AFTER calendar data is saved
       if (leadId) {
-        supabase.from("lead_tags").insert({
+        await supabase.from("lead_tags").insert({
           lead_id: leadId, tag: "reuniao_agendada", source: "formulario",
-        } as any).then(() => {
-          supabase.functions.invoke("enqueue-automation", {
-            body: { lead_id: leadId, funnel: "F1", event: "reuniao_agendada" },
-          }).catch((err) => console.error("Enqueue automation error:", err));
-        });
+        } as any);
+        await supabase.functions.invoke("enqueue-automation", {
+          body: { lead_id: leadId, funnel: "F1", event: "reuniao_agendada" },
+        }).catch((err) => console.error("Enqueue automation error:", err));
       }
 
       // Send welcome email WITH the Meet link
