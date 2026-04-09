@@ -5,8 +5,10 @@ import FooterSection from "@/components/landing/FooterSection";
 const Contato = () => (
   <div className="min-h-screen bg-background">
     <NavBar />
-    <ContactFormSection />
-    <FooterSection />
+    <div className="pt-[72px]">
+      <ContactFormSection />
+      <FooterSection />
+    </div>
   </div>
 );
 
