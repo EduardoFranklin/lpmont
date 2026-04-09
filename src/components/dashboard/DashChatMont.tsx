@@ -177,7 +177,7 @@ const tempColors: Record<string, string> = {
 
 /* ─── Main Component ─── */
 
-const DashChatMont = () => {
+const DashChatMont = ({ initialPhone, onPhoneConsumed }: { initialPhone?: string | null; onPhoneConsumed?: () => void }) => {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
