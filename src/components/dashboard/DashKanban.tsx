@@ -123,13 +123,14 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
         const phones = (seq as any).recipient_phones || [];
         let body = (seq as any).body || "";
         // Variable substitution
-        body = body
-          .replaceAll("{{nome}}", lead.name || "")
-          .replaceAll("{{email}}", lead.email || "")
-          .replaceAll("{{telefone}}", lead.phone || "")
-          .replaceAll("{{cidade}}", lead.city || "")
-          .replaceAll("{{score}}", String(lead.quiz_score ?? ""))
-          .replaceAll("{{status}}", status);
+        body = replaceVars(body, {
+          "{{nome}}": lead.name || "",
+          "{{email}}": lead.email || "",
+          "{{telefone}}": lead.phone || "",
+          "{{cidade}}": lead.city || "",
+          "{{score}}": String(lead.quiz_score ?? ""),
+          "{{status}}": status,
+        });
 
         for (const phone of phones) {
           const digits = String(phone).replace(/\D/g, "");
@@ -161,12 +162,13 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
 
       const template = tplData?.value || "🎉 Nova venda! {{nome}} ({{email}}) acabou de comprar!";
 
-      const body = template
-        .replaceAll("{{nome}}", lead.name || "")
-        .replaceAll("{{email}}", lead.email || "")
-        .replaceAll("{{valor}}", String(lead.valor_pago ?? lead.revenue ?? "—"))
-        .replaceAll("{{pagamento}}", lead.forma_pagamento || "—")
-        .replaceAll("{{oferta}}", lead.hotmart_offer_code || "—");
+      const body = replaceVars(template, {
+        "{{nome}}": lead.name || "",
+        "{{email}}": lead.email || "",
+        "{{valor}}": String(lead.valor_pago ?? lead.revenue ?? "—"),
+        "{{pagamento}}": lead.forma_pagamento || "—",
+        "{{oferta}}": lead.hotmart_offer_code || "—",
+      });
 
       for (const contact of contacts) {
         const digits = contact.phone.replace(/\D/g, "");
