@@ -191,6 +191,11 @@ const LeadDetail = () => {
   const handleSave = async () => {
     if (!lead) return;
     setSaving(true);
+
+    const newReuniaoStatus = editFields.reuniao_status || "pendente";
+    const oldReuniaoStatus = lead.reuniao_status || "pendente";
+    const oldStatus = lead.status;
+
     await supabase.from("leads").update({
       status: editStatus,
       temperature: editTemp,
@@ -204,12 +209,37 @@ const LeadDetail = () => {
       scheduled_day: editFields.scheduled_day || null,
       scheduled_time: editFields.scheduled_time || null,
       notes: editFields.notes || null,
-      reuniao_status: editFields.reuniao_status || "pendente",
+      reuniao_status: newReuniaoStatus,
       reuniao_consultor: editFields.reuniao_consultor || null,
     }).eq("id", lead.id);
+
+    // Create tags for reuniao_status changes
+    if (newReuniaoStatus !== oldReuniaoStatus) {
+      const tagMap: Record<string, string> = {
+        confirmada: "reuniao_confirmada",
+        cancelada: "reuniao_cancelada",
+        compareceu: "reuniao_compareceu",
+        nao_compareceu: "reuniao_nao_compareceu",
+      };
+      const tag = tagMap[newReuniaoStatus];
+      if (tag) {
+        await supabase.from("lead_tags").insert({
+          lead_id: lead.id, tag, source: "lead_detail",
+        } as any);
+      }
+    }
+
+    // Create tag for lead status changes (same as kanban)
+    if (editStatus !== oldStatus) {
+      await supabase.from("lead_tags").insert({
+        lead_id: lead.id, tag: `movido_${editStatus}`, source: "lead_detail",
+      } as any);
+    }
+
     await fetchLead();
     setHasChanges(false);
     setSaving(false);
+    toast.success("Alterações salvas!");
   };
 
   const handleAddNote = async () => {
