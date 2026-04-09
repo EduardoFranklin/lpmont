@@ -89,10 +89,10 @@ Deno.serve(async (req) => {
     const timeMatch = timeSlot.match(/^(\d+)h/);
     const startHour = timeMatch ? parseInt(timeMatch[1]) : 9;
 
-    // Build ISO date strings with São Paulo timezone offset
+    // Build ISO date strings with São Paulo timezone offset (-03:00)
     const pad = (n: number) => String(n).padStart(2, "0");
-    const startDateTime = `${year}-${pad(mm)}-${pad(dd)}T${pad(startHour)}:00:00`;
-    const endDateTime = `${year}-${pad(mm)}-${pad(dd)}T${pad(startHour)}:30:00`;
+    const startDateTime = `${year}-${pad(mm)}-${pad(dd)}T${pad(startHour)}:00:00-03:00`;
+    const endDateTime = `${year}-${pad(mm)}-${pad(dd)}T${pad(startHour)}:30:00-03:00`;
 
     const eventName = title || `Reunião Método Mont' - ${treatment || ""} ${guestName || "Lead"}`;
     const eventDesc = description || `Reunião online de 30 min com a equipe do Método Mont'.`;

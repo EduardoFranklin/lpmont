@@ -87,19 +87,37 @@ Deno.serve(async (req) => {
         .eq("id", tokenRow.id);
     }
 
-    // Parse the new date/time
+    // Parse the new date/time — force São Paulo interpretation
     const dt = new Date(newDateTimeISO);
     const pad = (n: number) => String(n).padStart(2, "0");
 
-    // Build start/end in local format for Sao Paulo
-    const startDateTime = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}:00`;
+    // Extract São Paulo local components using Intl formatter
+    const spFormatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+    });
+    const spParts = Object.fromEntries(
+      spFormatter.formatToParts(dt).map((p) => [p.type, p.value])
+    );
+    const startDateTime = `${spParts.year}-${spParts.month}-${spParts.day}T${spParts.hour}:${spParts.minute}:00`;
     const endDt = new Date(dt.getTime() + 30 * 60000);
-    const endDateTime = `${endDt.getFullYear()}-${pad(endDt.getMonth() + 1)}-${pad(endDt.getDate())}T${pad(endDt.getHours())}:${pad(endDt.getMinutes())}:00`;
+    const spPartsEnd = Object.fromEntries(
+      spFormatter.formatToParts(endDt).map((p) => [p.type, p.value])
+    );
+    const endDateTime = `${spPartsEnd.year}-${spPartsEnd.month}-${spPartsEnd.day}T${spPartsEnd.hour}:${spPartsEnd.minute}:00`;
 
-    // Build human-readable strings
-    const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-    const dataExtenso = diasSemana[dt.getDay()];
-    const horaExtenso = `${dt.getHours()}h às ${endDt.getHours()}h${pad(endDt.getMinutes()) !== "00" ? pad(endDt.getMinutes()) : "30"}`;
+    // Build human-readable strings using São Paulo local time
+    const spDayFormatter = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "long" });
+    const diasMap: Record<string, string> = {
+      "domingo": "Domingo", "segunda-feira": "Segunda", "terça-feira": "Terça",
+      "quarta-feira": "Quarta", "quinta-feira": "Quinta", "sexta-feira": "Sexta", "sábado": "Sábado",
+    };
+    const dataExtenso = diasMap[spDayFormatter.format(dt)] || spDayFormatter.format(dt);
+    const spH = parseInt(spParts.hour);
+    const spEndH = parseInt(spPartsEnd.hour);
+    const spEndM = spPartsEnd.minute;
+    const horaExtenso = `${spH}h às ${spEndH}h${spEndM !== "00" ? spEndM : "30"}`;
 
     let meetLink = lead.reuniao_link_google_meet;
     let calendarLink = lead.reuniao_link_google_calendar;
@@ -198,8 +216,8 @@ Deno.serve(async (req) => {
       reuniao_link_google_meet: meetLink,
       reuniao_link_google_calendar: calendarLink,
       google_calendar_event_id: newEventId,
-      scheduled_day: `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)}`,
-      scheduled_time: `${dt.getHours()}h às ${endDt.getHours()}h${pad(endDt.getMinutes()) !== "00" ? pad(endDt.getMinutes()) : "30"}`,
+      scheduled_day: `${spParts.day}/${spParts.month}`,
+      scheduled_time: `${spH}h às ${spEndH}h${spEndM !== "00" ? spEndM : "30"}`,
       updated_at: new Date().toISOString(),
     }).eq("id", leadId);
 

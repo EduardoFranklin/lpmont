@@ -176,19 +176,25 @@ export const useScheduleSlots = () => {
 
       if (leads) {
         const booked = new Set<string>();
+        const spFormat = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Sao_Paulo",
+          year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit", hour12: false,
+        });
         leads.forEach((lead: any) => {
           if (lead.reuniao_data_hora_iso) {
             const dt = new Date(lead.reuniao_data_hora_iso);
-            const dateKey = `${pad2(dt.getDate())}/${pad2(dt.getMonth() + 1)}`;
-            // Build the slot label that starts at this hour:minute using current slot duration
-            const h = dt.getHours();
-            const m = dt.getMinutes();
+            const parts = Object.fromEntries(
+              spFormat.formatToParts(dt).map((p) => [p.type, p.value])
+            );
+            const dateKey = `${parts.day}/${parts.month}`;
+            const h = parseInt(parts.hour);
+            const m = parseInt(parts.minute);
             const endMin = h * 60 + m + slotDuration;
             const endH = Math.floor(endMin / 60);
             const endM = endMin % 60;
             const slotLabel = buildSlotLabel(h, m, endH, endM);
             booked.add(`${dateKey}|${slotLabel}`);
-            // Also add the original scheduled_time label for backward compat
             if (lead.scheduled_time) {
               booked.add(`${dateKey}|${lead.scheduled_time}`);
             }
