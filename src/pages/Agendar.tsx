@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import useTrackingScripts from "@/hooks/useTrackingScripts";
 import useUtmCapture from "@/hooks/useUtmCapture";
+import { useScheduleSlots, buildSlotKey, parseSlotStart } from "@/hooks/useScheduleSlots";
 
 const UFS = [
   "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT","PA",
@@ -20,56 +21,6 @@ const getCareers = (treatment: string) => [
 ];
 
 const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-const ALL_SLOTS = ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"];
-
-// Generate slots for today + next 3 days (skip weekends)
-const generateTimeSlots = () => {
-  const result: { day: string; date: string; slots: string[] }[] = [];
-  const now = new Date();
-  let d = new Date(now);
-  while (result.length < 4) {
-    const dow = d.getDay();
-    if (dow !== 0 && dow !== 6) {
-      const dd = String(d.getDate()).padStart(2, "0");
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      result.push({
-        day: WEEKDAYS[dow],
-        date: `${dd}/${mm}`,
-        slots: [...ALL_SLOTS],
-      });
-    }
-    d = new Date(d.getTime() + 86400000);
-  }
-  return result;
-};
-
-const TIME_SLOTS = generateTimeSlots();
-
-// Convert a reuniao_data_hora_iso + scheduled_time into a "dd/mm|time" key
-const buildSlotKey = (date: string, time: string) => `${date}|${time}`;
-
-const slotFromIso = (iso: string): string => {
-  const d = new Date(iso);
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  return `${dd}/${mm}`;
-};
-
-// Parse start hour from slot label like "9h às 9h30" → 9
-const parseSlotHour = (slot: string): number => {
-  const match = slot.match(/^(\d+)h/);
-  return match ? parseInt(match[1], 10) : 0;
-};
-
-// Check if a slot is too soon (less than 2h from now)
-const isSlotTooSoon = (date: string, slot: string): boolean => {
-  const now = new Date();
-  const [dd, mm] = date.split("/").map(Number);
-  const year = now.getFullYear();
-  const slotDate = new Date(year, mm - 1, dd, parseSlotHour(slot), 0, 0);
-  const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-  return slotDate < minTime;
-};
 
 const benefits = [
   { icon: BookOpen, label: "Biblioteca de Cursos" },
@@ -121,6 +72,7 @@ const buildGoogleCalendarUrl = (
 const Agendar = () => {
   useTrackingScripts();
   const utmParams = useUtmCapture();
+  const { daySlots, isSlotBooked, loading: slotsLoading, config: scheduleConfig } = useScheduleSlots();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     treatment: "Dr.",
@@ -132,7 +84,6 @@ const Agendar = () => {
     career: "",
   });
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; date: string; time: string } | null>(null);
-  const [bookedSlots, setBookedSlots] = useState<Set<string>>(new Set());
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
   const [citySearch, setCitySearch] = useState("");
@@ -195,40 +146,7 @@ const Agendar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Fetch booked slots from DB
-  useEffect(() => {
-    const fetchBookedSlots = async () => {
-      const dates = TIME_SLOTS.map((d) => d.date);
-      const year = new Date().getFullYear();
-      const isoStarts = dates.map((dt) => {
-        const [dd, mm] = dt.split("/").map(Number);
-        return `${year}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}T00:00:00`;
-      });
-      const minDate = isoStarts[0];
-      const maxDateParts = dates[dates.length - 1].split("/").map(Number);
-      const maxDate = `${year}-${String(maxDateParts[1]).padStart(2, "0")}-${String(maxDateParts[0]).padStart(2, "0")}T23:59:59`;
-
-      const { data } = await supabase
-        .from("leads")
-        .select("reuniao_data_hora_iso, scheduled_time")
-        .not("reuniao_data_hora_iso", "is", null)
-        .gte("reuniao_data_hora_iso", minDate)
-        .lte("reuniao_data_hora_iso", maxDate)
-        .not("status", "eq", "perdido");
-
-      if (data) {
-        const booked = new Set<string>();
-        data.forEach((lead: any) => {
-          if (lead.reuniao_data_hora_iso && lead.scheduled_time) {
-            const dateKey = slotFromIso(lead.reuniao_data_hora_iso);
-            booked.add(buildSlotKey(dateKey, lead.scheduled_time));
-          }
-        });
-        setBookedSlots(booked);
-      }
-    };
-    fetchBookedSlots();
-  }, []);
+  // Booked slots are now handled by useScheduleSlots hook
 
   const normalize = (s: string) =>
     s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -571,22 +489,29 @@ const Agendar = () => {
                 Escolha o melhor <span className="summit-text">horário</span>
               </h2>
               <p className="text-[13px] text-foreground/35 mb-5">
-                Reunião online de 30 min com nosso consultor.
+                Reunião online de {scheduleConfig.slot_duration_min} min com nosso consultor.
               </p>
 
+              {slotsLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="w-5 h-5 animate-spin text-foreground/30" />
+                </div>
+              ) : daySlots.length === 0 ? (
+                <p className="text-sm text-foreground/40 text-center py-8">Nenhum horário disponível no momento.</p>
+              ) : (
               <div className="space-y-4">
-                {TIME_SLOTS.map((day) => (
-                  <div key={day.day}>
+                {daySlots.map((day) => (
+                  <div key={day.date}>
                     <p className="text-[12px] font-semibold text-foreground/30 mb-2">
                       {day.day} · <span className="text-foreground/20">{day.date}</span>
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
-                        const isUnavailable = bookedSlots.has(buildSlotKey(day.date, time)) || isSlotTooSoon(day.date, time);
+                        const isUnavailable = isSlotBooked(day.date, time);
                         const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
                           <button
-                            key={`${day.day}-${time}`}
+                            key={`${day.date}-${time}`}
                             onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, date: day.date, time })}
                             disabled={isUnavailable}
                             className={`py-2.5 rounded-lg text-[13px] font-medium border transition-all duration-200 ${
@@ -605,6 +530,7 @@ const Agendar = () => {
                   </div>
                 ))}
               </div>
+              )}
 
               <button
                 onClick={goToStep3}
