@@ -8,7 +8,8 @@ import {
   Search, Send, Star, StarOff, ArrowLeft, Phone, Mail,
   MapPin, Play, Pause, Bot, User, Mic, FileText,
   Image as ImageIcon, Video, Sticker, Loader2, Volume2,
-  MessageSquare, Eye, Heart, Filter,
+  MessageSquare, Eye, Heart, Filter, CalendarCheck, UserCheck,
+  ShoppingCart, CheckCircle2, Circle, Flame, Snowflake, Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format, isToday, isYesterday } from "date-fns";
