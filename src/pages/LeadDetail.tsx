@@ -434,28 +434,39 @@ const LeadDetail = () => {
 
               <Separator className="my-1" />
 
-              {/* Dia / Horário */}
-              {lead.reuniao_data_hora_iso ? (
-                <div className="space-y-2">
-                  {[
-                    { label: "Data", value: lead.reuniao_data_extenso || "—" },
-                    { label: "Horário", value: lead.reuniao_hora_extenso || "—" },
-                  ].map(r => (
-                    <div key={r.label} className="flex justify-between text-muted-foreground">
-                      <span className="text-xs uppercase tracking-wider">{r.label}</span>
-                      <span className="text-foreground text-xs font-medium">{r.value}</span>
-                    </div>
-                  ))}
+              {/* Dia / Horário — always editable */}
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
+                <div className="flex gap-2 items-center">
+                  <Input
+                    type="date"
+                    value={editDate}
+                    onChange={e => setEditDate(e.target.value)}
+                    className="flex-1 h-9"
+                  />
+                  <Input
+                    type="time"
+                    value={editTime}
+                    onChange={e => setEditTime(e.target.value)}
+                    className="w-28 h-9"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-9 gap-1.5 shrink-0"
+                    disabled={rescheduling || !editDate || !editTime}
+                    onClick={handleReschedule}
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${rescheduling ? "animate-spin" : ""}`} />
+                    {rescheduling ? "Reagendando..." : "Reagendar"}
+                  </Button>
                 </div>
-              ) : (
-                <div>
-                  <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
-                  <div className="flex gap-2">
-                    <Input value={editFields.scheduled_day} onChange={e => { setEditFields(f => ({...f, scheduled_day: e.target.value})); setHasChanges(true); }} placeholder="Dia (ex: Segunda)" className="flex-1 h-9" />
-                    <Input value={editFields.scheduled_time} onChange={e => { setEditFields(f => ({...f, scheduled_time: e.target.value})); setHasChanges(true); }} placeholder="Horário" className="w-32 h-9" />
-                  </div>
-                </div>
-              )}
+                {lead.reuniao_data_extenso && (
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    Atual: {lead.reuniao_data_extenso}, {lead.reuniao_hora_extenso}
+                  </p>
+                )}
+              </div>
 
               {/* Google Meet link */}
               {lead.reuniao_link_google_meet && (
