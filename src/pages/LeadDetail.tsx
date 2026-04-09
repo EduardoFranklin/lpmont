@@ -87,6 +87,7 @@ const LeadDetail = () => {
   const [editFields, setEditFields] = useState({
     treatment: "", name: "", phone: "", email: "", city: "", uf: "", career: "",
     scheduled_day: "", scheduled_time: "", notes: "",
+    reuniao_status: "pendente", reuniao_consultor: "contato@metodomont.com.br",
   });
 
   const fetchLead = async () => {
@@ -107,6 +108,8 @@ const LeadDetail = () => {
         scheduled_day: data.scheduled_day || "",
         scheduled_time: data.scheduled_time || "",
         notes: data.notes || "",
+        reuniao_status: data.reuniao_status || "pendente",
+        reuniao_consultor: data.reuniao_consultor || "contato@metodomont.com.br",
       });
     }
     setLoading(false);
@@ -148,6 +151,8 @@ const LeadDetail = () => {
       scheduled_day: editFields.scheduled_day || null,
       scheduled_time: editFields.scheduled_time || null,
       notes: editFields.notes || null,
+      reuniao_status: editFields.reuniao_status || "pendente",
+      reuniao_consultor: editFields.reuniao_consultor || null,
     }).eq("id", lead.id);
     await fetchLead();
     setHasChanges(false);
@@ -322,20 +327,73 @@ const LeadDetail = () => {
               <CardTitle className="text-sm flex items-center gap-2"><CalendarCheck className="w-4 h-4" /> Agendamento & Reunião</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
+              {/* Confirmação */}
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Confirmação</label>
+                <select
+                  value={editFields.reuniao_status === "confirmada" ? "confirmada" : editFields.reuniao_status === "cancelada" ? "cancelada" : "pendente"}
+                  onChange={e => { setEditFields(f => ({...f, reuniao_status: e.target.value})); setHasChanges(true); }}
+                  className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                  <option value="pendente">Pendente</option>
+                  <option value="confirmada">Confirmada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </div>
+
+              {/* Consultor */}
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Consultor</label>
+                <select
+                  value={editFields.reuniao_consultor}
+                  onChange={e => { setEditFields(f => ({...f, reuniao_consultor: e.target.value})); setHasChanges(true); }}
+                  className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                  <option value="contato@metodomont.com.br">contato@metodomont.com.br</option>
+                </select>
+              </div>
+
+              {/* Presença */}
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Presença</label>
+                <select
+                  value={
+                    editFields.reuniao_status === "compareceu" ? "compareceu"
+                    : editFields.reuniao_status === "nao_compareceu" ? "nao_compareceu"
+                    : "aguardando"
+                  }
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val === "aguardando") {
+                      // keep current confirmation status
+                    } else {
+                      setEditFields(f => ({...f, reuniao_status: val}));
+                    }
+                    setHasChanges(true);
+                  }}
+                  className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                  <option value="aguardando">Aguardando...</option>
+                  <option value="compareceu">Compareceu</option>
+                  <option value="nao_compareceu">Não compareceu</option>
+                </select>
+              </div>
+
+              <Separator className="my-1" />
+
+              {/* Dia / Horário */}
               {lead.reuniao_data_hora_iso ? (
-                <>
+                <div className="space-y-2">
                   {[
                     { label: "Data", value: lead.reuniao_data_extenso || "—" },
                     { label: "Horário", value: lead.reuniao_hora_extenso || "—" },
-                    { label: "Consultor", value: lead.reuniao_consultor || "—" },
-                    { label: "Status", value: lead.reuniao_status || "pendente" },
                   ].map(r => (
                     <div key={r.label} className="flex justify-between text-muted-foreground">
                       <span className="text-xs uppercase tracking-wider">{r.label}</span>
                       <span className="text-foreground text-xs font-medium">{r.value}</span>
                     </div>
                   ))}
-                </>
+                </div>
               ) : (
                 <div>
                   <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
