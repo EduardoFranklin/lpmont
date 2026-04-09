@@ -215,13 +215,19 @@ const DashChatMont = ({ initialPhone, initialLeadName, onPhoneConsumed }: { init
 
   // Auto-open conversation when initialPhone is provided (e.g. from Kanban)
   useEffect(() => {
-    if (!initialPhone || loadingConvs) return;
+    if (!initialPhone) return;
     const openOrCreate = async () => {
-      const match = conversations.find((c) => phonesMatch(c.phone, initialPhone));
+      // Fetch fresh conversations to avoid stale state
+      const { data: freshConvs } = await supabase
+        .from("whatsapp_conversations")
+        .select("*")
+        .order("last_message_at", { ascending: false });
+      const allConvs = (freshConvs || []) as unknown as Conversation[];
+
+      const match = allConvs.find((c) => phonesMatch(c.phone, initialPhone));
       if (match) {
         selectConversation(match);
       } else {
-        // Create a new conversation for this lead
         const phoneDigits = initialPhone.replace(/\D/g, "");
         const fullPhone = phoneDigits.startsWith("55") ? phoneDigits : `55${phoneDigits}`;
         const { data: newConv } = await supabase
@@ -240,7 +246,7 @@ const DashChatMont = ({ initialPhone, initialLeadName, onPhoneConsumed }: { init
       onPhoneConsumed?.();
     };
     openOrCreate();
-  }, [initialPhone, loadingConvs]);
+  }, [initialPhone]);
 
   // Realtime conversations
   useEffect(() => {
