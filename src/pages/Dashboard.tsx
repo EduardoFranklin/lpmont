@@ -158,6 +158,9 @@ const Dashboard = () => {
               <TabsContent value="agenda">
                 <DashAgenda leads={leads} onRefresh={fetchLeads} />
               </TabsContent>
+              <TabsContent value="chat">
+                <DashChatMont />
+              </TabsContent>
               <TabsContent value="messaging">
                 <DashMessaging />
               </TabsContent>
