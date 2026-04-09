@@ -107,10 +107,17 @@ Deno.serve(async (req) => {
     );
     const endDateTime = `${spPartsEnd.year}-${spPartsEnd.month}-${spPartsEnd.day}T${spPartsEnd.hour}:${spPartsEnd.minute}:00`;
 
-    // Build human-readable strings
-    const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-    const dataExtenso = diasSemana[dt.getDay()];
-    const horaExtenso = `${dt.getHours()}h às ${endDt.getHours()}h${pad(endDt.getMinutes()) !== "00" ? pad(endDt.getMinutes()) : "30"}`;
+    // Build human-readable strings using São Paulo local time
+    const spDayFormatter = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "long" });
+    const diasMap: Record<string, string> = {
+      "domingo": "Domingo", "segunda-feira": "Segunda", "terça-feira": "Terça",
+      "quarta-feira": "Quarta", "quinta-feira": "Quinta", "sexta-feira": "Sexta", "sábado": "Sábado",
+    };
+    const dataExtenso = diasMap[spDayFormatter.format(dt)] || spDayFormatter.format(dt);
+    const spH = parseInt(spParts.hour);
+    const spEndH = parseInt(spPartsEnd.hour);
+    const spEndM = spPartsEnd.minute;
+    const horaExtenso = `${spH}h às ${spEndH}h${spEndM !== "00" ? spEndM : "30"}`;
 
     let meetLink = lead.reuniao_link_google_meet;
     let calendarLink = lead.reuniao_link_google_calendar;
@@ -209,8 +216,8 @@ Deno.serve(async (req) => {
       reuniao_link_google_meet: meetLink,
       reuniao_link_google_calendar: calendarLink,
       google_calendar_event_id: newEventId,
-      scheduled_day: `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)}`,
-      scheduled_time: `${dt.getHours()}h às ${endDt.getHours()}h${pad(endDt.getMinutes()) !== "00" ? pad(endDt.getMinutes()) : "30"}`,
+      scheduled_day: `${spParts.day}/${spParts.month}`,
+      scheduled_time: `${spH}h às ${spEndH}h${spEndM !== "00" ? spEndM : "30"}`,
       updated_at: new Date().toISOString(),
     }).eq("id", leadId);
 
