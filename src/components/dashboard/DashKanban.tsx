@@ -139,7 +139,7 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
                             variant="ghost"
                             size="icon"
                             className="h-6 w-6 text-emerald-400"
-                            onClick={(e) => { e.stopPropagation(); onOpenChat ? onOpenChat(lead.phone) : openWhatsApp(lead.phone); }}
+                            onClick={(e) => { e.stopPropagation(); onOpenChat ? onOpenChat(lead.phone, lead.name) : openWhatsApp(lead.phone); }}
                             title="Abrir conversa no ChatMont"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
