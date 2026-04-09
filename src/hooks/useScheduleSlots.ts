@@ -161,7 +161,7 @@ export const useScheduleSlots = () => {
       daysChecked++;
     }
 
-    // Fetch booked slots
+    // Fetch booked slots — match by start hour/minute from reuniao_data_hora_iso
     if (result.length > 0) {
       const minIso = result[0].isoDate + "T00:00:00";
       const maxIso = result[result.length - 1].isoDate + "T23:59:59";
@@ -177,10 +177,21 @@ export const useScheduleSlots = () => {
       if (leads) {
         const booked = new Set<string>();
         leads.forEach((lead: any) => {
-          if (lead.reuniao_data_hora_iso && lead.scheduled_time) {
+          if (lead.reuniao_data_hora_iso) {
             const dt = new Date(lead.reuniao_data_hora_iso);
             const dateKey = `${pad2(dt.getDate())}/${pad2(dt.getMonth() + 1)}`;
-            booked.add(`${dateKey}|${lead.scheduled_time}`);
+            // Build the slot label that starts at this hour:minute using current slot duration
+            const h = dt.getHours();
+            const m = dt.getMinutes();
+            const endMin = h * 60 + m + slotDuration;
+            const endH = Math.floor(endMin / 60);
+            const endM = endMin % 60;
+            const slotLabel = buildSlotLabel(h, m, endH, endM);
+            booked.add(`${dateKey}|${slotLabel}`);
+            // Also add the original scheduled_time label for backward compat
+            if (lead.scheduled_time) {
+              booked.add(`${dateKey}|${lead.scheduled_time}`);
+            }
           }
         });
         setBookedSlots(booked);
