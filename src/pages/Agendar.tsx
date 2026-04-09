@@ -489,22 +489,29 @@ const Agendar = () => {
                 Escolha o melhor <span className="summit-text">horário</span>
               </h2>
               <p className="text-[13px] text-foreground/35 mb-5">
-                Reunião online de 30 min com nosso consultor.
+                Reunião online de {scheduleConfig.slot_duration_min} min com nosso consultor.
               </p>
 
+              {slotsLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="w-5 h-5 animate-spin text-foreground/30" />
+                </div>
+              ) : daySlots.length === 0 ? (
+                <p className="text-sm text-foreground/40 text-center py-8">Nenhum horário disponível no momento.</p>
+              ) : (
               <div className="space-y-4">
-                {TIME_SLOTS.map((day) => (
-                  <div key={day.day}>
+                {daySlots.map((day) => (
+                  <div key={day.date}>
                     <p className="text-[12px] font-semibold text-foreground/30 mb-2">
                       {day.day} · <span className="text-foreground/20">{day.date}</span>
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
-                        const isUnavailable = bookedSlots.has(buildSlotKey(day.date, time)) || isSlotTooSoon(day.date, time);
+                        const isUnavailable = isSlotBooked(day.date, time);
                         const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
                           <button
-                            key={`${day.day}-${time}`}
+                            key={`${day.date}-${time}`}
                             onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, date: day.date, time })}
                             disabled={isUnavailable}
                             className={`py-2.5 rounded-lg text-[13px] font-medium border transition-all duration-200 ${
@@ -523,6 +530,7 @@ const Agendar = () => {
                   </div>
                 ))}
               </div>
+              )}
 
               <button
                 onClick={goToStep3}
