@@ -176,9 +176,16 @@ const Agendar = () => {
     }
   };
 
+  const confirmationRef = useRef<HTMLDivElement>(null);
+
   const goToStep3 = async () => {
     if (!selectedSlot) return;
     setCalendarCreating(true);
+    setStep(3); // Show loading animation immediately
+    
+    // Scroll to top so loading and confirmation are visible
+    window.scrollTo({ top: 0, behavior: "instant" });
+
     try {
       // Cancel pending F1 messages from previous appointments with same email
       const { data: existingLeads } = await supabase.from("leads")
@@ -272,7 +279,10 @@ const Agendar = () => {
       console.error("Erro ao salvar lead:", err);
     }
     setCalendarCreating(false);
-    setStep(3);
+    // Scroll to confirmation card position
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }, 50);
   };
 
   const stepVariants = {
