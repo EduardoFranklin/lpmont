@@ -588,6 +588,11 @@ const LeadDetail = () => {
                 <Clock className="w-3.5 h-3.5" />
                 <span>Atualizado em {format(new Date(lead.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
               </div>
+              <div className="flex justify-end pt-2">
+                <Button onClick={() => handleSaveSection("reuniao")} disabled={savingSection === "reuniao" || !changedSections.has("reuniao")} size="sm">
+                  <Save className="w-3.5 h-3.5 mr-1.5" /> {savingSection === "reuniao" ? "Salvando..." : changedSections.has("reuniao") ? "Salvar reunião" : "Salvo"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
