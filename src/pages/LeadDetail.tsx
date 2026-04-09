@@ -329,32 +329,32 @@ const LeadDetail = () => {
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tratamento / Nome</label>
                 <div className="flex gap-2">
-                  <select value={editFields.treatment} onChange={e => { setEditFields(f => ({...f, treatment: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                  <select value={editFields.treatment} onChange={e => { setEditFields(f => ({...f, treatment: e.target.value})); markChanged("dados"); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
                     {TREATMENT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  <Input value={editFields.name} onChange={e => { setEditFields(f => ({...f, name: e.target.value})); setHasChanges(true); }} placeholder="Nome completo" className="flex-1 h-9" />
+                  <Input value={editFields.name} onChange={e => { setEditFields(f => ({...f, name: e.target.value})); markChanged("dados"); }} placeholder="Nome completo" className="flex-1 h-9" />
                 </div>
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Telefone</label>
-                <Input value={editFields.phone} onChange={e => { setEditFields(f => ({...f, phone: e.target.value})); setHasChanges(true); }} placeholder="(00) 00000-0000" className="h-9" />
+                <Input value={editFields.phone} onChange={e => { setEditFields(f => ({...f, phone: e.target.value})); markChanged("dados"); }} placeholder="(00) 00000-0000" className="h-9" />
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Email</label>
-                <Input value={editFields.email} onChange={e => { setEditFields(f => ({...f, email: e.target.value.toLowerCase()})); setHasChanges(true); }} placeholder="seu@email.com" type="email" className="h-9" />
+                <Input value={editFields.email} onChange={e => { setEditFields(f => ({...f, email: e.target.value.toLowerCase()})); markChanged("dados"); }} placeholder="seu@email.com" type="email" className="h-9" />
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Cidade / UF</label>
                 <div className="flex gap-2">
-                  <Input value={editFields.city} onChange={e => { setEditFields(f => ({...f, city: e.target.value})); setHasChanges(true); }} placeholder="Cidade" className="flex-1 h-9" />
-                  <select value={editFields.uf} onChange={e => { setEditFields(f => ({...f, uf: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                  <Input value={editFields.city} onChange={e => { setEditFields(f => ({...f, city: e.target.value})); markChanged("dados"); }} placeholder="Cidade" className="flex-1 h-9" />
+                  <select value={editFields.uf} onChange={e => { setEditFields(f => ({...f, uf: e.target.value})); markChanged("dados"); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
                     {UF_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Carreira</label>
-                <select value={editFields.career} onChange={e => { setEditFields(f => ({...f, career: e.target.value})); setHasChanges(true); }} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
+                <select value={editFields.career} onChange={e => { setEditFields(f => ({...f, career: e.target.value})); markChanged("dados"); }} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
                   {CAREER_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
               </div>
