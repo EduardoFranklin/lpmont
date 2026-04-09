@@ -8,7 +8,8 @@ import {
   Search, Send, Star, StarOff, ArrowLeft, Phone, Mail,
   MapPin, Play, Pause, Bot, User, Mic, FileText,
   Image as ImageIcon, Video, Sticker, Loader2, Volume2,
-  MessageSquare, Eye, Heart, Filter,
+  MessageSquare, Eye, Heart, Filter, CalendarCheck, UserCheck,
+  ShoppingCart, CheckCircle2, Circle, Flame, Snowflake, Zap,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format, isToday, isYesterday } from "date-fns";
@@ -709,7 +710,7 @@ const DashChatMont = () => {
 
       {/* ─── Lead Info Panel ─── */}
       {selectedConvId && showLeadPanel && (
-        <div className="w-64 border-l border-border shrink-0 hidden lg:flex flex-col">
+        <div className="w-72 border-l border-border shrink-0 hidden lg:flex flex-col">
           <div className="p-3 border-b border-border">
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
               Info do Lead
@@ -717,72 +718,146 @@ const DashChatMont = () => {
           </div>
           <ScrollArea className="flex-1 p-3">
             {lead ? (
-              <div className="space-y-3">
-                {/* Name */}
+              <div className="space-y-4">
+                {/* Name & Number */}
                 <div className="text-center">
-                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-lg font-bold text-primary mb-2">
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto text-base font-bold text-primary mb-1.5">
                     {lead.name.charAt(0).toUpperCase()}
                   </div>
                   <p className="text-sm font-semibold">{lead.treatment} {lead.name}</p>
-                  <Badge variant="outline" className="text-[10px] mt-1">
-                    #{lead.lead_number}
-                  </Badge>
+                  <Badge variant="outline" className="text-[10px] mt-1">#{lead.lead_number}</Badge>
                 </div>
 
-                {/* Status */}
-                <div className="flex flex-wrap gap-1 justify-center">
-                  <Badge className="text-[10px]">{statusLabels[lead.status] || lead.status}</Badge>
-                  {lead.temperature && (
-                    <Badge className={`text-[10px] ${tempColors[lead.temperature] || ""}`}>
-                      {lead.temperature}
-                    </Badge>
+                {/* Contact info compact */}
+                <div className="space-y-1 text-[11px] text-muted-foreground">
+                  <div className="flex items-center gap-1.5"><Phone className="w-3 h-3" /><span>{lead.phone}</span></div>
+                  <div className="flex items-center gap-1.5"><Mail className="w-3 h-3" /><span className="truncate">{lead.email}</span></div>
+                  <div className="flex items-center gap-1.5"><MapPin className="w-3 h-3" /><span>{lead.city}/{lead.uf}</span></div>
+                </div>
+
+                {/* ─── MISSÕES (action steps) ─── */}
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Missões</p>
+                  
+                  {/* Mission 1: Agendar reunião */}
+                  {(() => {
+                    const done = ["agendado", "compareceu", "convertido"].includes(lead.status);
+                    return (
+                      <div className={`flex items-center gap-2.5 p-2.5 rounded-lg border transition-all ${
+                        done ? "border-emerald-500/30 bg-emerald-500/5" : 
+                        lead.status === "novo" ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20" : "border-border bg-muted/30"
+                      }`}>
+                        {done ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                        ) : (
+                          <CalendarCheck className={`w-5 h-5 shrink-0 ${lead.status === "novo" ? "text-primary" : "text-muted-foreground"}`} />
+                        )}
+                        <div className="min-w-0">
+                          <p className={`text-xs font-semibold ${done ? "text-emerald-400" : ""}`}>1. Agendar reunião</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {done && lead.reuniao_data_extenso ? lead.reuniao_data_extenso : done ? "Agendada ✓" : "Pendente"}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Mission 2: Confirmar comparecimento */}
+                  {(() => {
+                    const done = ["compareceu", "convertido"].includes(lead.status);
+                    const active = lead.status === "agendado";
+                    const confirmed = lead.reuniao_status === "confirmada";
+                    return (
+                      <div className={`flex items-center gap-2.5 p-2.5 rounded-lg border transition-all ${
+                        done ? "border-emerald-500/30 bg-emerald-500/5" : 
+                        active ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20" : "border-border bg-muted/20 opacity-50"
+                      }`}>
+                        {done ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                        ) : (
+                          <UserCheck className={`w-5 h-5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                        )}
+                        <div className="min-w-0">
+                          <p className={`text-xs font-semibold ${done ? "text-emerald-400" : ""}`}>2. Confirmar presença</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {done ? "Compareceu ✓" : active && confirmed ? "Confirmada" : active ? "Aguardando confirmação" : "—"}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Mission 3: Comprar o curso */}
+                  {(() => {
+                    const done = lead.status === "convertido";
+                    const active = lead.status === "compareceu";
+                    return (
+                      <div className={`flex items-center gap-2.5 p-2.5 rounded-lg border transition-all ${
+                        done ? "border-emerald-500/30 bg-emerald-500/5" : 
+                        active ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20" : "border-border bg-muted/20 opacity-50"
+                      }`}>
+                        {done ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                        ) : (
+                          <ShoppingCart className={`w-5 h-5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                        )}
+                        <div className="min-w-0">
+                          <p className={`text-xs font-semibold ${done ? "text-emerald-400" : ""}`}>3. Comprar o curso</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {done ? "Pago ✓" : active ? "Em negociação" : "—"}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* ─── Temperatura (secondary) ─── */}
+                <div className="space-y-1.5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Temperatura</p>
+                  <div className="flex gap-1">
+                    {(["frio", "morno", "quente"] as const).map((t) => {
+                      const active = lead.temperature === t;
+                      const icons = { frio: Snowflake, morno: Flame, quente: Zap };
+                      const colors = {
+                        frio: active ? "bg-blue-500/20 text-blue-400 border-blue-500/40" : "border-border text-muted-foreground hover:border-blue-500/30",
+                        morno: active ? "bg-amber-500/20 text-amber-400 border-amber-500/40" : "border-border text-muted-foreground hover:border-amber-500/30",
+                        quente: active ? "bg-red-500/20 text-red-400 border-red-500/40" : "border-border text-muted-foreground hover:border-red-500/30",
+                      };
+                      const Icon = icons[t];
+                      return (
+                        <button
+                          key={t}
+                          onClick={async () => {
+                            const newTemp = lead.temperature === t ? "frio" : t;
+                            await supabase.from("leads").update({ temperature: newTemp }).eq("id", lead.id);
+                            setLead((prev) => prev ? { ...prev, temperature: newTemp } : prev);
+                          }}
+                          className={`flex-1 flex flex-col items-center gap-0.5 p-1.5 rounded-md border text-[10px] transition-all cursor-pointer ${colors[t]}`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          <span className="capitalize">{t}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Specialty & Quiz compact */}
+                <div className="space-y-1.5">
+                  <div className="p-2 rounded-lg bg-muted/50 text-xs">
+                    <span className="text-muted-foreground">Especialidade: </span>
+                    <span className="font-medium">{lead.career}</span>
+                  </div>
+                  {lead.quiz_score != null && (
+                    <div className="p-2 rounded-lg bg-muted/50 text-xs">
+                      <span className="text-muted-foreground">Quiz: </span>
+                      <span className="font-bold text-primary">{lead.quiz_score}%</span>
+                    </div>
                   )}
                 </div>
 
-                {/* Contact */}
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <Phone className="w-3 h-3" />
-                    <span>{lead.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <Mail className="w-3 h-3" />
-                    <span className="truncate">{lead.email}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
-                    <MapPin className="w-3 h-3" />
-                    <span>{lead.city}/{lead.uf}</span>
-                  </div>
-                </div>
-
-                {/* Career */}
-                <div className="p-2 rounded-lg bg-muted/50 text-xs">
-                  <p className="text-muted-foreground">Especialidade</p>
-                  <p className="font-medium">{lead.career}</p>
-                </div>
-
-                {/* Quiz */}
-                {lead.quiz_score != null && (
-                  <div className="p-2 rounded-lg bg-muted/50 text-xs">
-                    <p className="text-muted-foreground">Score Quiz</p>
-                    <p className="font-bold text-lg text-primary">{lead.quiz_score}%</p>
-                  </div>
-                )}
-
-                {/* Meeting */}
-                {lead.reuniao_status && (
-                  <div className="p-2 rounded-lg bg-muted/50 text-xs space-y-1">
-                    <p className="text-muted-foreground">Reunião</p>
-                    <Badge variant="outline" className="text-[10px]">
-                      {lead.reuniao_status}
-                    </Badge>
-                    {lead.reuniao_data_extenso && (
-                      <p className="text-muted-foreground">{lead.reuniao_data_extenso}</p>
-                    )}
-                  </div>
-                )}
-
-                {/* Lead detail link */}
+                {/* Open full detail */}
                 <Button
                   variant="outline"
                   size="sm"
