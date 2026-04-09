@@ -22,7 +22,7 @@ const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "
 const ALL_SLOTS = ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"];
 
 const generateTimeSlots = () => {
-  const result: { day: string; date: string; slots: string[]; unavailable: string[] }[] = [];
+  const result: { day: string; date: string; slots: string[] }[] = [];
   const now = new Date();
   let d = new Date(now);
   while (result.length < 4) {
@@ -30,9 +30,7 @@ const generateTimeSlots = () => {
     if (dow !== 0 && dow !== 6) {
       const dd = String(d.getDate()).padStart(2, "0");
       const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const seed = d.getDate() * 7 + d.getMonth() * 13;
-      const unavailable = ALL_SLOTS.filter((_, i) => (seed + i * 3) % 5 === 0);
-      result.push({ day: WEEKDAYS[dow], date: `${dd}/${mm}`, slots: [...ALL_SLOTS], unavailable });
+      result.push({ day: WEEKDAYS[dow], date: `${dd}/${mm}`, slots: [...ALL_SLOTS] });
     }
     d = new Date(d.getTime() + 86400000);
   }
@@ -40,6 +38,15 @@ const generateTimeSlots = () => {
 };
 
 const TIME_SLOTS = generateTimeSlots();
+
+const buildSlotKey = (date: string, time: string) => `${date}|${time}`;
+
+const slotFromIso = (iso: string): string => {
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}`;
+};
 
 const parseSlotHour = (slot: string): number => {
   const match = slot.match(/^(\d+)h/);
