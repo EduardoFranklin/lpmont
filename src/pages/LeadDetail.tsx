@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
   Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap,
-  Video, CreditCard
+  Video, CreditCard, Copy, ExternalLink
 } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
