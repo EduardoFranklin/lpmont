@@ -177,7 +177,7 @@ const tempColors: Record<string, string> = {
 
 /* ─── Main Component ─── */
 
-const DashChatMont = ({ initialPhone, onPhoneConsumed }: { initialPhone?: string | null; onPhoneConsumed?: () => void }) => {
+const DashChatMont = ({ initialPhone, initialLeadName, onPhoneConsumed }: { initialPhone?: string | null; initialLeadName?: string | null; onPhoneConsumed?: () => void }) => {
   const navigate = useNavigate();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
@@ -215,13 +215,32 @@ const DashChatMont = ({ initialPhone, onPhoneConsumed }: { initialPhone?: string
 
   // Auto-open conversation when initialPhone is provided (e.g. from Kanban)
   useEffect(() => {
-    if (!initialPhone || loadingConvs || conversations.length === 0) return;
-    const match = conversations.find((c) => phonesMatch(c.phone, initialPhone));
-    if (match) {
-      selectConversation(match);
-    }
-    onPhoneConsumed?.();
-  }, [initialPhone, conversations, loadingConvs]);
+    if (!initialPhone || loadingConvs) return;
+    const openOrCreate = async () => {
+      const match = conversations.find((c) => phonesMatch(c.phone, initialPhone));
+      if (match) {
+        selectConversation(match);
+      } else {
+        // Create a new conversation for this lead
+        const phoneDigits = initialPhone.replace(/\D/g, "");
+        const fullPhone = phoneDigits.startsWith("55") ? phoneDigits : `55${phoneDigits}`;
+        const { data: newConv } = await supabase
+          .from("whatsapp_conversations")
+          .insert({
+            phone: fullPhone,
+            contact_name: initialLeadName || "Novo contato",
+          })
+          .select()
+          .single();
+        if (newConv) {
+          await fetchConversations();
+          selectConversation(newConv as unknown as Conversation);
+        }
+      }
+      onPhoneConsumed?.();
+    };
+    openOrCreate();
+  }, [initialPhone, loadingConvs]);
 
   // Realtime conversations
   useEffect(() => {
