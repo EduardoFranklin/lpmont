@@ -160,6 +160,7 @@ Deno.serve(async (req) => {
         calendarLink: calData.htmlLink,
         meetLink,
         startDateTime,
+        googleCalendarEventId: calData.id,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

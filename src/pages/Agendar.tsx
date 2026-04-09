@@ -320,6 +320,7 @@ const Agendar = () => {
               reuniao_data_hora_iso: calData.startDateTime || null,
               reuniao_data_extenso: selectedSlot.day,
               reuniao_hora_extenso: selectedSlot.time,
+              google_calendar_event_id: calData.googleCalendarEventId || calData.eventId || null,
             } as any).eq("id", leadId);
           }
         }
