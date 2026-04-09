@@ -10,7 +10,7 @@ const WhatsAppButton = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const phone = "5598991426777";
+  const phone = "5598984636510";
   const message = encodeURIComponent("Quero saber mais sobre o Treinamento Mont'Alverne");
   const url = `https://wa.me/${phone}?text=${message}`;
 
