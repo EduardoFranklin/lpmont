@@ -227,9 +227,76 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Sending window removed — messages are sent at any time
+    // Parse trigger mode
+    let triggerMode = "scheduled";
+    try {
+      const body = await req.json();
+      if (body?.trigger === "immediate") triggerMode = "immediate";
+    } catch { /* no body = scheduled cron */ }
 
-    // ── Check hourly WA rate (via message_history last 1h) ─
+    const now = new Date().toISOString();
+
+    // ── STEP 1: Always process IMMEDIATE messages first (delay_minutes=0, just enqueued) ──
+    // These bypass hourly limits and batch size — they must go out NOW.
+    const { data: immediateMessages } = await supabase
+      .from("message_queue")
+      .select("*, automation_sequences!message_queue_sequence_id_fkey(delay_minutes)")
+      .eq("status", "pending")
+      .lte("scheduled_for", now)
+      .order("scheduled_for")
+      .limit(20);
+
+    // Separate immediate (delay_minutes=0) from scheduled
+    const immediateMsgs: any[] = [];
+    const scheduledMsgs: any[] = [];
+
+    for (const msg of (immediateMessages || [])) {
+      const seqDelay = (msg as any).automation_sequences?.delay_minutes;
+      if (seqDelay === 0 || seqDelay === null) {
+        immediateMsgs.push(msg);
+      } else {
+        scheduledMsgs.push(msg);
+      }
+    }
+
+    // ── Fetch Z-API settings (shared) ─────────────────────
+    const { data: settingsRows } = await supabase
+      .from("site_settings")
+      .select("key, value")
+      .in("key", ["zapi_instance_id", "zapi_token", "zapi_client_token"]);
+
+    const settings: Record<string, string> = {};
+    for (const row of settingsRows || []) {
+      settings[row.key] = row.value;
+    }
+
+    let processed = 0;
+    let errors = 0;
+    let skipped = 0;
+    const sentToLeadInBatch = new Set<string>();
+
+    // ── PROCESS IMMEDIATE MESSAGES (priority, no hourly limit) ──
+    for (const msg of immediateMsgs) {
+      const result = await processOneMessage(msg, supabase, settings, sentToLeadInBatch, supabaseUrl, serviceKey);
+      if (result === "processed") processed++;
+      else if (result === "error") errors++;
+      else skipped++;
+
+      if (processed < immediateMsgs.length) {
+        await sleep(1000 + Math.random() * 2000);
+      }
+    }
+
+    // If this was an immediate-only trigger, return early
+    if (triggerMode === "immediate") {
+      return new Response(
+        JSON.stringify({ processed, errors, skipped, mode: "immediate" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // ── STEP 2: Process SCHEDULED messages (normal cron cycle) ──
+    // Check hourly WA rate
     const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
     const { count: waLastHour } = await supabase
       .from("message_history")
@@ -239,28 +306,25 @@ Deno.serve(async (req) => {
       .gte("created_at", oneHourAgo);
 
     const waRemaining = HOURLY_WA_LIMIT - (waLastHour || 0);
-    if (waRemaining <= 0) {
-      console.log("Hourly WA limit reached (30/h). Skipping.");
+    if (waRemaining <= 0 && scheduledMsgs.length > 0) {
+      console.log("Hourly WA limit reached (30/h). Skipping scheduled.");
       return new Response(
-        JSON.stringify({ processed: 0, reason: "hourly_limit" }),
+        JSON.stringify({ processed, errors, skipped, reason: "hourly_limit_scheduled" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // ── Fetch pending messages due now ─────────────────────
-    const { data: pendingMessages, error: fetchError } = await supabase
-      .from("message_queue")
-      .select("*")
-      .eq("status", "pending")
-      .lte("scheduled_for", new Date().toISOString())
-      .order("scheduled_for")
-      .limit(Math.min(waRemaining, 10)); // Process max 10 per cycle
+    // Process scheduled messages up to remaining limit
+    const toProcess = scheduledMsgs.slice(0, Math.min(waRemaining, 10));
+    for (const msg of toProcess) {
+      const result = await processOneMessage(msg, supabase, settings, sentToLeadInBatch, supabaseUrl, serviceKey);
+      if (result === "processed") processed++;
+      else if (result === "error") errors++;
+      else skipped++;
 
-    if (fetchError) throw fetchError;
-    if (!pendingMessages || pendingMessages.length === 0) {
-      return new Response(JSON.stringify({ processed: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      if (processed < toProcess.length) {
+        await sleep(1000 + Math.random() * 2000);
+      }
     }
 
     // ── Fetch Z-API settings ──────────────────────────────
