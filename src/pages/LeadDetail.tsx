@@ -393,8 +393,8 @@ const LeadDetail = () => {
           </CardContent>
         </Card>
 
-        {/* Conditional cards: Quiz, Reunião, Compra */}
-        {(lead.quiz_slug || lead.reuniao_data_hora_iso || lead.hotmart_transaction_id || lead.data_compra) && (
+        {/* Conditional cards: Quiz, Compra */}
+        {(lead.quiz_slug || lead.hotmart_transaction_id || lead.data_compra) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {lead.quiz_slug && (
               <Card>
@@ -413,30 +413,6 @@ const LeadDetail = () => {
                       <span className="text-foreground text-xs font-medium">{r.value}</span>
                     </div>
                   ))}
-                </CardContent>
-              </Card>
-            )}
-            {lead.reuniao_data_hora_iso && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-2"><Video className="w-4 h-4" /> Reunião</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  {[
-                    { label: "Data", value: lead.reuniao_data_extenso || "—" },
-                    { label: "Horário", value: lead.reuniao_hora_extenso || "—" },
-                    { label: "Consultor", value: lead.reuniao_consultor || "—" },
-                    { label: "Status", value: lead.reuniao_status || "pendente" },
-                  ].map(r => (
-                    <div key={r.label} className="flex justify-between text-muted-foreground">
-                      <span className="text-xs uppercase tracking-wider">{r.label}</span>
-                      <span className="text-foreground text-xs font-medium">{r.value}</span>
-                    </div>
-                  ))}
-                  {lead.reuniao_link_google_meet && (
-                    <a href={lead.reuniao_link_google_meet} target="_blank" rel="noopener noreferrer"
-                      className="text-xs text-primary underline">Abrir Google Meet</a>
-                  )}
                 </CardContent>
               </Card>
             )}
