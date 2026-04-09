@@ -108,6 +108,8 @@ const LeadDetail = () => {
         scheduled_day: data.scheduled_day || "",
         scheduled_time: data.scheduled_time || "",
         notes: data.notes || "",
+        reuniao_status: data.reuniao_status || "pendente",
+        reuniao_consultor: data.reuniao_consultor || "contato@metodomont.com.br",
       });
     }
     setLoading(false);
