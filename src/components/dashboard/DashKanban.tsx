@@ -41,19 +41,137 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
     setDeleteId(null);
   };
 
+  // Map status → funnel for automation triggers
+  const STATUS_FUNNEL_MAP: Partial<Record<LeadStatus, string>> = {
+    agendado: "F1",
+    compareceu: "F3",
+    convertido: "F4",
+  };
+
   const handleDrop = async (e: React.DragEvent, newStatus: LeadStatus) => {
     e.preventDefault();
     const leadId = e.dataTransfer.getData("leadId");
     if (!leadId) return;
-    await supabase.from("leads").update({ status: newStatus }).eq("id", leadId);
-    // Add tag with the new stage name
-    const colLabel = COLUMNS.find((c) => c.status === newStatus)?.label || newStatus;
+
+    const lead = leads.find((l) => l.id === leadId);
+    const oldStatus = lead?.status;
+    if (oldStatus === newStatus) return;
+
+    // 1. Update lead status
+    const updatePayload: any = { status: newStatus };
+    if (newStatus === "convertido" && lead) {
+      updatePayload.temperature = "quente";
+    }
+    await supabase.from("leads").update(updatePayload).eq("id", leadId);
+
+    // 2. Add Kanban movement tag
     const tagName = `movido_${newStatus}`;
     await supabase.from("lead_tags").upsert(
       { lead_id: leadId, tag: tagName, source: "kanban" },
       { onConflict: "lead_id,tag", ignoreDuplicates: true }
     ).select();
+
+    // 3. Trigger automation funnel (enqueue-automation)
+    const funnel = STATUS_FUNNEL_MAP[newStatus];
+    if (funnel) {
+      supabase.functions.invoke("enqueue-automation", {
+        body: { lead_id: leadId, funnel, event: `kanban_${newStatus}` },
+      }).catch((err) => console.error("Enqueue automation error:", err));
+    }
+
+    // 4. Trigger team notifications (team_automation_sequences)
+    triggerTeamNotifications(leadId, newStatus, lead);
+
+    // 5. Trigger sale notifications when moved to convertido
+    if (newStatus === "convertido" && lead) {
+      triggerSaleNotifications(lead);
+    }
+
     onRefresh();
+  };
+
+  const triggerTeamNotifications = async (leadId: string, status: string, lead: Lead | undefined) => {
+    try {
+      const { data: sequences } = await supabase
+        .from("team_automation_sequences" as any)
+        .select("*")
+        .eq("trigger_status", status)
+        .eq("active", true)
+        .order("step_order");
+
+      if (!sequences?.length || !lead) return;
+
+      // Fetch Z-API settings
+      const { data: settingsRows } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", ["zapi_instance_id", "zapi_token", "zapi_client_token"]);
+      const settings: Record<string, string> = {};
+      (settingsRows || []).forEach((r: any) => { settings[r.key] = r.value; });
+
+      if (!settings.zapi_instance_id || !settings.zapi_token) return;
+
+      for (const seq of sequences) {
+        const phones = (seq as any).recipient_phones || [];
+        let body = (seq as any).body || "";
+        // Variable substitution
+        body = body
+          .replaceAll("{{nome}}", lead.name || "")
+          .replaceAll("{{email}}", lead.email || "")
+          .replaceAll("{{telefone}}", lead.phone || "")
+          .replaceAll("{{cidade}}", lead.city || "")
+          .replaceAll("{{score}}", String(lead.quiz_score ?? ""))
+          .replaceAll("{{status}}", status);
+
+        for (const phone of phones) {
+          const digits = String(phone).replace(/\D/g, "");
+          const fullPhone = digits.startsWith("55") ? digits : `55${digits}`;
+          // Fire and forget via send-whatsapp-chat
+          supabase.functions.invoke("send-whatsapp-chat", {
+            body: { phone: fullPhone, message: body },
+          }).catch((err) => console.error("Team notification error:", err));
+        }
+
+        // Delay between steps
+        if ((seq as any).delay_minutes > 0) {
+          await new Promise((r) => setTimeout(r, Math.min((seq as any).delay_minutes * 60 * 1000, 5000)));
+        }
+      }
+    } catch (err) {
+      console.error("Team notifications error:", err);
+    }
+  };
+
+  const triggerSaleNotifications = async (lead: Lead) => {
+    try {
+      const [{ data: contacts }, { data: tplData }] = await Promise.all([
+        supabase.from("sale_notification_contacts").select("*").eq("active", true),
+        supabase.from("site_settings").select("value").eq("key", "sale_notification_template").maybeSingle(),
+      ]);
+
+      if (!contacts?.length) return;
+
+      const template = tplData?.value || "🎉 Nova venda! {{nome}} ({{email}}) acabou de comprar!";
+
+      const body = template
+        .replaceAll("{{nome}}", lead.name || "")
+        .replaceAll("{{email}}", lead.email || "")
+        .replaceAll("{{valor}}", String(lead.valor_pago ?? lead.revenue ?? "—"))
+        .replaceAll("{{pagamento}}", lead.forma_pagamento || "—")
+        .replaceAll("{{oferta}}", lead.hotmart_offer_code || "—");
+
+      for (const contact of contacts) {
+        const digits = contact.phone.replace(/\D/g, "");
+        const fullPhone = digits.startsWith("55") ? digits : `55${digits}`;
+        supabase.functions.invoke("send-whatsapp-chat", {
+          body: { phone: fullPhone, message: body },
+        }).catch((err) => console.error("Sale notification error:", err));
+      }
+
+      toast.success("Notificações de venda enviadas!");
+    } catch (err) {
+      console.error("Sale notifications error:", err);
+    }
   };
 
   const handleDragStart = (e: React.DragEvent, leadId: string) => {
