@@ -327,21 +327,7 @@ const LeadDetail = () => {
               <CardTitle className="text-sm flex items-center gap-2"><CalendarCheck className="w-4 h-4" /> Agendamento & Reunião</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {/* Confirmação */}
-              <div>
-                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Confirmação</label>
-                <select
-                  value={editFields.reuniao_status === "confirmada" ? "confirmada" : editFields.reuniao_status === "cancelada" ? "cancelada" : "pendente"}
-                  onChange={e => { setEditFields(f => ({...f, reuniao_status: e.target.value})); setHasChanges(true); }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
-                >
-                  <option value="pendente">Pendente</option>
-                  <option value="confirmada">Confirmada</option>
-                  <option value="cancelada">Cancelada</option>
-                </select>
-              </div>
-
-              {/* Consultor */}
+              {/* 1. Consultor */}
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Consultor</label>
                 <select
@@ -353,30 +339,67 @@ const LeadDetail = () => {
                 </select>
               </div>
 
-              {/* Presença */}
+              {/* 2. Confirmação — pills */}
               <div>
-                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Presença</label>
-                <select
-                  value={
-                    editFields.reuniao_status === "compareceu" ? "compareceu"
-                    : editFields.reuniao_status === "nao_compareceu" ? "nao_compareceu"
-                    : "aguardando"
-                  }
-                  onChange={e => {
-                    const val = e.target.value;
-                    if (val === "aguardando") {
-                      // keep current confirmation status
-                    } else {
-                      setEditFields(f => ({...f, reuniao_status: val}));
-                    }
-                    setHasChanges(true);
-                  }}
-                  className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
-                >
-                  <option value="aguardando">Aguardando...</option>
-                  <option value="compareceu">Compareceu</option>
-                  <option value="nao_compareceu">Não compareceu</option>
-                </select>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5 block">Confirmação</label>
+                <div className="flex gap-1.5">
+                  {([
+                    { value: "pendente", label: "Pendente", cls: "bg-amber-500/20 text-amber-400 border-amber-500/50" },
+                    { value: "confirmada", label: "Confirmada", cls: "bg-emerald-500/20 text-emerald-400 border-emerald-500/50" },
+                    { value: "cancelada", label: "Cancelada", cls: "bg-red-500/20 text-red-400 border-red-500/50" },
+                  ] as const).map(opt => {
+                    const current = editFields.reuniao_status;
+                    const isActive = current === opt.value || (opt.value === "pendente" && !["confirmada", "cancelada", "compareceu", "nao_compareceu"].includes(current));
+                    return (
+                      <Button
+                        key={opt.value}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className={`flex-1 text-xs h-8 ${isActive ? opt.cls : "text-muted-foreground"}`}
+                        onClick={() => { setEditFields(f => ({...f, reuniao_status: opt.value})); setHasChanges(true); }}
+                      >
+                        {opt.label}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 3. Presença — pills */}
+              <div>
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5 block">Presença</label>
+                <div className="flex gap-1.5">
+                  {([
+                    { value: "aguardando", label: "Aguardando...", cls: "bg-muted text-muted-foreground border-border" },
+                    { value: "compareceu", label: "Compareceu", cls: "bg-emerald-500/20 text-emerald-400 border-emerald-500/50" },
+                    { value: "nao_compareceu", label: "Não compareceu", cls: "bg-red-500/20 text-red-400 border-red-500/50" },
+                  ] as const).map(opt => {
+                    const current = editFields.reuniao_status;
+                    const isActive = opt.value === "aguardando"
+                      ? !["compareceu", "nao_compareceu"].includes(current)
+                      : current === opt.value;
+                    return (
+                      <Button
+                        key={opt.value}
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className={`flex-1 text-xs h-8 ${isActive ? opt.cls : "text-muted-foreground"}`}
+                        onClick={() => {
+                          if (opt.value === "aguardando") {
+                            setEditFields(f => ({...f, reuniao_status: "pendente"}));
+                          } else {
+                            setEditFields(f => ({...f, reuniao_status: opt.value}));
+                          }
+                          setHasChanges(true);
+                        }}
+                      >
+                        {opt.label}
+                      </Button>
+                    );
+                  })}
+                </div>
               </div>
 
               <Separator className="my-1" />
