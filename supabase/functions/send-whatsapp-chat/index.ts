@@ -38,24 +38,37 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { conversationId, message, messageType = "text" } = await req.json();
+    const { conversationId, phone: directPhone, message, messageType = "text" } = await req.json();
 
-    if (!conversationId || !message) {
-      return new Response(JSON.stringify({ error: "Missing conversationId or message" }), {
+    // Support two modes: conversationId-based (ChatMont) or direct phone (Kanban notifications)
+    if (!message) {
+      return new Response(JSON.stringify({ error: "Missing message" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Get conversation
-    const { data: conv, error: convErr } = await supabase
-      .from("whatsapp_conversations")
-      .select("phone")
-      .eq("id", conversationId)
-      .single();
+    let targetPhone: string;
 
-    if (convErr || !conv) {
-      return new Response(JSON.stringify({ error: "Conversation not found" }), {
-        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    if (conversationId) {
+      // Mode 1: Get phone from conversation
+      const { data: conv, error: convErr } = await supabase
+        .from("whatsapp_conversations")
+        .select("phone")
+        .eq("id", conversationId)
+        .single();
+
+      if (convErr || !conv) {
+        return new Response(JSON.stringify({ error: "Conversation not found" }), {
+          status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      targetPhone = conv.phone;
+    } else if (directPhone) {
+      // Mode 2: Direct phone number (for Kanban/team/sale notifications)
+      targetPhone = directPhone;
+    } else {
+      return new Response(JSON.stringify({ error: "Missing conversationId or phone" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -80,7 +93,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const formattedPhone = formatPhoneE164(conv.phone);
+    const formattedPhone = formatPhoneE164(targetPhone);
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       ...(clientToken ? { "Client-Token": clientToken } : {}),
@@ -113,23 +126,24 @@ Deno.serve(async (req) => {
 
     const zapiResponse = await res.json();
 
-    // Save message to DB
-    await supabase.from("whatsapp_messages").insert({
-      conversation_id: conversationId,
-      direction: "outgoing",
-      message_type: messageType,
-      content: messageType === "audio" ? "" : message,
-      media_url: messageType === "audio" ? message : null,
-      is_automated: false,
-      status: "sent",
-      external_id: zapiResponse?.messageId || null,
-    });
+    // Save message to DB only if conversationId was provided
+    if (conversationId) {
+      await supabase.from("whatsapp_messages").insert({
+        conversation_id: conversationId,
+        direction: "outgoing",
+        message_type: messageType,
+        content: messageType === "audio" ? "" : message,
+        media_url: messageType === "audio" ? message : null,
+        is_automated: false,
+        status: "sent",
+        external_id: zapiResponse?.messageId || null,
+      });
 
-    // Update conversation
-    await supabase.from("whatsapp_conversations").update({
-      last_message: messageType === "audio" ? "[Áudio]" : message,
-      last_message_at: new Date().toISOString(),
-    }).eq("id", conversationId);
+      await supabase.from("whatsapp_conversations").update({
+        last_message: messageType === "audio" ? "[Áudio]" : message,
+        last_message_at: new Date().toISOString(),
+      }).eq("id", conversationId);
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
