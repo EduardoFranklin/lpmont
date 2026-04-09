@@ -130,11 +130,11 @@ const Dashboard = () => {
                 <TabsTrigger value="chat" className="gap-1.5">
                   <MessageCircle className="w-4 h-4" /> <span className="hidden sm:inline">ChatMont</span><span className="sm:hidden">Chat</span>
                 </TabsTrigger>
-                <TabsTrigger value="reports" className="gap-1.5">
-                  <BarChart3 className="w-4 h-4" /> Relatórios
-                </TabsTrigger>
                 <TabsTrigger value="leads" className="gap-1.5">
                   <List className="w-4 h-4" /> Leads
+                </TabsTrigger>
+                <TabsTrigger value="reports" className="gap-1.5">
+                  <BarChart3 className="w-4 h-4" /> Relatórios
                 </TabsTrigger>
                 <TabsTrigger value="messaging" className="gap-1.5">
                   <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Mensageria</span><span className="sm:hidden">Msg</span>
@@ -155,11 +155,11 @@ const Dashboard = () => {
               <TabsContent value="chat">
                 <DashChatMont />
               </TabsContent>
-              <TabsContent value="reports">
-                <DashReports leads={filteredLeads} />
-              </TabsContent>
               <TabsContent value="leads">
                 <DashLeadsList leads={filteredLeads} onRefresh={fetchLeads} />
+              </TabsContent>
+              <TabsContent value="reports">
+                <DashReports leads={filteredLeads} />
               </TabsContent>
               <TabsContent value="messaging">
                 <DashMessaging />
