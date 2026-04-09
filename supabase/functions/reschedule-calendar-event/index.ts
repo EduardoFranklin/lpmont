@@ -87,14 +87,25 @@ Deno.serve(async (req) => {
         .eq("id", tokenRow.id);
     }
 
-    // Parse the new date/time
+    // Parse the new date/time — force São Paulo interpretation
     const dt = new Date(newDateTimeISO);
     const pad = (n: number) => String(n).padStart(2, "0");
 
-    // Build start/end in local format for Sao Paulo
-    const startDateTime = `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}:00`;
+    // Extract São Paulo local components using Intl formatter
+    const spFormatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+    });
+    const spParts = Object.fromEntries(
+      spFormatter.formatToParts(dt).map((p) => [p.type, p.value])
+    );
+    const startDateTime = `${spParts.year}-${spParts.month}-${spParts.day}T${spParts.hour}:${spParts.minute}:00`;
     const endDt = new Date(dt.getTime() + 30 * 60000);
-    const endDateTime = `${endDt.getFullYear()}-${pad(endDt.getMonth() + 1)}-${pad(endDt.getDate())}T${pad(endDt.getHours())}:${pad(endDt.getMinutes())}:00`;
+    const spPartsEnd = Object.fromEntries(
+      spFormatter.formatToParts(endDt).map((p) => [p.type, p.value])
+    );
+    const endDateTime = `${spPartsEnd.year}-${spPartsEnd.month}-${spPartsEnd.day}T${spPartsEnd.hour}:${spPartsEnd.minute}:00`;
 
     // Build human-readable strings
     const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
