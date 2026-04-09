@@ -26,6 +26,14 @@ const TEMP_COLORS: Record<string, string> = {
   quente: "bg-red-500",
 };
 
+const replaceVars = (tpl: string, vars: Record<string, string>) => {
+  let result = tpl;
+  for (const [k, v] of Object.entries(vars)) {
+    result = result.split(k).join(v);
+  }
+  return result;
+};
+
 const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh: () => void; onOpenChat?: (phone: string, name: string) => void }) => {
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
