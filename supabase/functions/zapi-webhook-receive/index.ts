@@ -70,27 +70,31 @@ Deno.serve(async (req) => {
     }
 
     const normalizedPhone = normalizePhone(rawPhone);
+    const phoneSuffix = normalizedPhone.slice(-9); // last 9 digits
 
-    // Find or create conversation
-    const { data: existingConv } = await supabase
-      .from("whatsapp_conversations")
-      .select("*")
-      .eq("phone", normalizedPhone)
-      .maybeSingle();
-
-    let conversationId: string;
-    
-    // Try to find matching lead by last 8-10 digits
-    const phoneSuffix = normalizedPhone.slice(-9); // last 9 digits for matching
+    // Find matching lead by phone suffix
     const { data: allLeads } = await supabase
       .from("leads")
-      .select("id, name, phone")
+      .select("id, name, phone, treatment")
       .limit(500);
-    
+
     const matchedLead = allLeads?.find((l) => {
       const leadDigits = l.phone.replace(/\D/g, "").replace(/^55/, "");
       return leadDigits === normalizedPhone || leadDigits.endsWith(phoneSuffix) || normalizedPhone.endsWith(leadDigits.slice(-9));
     }) || null;
+
+    // Find conversation by phone suffix match (handles 55 prefix inconsistencies)
+    const { data: allConvs } = await supabase
+      .from("whatsapp_conversations")
+      .select("*")
+      .limit(500);
+
+    const existingConv = (allConvs || []).find((c: any) => {
+      const convDigits = c.phone.replace(/\D/g, "").replace(/^55/, "");
+      return convDigits === normalizedPhone || convDigits.endsWith(phoneSuffix) || normalizedPhone.endsWith(convDigits.slice(-9));
+    }) || null;
+
+    let conversationId: string;
 
     if (existingConv) {
       conversationId = existingConv.id;
@@ -98,23 +102,25 @@ Deno.serve(async (req) => {
         last_message: content || `[${messageType}]`,
         last_message_at: new Date().toISOString(),
       };
-      if (senderName && !existingConv.contact_name) {
+      // For incoming messages, update contact name if empty
+      if (!isFromMe && senderName && !existingConv.contact_name) {
         updates.contact_name = senderName;
       }
       if (matchedLead && !existingConv.lead_id) {
         updates.lead_id = matchedLead.id;
       }
-      // Increment unread only for incoming messages
       if (!isFromMe) {
         updates.unread_count = (existingConv.unread_count || 0) + 1;
       }
       await supabase.from("whatsapp_conversations").update(updates).eq("id", conversationId);
     } else {
+      // Use lead name for contact, never the business name from isFromMe
+      const contactName = matchedLead?.name || (!isFromMe ? senderName : "") || normalizedPhone;
       const { data: newConv, error: convErr } = await supabase
         .from("whatsapp_conversations")
         .insert({
           phone: normalizedPhone,
-          contact_name: senderName || matchedLead?.name || normalizedPhone,
+          contact_name: contactName,
           last_message: content || `[${messageType}]`,
           last_message_at: new Date().toISOString(),
           unread_count: isFromMe ? 0 : 1,
