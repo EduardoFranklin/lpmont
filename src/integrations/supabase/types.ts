@@ -763,6 +763,104 @@ export type Database = {
         }
         Relationships: []
       }
+      schedule_availability: {
+        Row: {
+          consultant_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          start_time: string
+        }
+        Insert: {
+          consultant_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          start_time: string
+        }
+        Update: {
+          consultant_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_availability_consultant_id_fkey"
+            columns: ["consultant_id"]
+            isOneToOne: false
+            referencedRelation: "schedule_consultants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedule_blocked_periods: {
+        Row: {
+          created_at: string
+          end_at: string
+          id: string
+          reason: string | null
+          start_at: string
+        }
+        Insert: {
+          created_at?: string
+          end_at: string
+          id?: string
+          reason?: string | null
+          start_at: string
+        }
+        Update: {
+          created_at?: string
+          end_at?: string
+          id?: string
+          reason?: string | null
+          start_at?: string
+        }
+        Relationships: []
+      }
+      schedule_consultants: {
+        Row: {
+          active: boolean
+          advance_hours: number
+          buffer_min: number
+          created_at: string
+          email: string
+          id: string
+          max_days_ahead: number
+          name: string
+          slot_duration_min: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          advance_hours?: number
+          buffer_min?: number
+          created_at?: string
+          email: string
+          id?: string
+          max_days_ahead?: number
+          name?: string
+          slot_duration_min?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          advance_hours?: number
+          buffer_min?: number
+          created_at?: string
+          email?: string
+          id?: string
+          max_days_ahead?: number
+          name?: string
+          slot_duration_min?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           content_key: string
