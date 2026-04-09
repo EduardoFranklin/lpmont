@@ -1090,8 +1090,9 @@ const DashMessaging = () => {
 
   return (
     <Tabs defaultValue="automacoes" className="space-y-4">
-      <TabsList>
-        <TabsTrigger value="automacoes" className="gap-1.5"><Zap className="w-4 h-4" /> Automações</TabsTrigger>
+      <TabsList className="flex flex-wrap h-auto gap-1">
+        <TabsTrigger value="automacoes" className="gap-1.5"><Zap className="w-4 h-4" /> Clientes</TabsTrigger>
+        <TabsTrigger value="equipe" className="gap-1.5"><Users className="w-4 h-4" /> Equipe</TabsTrigger>
         <TabsTrigger value="fila" className="gap-1.5"><Send className="w-4 h-4" /> Fila de Envio</TabsTrigger>
         <TabsTrigger value="vendas" className="gap-1.5"><Trophy className="w-4 h-4" /> Notif. Vendas</TabsTrigger>
       </TabsList>
@@ -1118,6 +1119,7 @@ const DashMessaging = () => {
         </Accordion>
       </TabsContent>
 
+      <TabsContent value="equipe"><DashTeamMessaging /></TabsContent>
       <TabsContent value="fila"><QueueMonitor /></TabsContent>
       <TabsContent value="vendas"><SaleNotificationsTab /></TabsContent>
     </Tabs>
