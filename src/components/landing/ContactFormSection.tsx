@@ -91,7 +91,6 @@ const ContactFormSection = () => {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ treatment: "Dr.", name: "", phone: "", email: "", uf: "", city: "", career: "" });
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; date: string; time: string } | null>(null);
-  const [dynamicUnavailable, setDynamicUnavailable] = useState<{ day: string; time: string } | null>(null);
   const [bookedSlots, setBookedSlots] = useState<Set<string>>(new Set());
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
