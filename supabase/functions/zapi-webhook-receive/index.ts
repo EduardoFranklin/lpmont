@@ -126,6 +126,43 @@ Deno.serve(async (req) => {
       conversationId = newConv.id;
     }
 
+    // Skip outgoing messages already saved by ChatMont (avoid duplication)
+    if (isFromMe && messageId) {
+      const { data: existingMsg } = await supabase
+        .from("whatsapp_messages")
+        .select("id")
+        .eq("conversation_id", conversationId)
+        .eq("direction", "outgoing")
+        .gte("created_at", new Date(Date.now() - 60000).toISOString()) // last 60s
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (existingMsg) {
+        // Message already saved by send-whatsapp-chat, skip
+        console.log("Skipping duplicate outgoing message from ChatMont");
+        return new Response(JSON.stringify({ ok: true, skip: "duplicate_outgoing" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Determine if this is an automated message (from message_queue/automation, not ChatMont)
+    let isAutomated = false;
+    if (isFromMe) {
+      // Check if this message matches a recent automation send (message_history)
+      const { data: automationMatch } = await supabase
+        .from("message_history")
+        .select("id")
+        .eq("channel", "whatsapp")
+        .gte("created_at", new Date(Date.now() - 120000).toISOString()) // last 2min
+        .limit(1)
+        .maybeSingle();
+      
+      // If found in automation history, it's automated; otherwise it's manual from phone
+      isAutomated = !!automationMatch;
+    }
+
     // Insert message
     const { error: msgErr } = await supabase.from("whatsapp_messages").insert({
       conversation_id: conversationId,
@@ -133,7 +170,7 @@ Deno.serve(async (req) => {
       message_type: messageType,
       content,
       media_url: mediaUrl || null,
-      is_automated: isFromMe,
+      is_automated: isAutomated,
       status: "delivered",
       external_id: messageId || null,
     });
