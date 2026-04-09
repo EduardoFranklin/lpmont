@@ -414,8 +414,8 @@ const LeadDetail = () => {
               />
             </div>
             <div className="flex justify-end">
-              <Button onClick={handleSave} disabled={saving || !hasChanges} size="sm">
-                <Save className="w-3.5 h-3.5 mr-1.5" /> {saving ? "Salvando..." : hasChanges ? "Salvar alterações" : "Salvo"}
+              <Button onClick={() => handleSaveSection("gerenciar")} disabled={savingSection === "gerenciar" || !changedSections.has("gerenciar")} size="sm">
+                <Save className="w-3.5 h-3.5 mr-1.5" /> {savingSection === "gerenciar" ? "Salvando..." : changedSections.has("gerenciar") ? "Salvar alterações" : "Salvo"}
               </Button>
             </div>
           </CardContent>
