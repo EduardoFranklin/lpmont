@@ -14,7 +14,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
 } from "@/components/ui/dialog";
 import {
-  Save, MessageCircle, Mail, Bold, Italic, Link2, Type,
+  Save, MessageCircle, MessageSquare, Mail, Bold, Italic, Link2, Type,
   Variable, Strikethrough, Plus, Trash2, Clock, Trophy, Phone,
   Zap, Users, ShoppingCart, GraduationCap,
   Send, CheckCircle2, XCircle, Loader2, RefreshCw, X,
