@@ -209,10 +209,163 @@ async function sendEmail(
   }
 }
 
-// ── GLOBAL RATE LIMIT: max 30 WA messages per hour ───────
-const HOURLY_WA_LIMIT = 30;
-const MAX_DAILY_WA = 200;
-const MIN_SAME_LEAD_INTERVAL_SEC = 60;
+// ── PROCESS ONE MESSAGE ───────────────────────────────────
+async function processOneMessage(
+  msg: any,
+  supabase: any,
+  settings: Record<string, string>,
+  sentToLeadInBatch: Set<string>,
+  supabaseUrl: string,
+  serviceKey: string,
+): Promise<"processed" | "error" | "skipped"> {
+  // Re-fetch lead data fresh
+  const { data: lead, error: leadErr } = await supabase
+    .from("leads")
+    .select("*")
+    .eq("id", msg.lead_id)
+    .single();
+
+  if (leadErr || !lead) {
+    await supabase
+      .from("message_queue")
+      .update({ status: "failed", last_error: "Lead not found", attempts: msg.attempts + 1 })
+      .eq("id", msg.id);
+    return "error";
+  }
+
+  // Re-validate tags at send time
+  const { data: leadTagsRows } = await supabase
+    .from("lead_tags")
+    .select("tag")
+    .eq("lead_id", lead.id);
+  const leadTags = new Set((leadTagsRows || []).map((t: any) => t.tag));
+
+  // Cancel sales funnels if lead already paid
+  const hasPaid = leadTags.has("pagou") || leadTags.has("comprador") || lead.status === "convertido";
+  if (hasPaid && msg.funnel !== "F4") {
+    await supabase.from("message_queue").update({ status: "cancelled", last_error: "Lead já comprou" }).eq("id", msg.id);
+    await supabase.from("message_queue")
+      .update({ status: "cancelled", last_error: "Lead já comprou" })
+      .eq("lead_id", lead.id).eq("funnel", msg.funnel).eq("status", "pending");
+    return "skipped";
+  }
+
+  // Cancel if lead is perdido (except F4)
+  if (lead.status === "perdido" && msg.funnel !== "F4") {
+    await supabase.from("message_queue").update({ status: "cancelled", last_error: "Lead perdido" }).eq("id", msg.id);
+    return "skipped";
+  }
+
+  // Re-check sequence conditions
+  if (msg.sequence_id) {
+    const { data: seqRow } = await supabase.from("automation_sequences").select("conditions").eq("id", msg.sequence_id).single();
+    const cond = seqRow?.conditions as any || {};
+    if (cond.required_tags?.length) {
+      const missing = cond.required_tags.some((t: string) => !leadTags.has(t));
+      if (missing) {
+        await supabase.from("message_queue").update({ status: "cancelled", last_error: "Tag obrigatória ausente" }).eq("id", msg.id);
+        return "skipped";
+      }
+    }
+    if (cond.excluded_tags?.length) {
+      const blocked = cond.excluded_tags.some((t: string) => leadTags.has(t));
+      if (blocked) {
+        await supabase.from("message_queue").update({ status: "cancelled", last_error: "Tag de exclusão presente" }).eq("id", msg.id);
+        return "skipped";
+      }
+    }
+  }
+
+  // WA-specific anti-ban checks
+  if (msg.channel === "whatsapp") {
+    if (sentToLeadInBatch.has(lead.id)) {
+      const newTime = new Date(Date.now() + 90 * 1000).toISOString();
+      await supabase.from("message_queue").update({ scheduled_for: newTime }).eq("id", msg.id);
+      console.log(`Lead ${lead.id}: already sent in this batch, rescheduling`);
+      return "skipped";
+    }
+
+    if ((lead.wa_sem_resposta_count || 0) >= 3) {
+      await supabase.from("message_queue")
+        .update({ status: "cancelled", last_error: "wa_sem_resposta >= 3 — bloqueado" })
+        .eq("id", msg.id);
+      return "skipped";
+    }
+
+    if (lead.last_wa_sent_at) {
+      const lastSent = new Date(lead.last_wa_sent_at).getTime();
+      const elapsed = (Date.now() - lastSent) / 1000;
+      if (elapsed < MIN_SAME_LEAD_INTERVAL_SEC) {
+        const newTime = new Date(lastSent + MIN_SAME_LEAD_INTERVAL_SEC * 1000).toISOString();
+        await supabase.from("message_queue").update({ scheduled_for: newTime }).eq("id", msg.id);
+        return "skipped";
+      }
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+    const dailyCount = lead.daily_wa_date === today ? lead.daily_wa_count || 0 : 0;
+    if (dailyCount >= MAX_DAILY_WA) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(11, 5, 0, 0);
+      await supabase.from("message_queue").update({ scheduled_for: tomorrow.toISOString() }).eq("id", msg.id);
+      return "skipped";
+    }
+  }
+
+  // Substitute variables
+  let body = substituteVariables(msg.body, lead);
+  const subject = msg.subject ? substituteVariables(msg.subject, lead) : null;
+
+  let result: { success: boolean; error?: string };
+
+  if (msg.channel === "whatsapp") {
+    result = await sendWhatsAppHumanized(lead.phone, body, settings);
+  } else {
+    result = await sendEmail(lead.email, subject || "Método Mont'Alverne", body, supabaseUrl, serviceKey);
+  }
+
+  if (result.success) {
+    await supabase.from("message_queue").update({
+      status: "sent",
+      sent_at: new Date().toISOString(),
+      attempts: msg.attempts + 1,
+    }).eq("id", msg.id);
+
+    await supabase.from("message_history").insert({
+      lead_id: lead.id,
+      funnel: msg.funnel,
+      step_key: msg.step_key,
+      channel: msg.channel,
+      subject,
+      body_preview: body.substring(0, 150),
+      status: "sent",
+    });
+
+    if (msg.channel === "whatsapp") {
+      sentToLeadInBatch.add(lead.id);
+      const today = new Date().toISOString().split("T")[0];
+      const newDailyCount = lead.daily_wa_date === today ? (lead.daily_wa_count || 0) + 1 : 1;
+      await supabase.from("leads").update({
+        last_wa_sent_at: new Date().toISOString(),
+        wa_sem_resposta_count: (lead.wa_sem_resposta_count || 0) + 1,
+        daily_wa_count: newDailyCount,
+        daily_wa_date: today,
+      }).eq("id", lead.id);
+    }
+
+    return "processed";
+  } else {
+    const newAttempts = msg.attempts + 1;
+    await supabase.from("message_queue").update({
+      status: newAttempts >= 3 ? "failed" : "pending",
+      last_error: result.error,
+      attempts: newAttempts,
+      ...(newAttempts < 3 ? { scheduled_for: new Date(Date.now() + 5 * 60 * 1000).toISOString() } : {}),
+    }).eq("id", msg.id);
+    return "error";
+  }
+}
 
 // ══════════════════════════════════════════════════════════
 // MAIN HANDLER
@@ -227,43 +380,16 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Sending window removed — messages are sent at any time
+    // Parse trigger mode
+    let triggerMode = "scheduled";
+    try {
+      const body = await req.json();
+      if (body?.trigger === "immediate") triggerMode = "immediate";
+    } catch { /* no body = scheduled cron */ }
 
-    // ── Check hourly WA rate (via message_history last 1h) ─
-    const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
-    const { count: waLastHour } = await supabase
-      .from("message_history")
-      .select("*", { count: "exact", head: true })
-      .eq("channel", "whatsapp")
-      .eq("status", "sent")
-      .gte("created_at", oneHourAgo);
+    const now = new Date().toISOString();
 
-    const waRemaining = HOURLY_WA_LIMIT - (waLastHour || 0);
-    if (waRemaining <= 0) {
-      console.log("Hourly WA limit reached (30/h). Skipping.");
-      return new Response(
-        JSON.stringify({ processed: 0, reason: "hourly_limit" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // ── Fetch pending messages due now ─────────────────────
-    const { data: pendingMessages, error: fetchError } = await supabase
-      .from("message_queue")
-      .select("*")
-      .eq("status", "pending")
-      .lte("scheduled_for", new Date().toISOString())
-      .order("scheduled_for")
-      .limit(Math.min(waRemaining, 10)); // Process max 10 per cycle
-
-    if (fetchError) throw fetchError;
-    if (!pendingMessages || pendingMessages.length === 0) {
-      return new Response(JSON.stringify({ processed: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // ── Fetch Z-API settings ──────────────────────────────
+    // ── Fetch Z-API settings ─────────────────────────────
     const { data: settingsRows } = await supabase
       .from("site_settings")
       .select("key, value")
@@ -277,211 +403,82 @@ Deno.serve(async (req) => {
     let processed = 0;
     let errors = 0;
     let skipped = 0;
-
-    // Track leads we already sent WA to in THIS batch to prevent duplicates
     const sentToLeadInBatch = new Set<string>();
 
-    // CONCURRENCY = 1: process one message at a time (anti-ban)
-    for (const msg of pendingMessages) {
+    // ── STEP 1: IMMEDIATE messages (delay_minutes=0) — priority, no hourly limit ──
+    const { data: allPending } = await supabase
+      .from("message_queue")
+      .select("*, automation_sequences!message_queue_sequence_id_fkey(delay_minutes)")
+      .eq("status", "pending")
+      .lte("scheduled_for", now)
+      .order("scheduled_for")
+      .limit(30);
 
-      // ── Re-fetch lead data fresh for EVERY message ──────
-      const { data: lead, error: leadErr } = await supabase
-        .from("leads")
-        .select("*")
-        .eq("id", msg.lead_id)
-        .single();
+    const immediateMsgs: any[] = [];
+    const scheduledMsgs: any[] = [];
 
-      if (leadErr || !lead) {
-        await supabase
-          .from("message_queue")
-          .update({ status: "failed", last_error: "Lead not found", attempts: msg.attempts + 1 })
-          .eq("id", msg.id);
-        errors++;
-        continue;
-      }
-
-      // ── Re-validate tags at send time ──────────────────
-      const { data: leadTagsRows } = await supabase
-        .from("lead_tags")
-        .select("tag")
-        .eq("lead_id", lead.id);
-      const leadTags = new Set((leadTagsRows || []).map((t: any) => t.tag));
-
-      // Cancel sales funnels if lead already paid
-      const hasPaid = leadTags.has("pagou") || leadTags.has("comprador") || lead.status === "convertido";
-      if (hasPaid && msg.funnel !== "F4") {
-        await supabase.from("message_queue").update({ status: "cancelled", last_error: "Lead já comprou" }).eq("id", msg.id);
-        // Also cancel ALL remaining pending messages in this funnel for this lead
-        await supabase.from("message_queue")
-          .update({ status: "cancelled", last_error: "Lead já comprou" })
-          .eq("lead_id", lead.id).eq("funnel", msg.funnel).eq("status", "pending");
-        skipped++;
-        continue;
-      }
-
-      // Cancel if lead is perdido (except F4 onboarding)
-      if (lead.status === "perdido" && msg.funnel !== "F4") {
-        await supabase.from("message_queue").update({ status: "cancelled", last_error: "Lead perdido" }).eq("id", msg.id);
-        skipped++;
-        continue;
-      }
-
-      // Re-check sequence conditions (required_tags / excluded_tags)
-      if (msg.sequence_id) {
-        const { data: seqRow } = await supabase.from("automation_sequences").select("conditions").eq("id", msg.sequence_id).single();
-        const cond = seqRow?.conditions as any || {};
-        if (cond.required_tags?.length) {
-          const missing = cond.required_tags.some((t: string) => !leadTags.has(t));
-          if (missing) {
-            await supabase.from("message_queue").update({ status: "cancelled", last_error: "Tag obrigatória ausente" }).eq("id", msg.id);
-            skipped++; continue;
-          }
-        }
-        if (cond.excluded_tags?.length) {
-          const blocked = cond.excluded_tags.some((t: string) => leadTags.has(t));
-          if (blocked) {
-            await supabase.from("message_queue").update({ status: "cancelled", last_error: "Tag de exclusão presente" }).eq("id", msg.id);
-            skipped++; continue;
-          }
-        }
-      }
-
-      // ── WA-specific anti-ban checks ─────────────────────
-      if (msg.channel === "whatsapp") {
-        // CHECK 0: Already sent WA to this lead in THIS batch → reschedule
-        if (sentToLeadInBatch.has(lead.id)) {
-          const newTime = new Date(Date.now() + 90 * 1000).toISOString(); // 90s later
-          await supabase.from("message_queue").update({ scheduled_for: newTime }).eq("id", msg.id);
-          console.log(`Lead ${lead.id}: already sent in this batch, rescheduling`);
-          skipped++;
-          continue;
-        }
-
-        // CHECK 1: wa_sem_resposta_count >= 3 → block WA
-        if ((lead.wa_sem_resposta_count || 0) >= 3) {
-          await supabase
-            .from("message_queue")
-            .update({ status: "cancelled", last_error: "wa_sem_resposta >= 3 — bloqueado" })
-            .eq("id", msg.id);
-          console.log(`Lead ${lead.id}: WA blocked (${lead.wa_sem_resposta_count} sem resposta)`);
-          skipped++;
-          continue;
-        }
-
-        // CHECK 2: Min 60s between WA to same lead (fresh data)
-        if (lead.last_wa_sent_at) {
-          const lastSent = new Date(lead.last_wa_sent_at).getTime();
-          const elapsed = (Date.now() - lastSent) / 1000;
-          if (elapsed < MIN_SAME_LEAD_INTERVAL_SEC) {
-            console.log(`Lead ${lead.id}: skipping, only ${elapsed.toFixed(0)}s since last WA`);
-            const newTime = new Date(lastSent + MIN_SAME_LEAD_INTERVAL_SEC * 1000).toISOString();
-            await supabase.from("message_queue").update({ scheduled_for: newTime }).eq("id", msg.id);
-            skipped++;
-            continue;
-          }
-        }
-
-        // CHECK 3: Daily WA limit per number
-        const today = new Date().toISOString().split("T")[0];
-        const dailyCount =
-          lead.daily_wa_date === today ? lead.daily_wa_count || 0 : 0;
-        if (dailyCount >= MAX_DAILY_WA) {
-          console.log(`Lead ${lead.id}: daily WA limit (${MAX_DAILY_WA}) reached`);
-          const tomorrow = new Date();
-          tomorrow.setDate(tomorrow.getDate() + 1);
-          tomorrow.setHours(11, 5, 0, 0);
-          await supabase.from("message_queue").update({ scheduled_for: tomorrow.toISOString() }).eq("id", msg.id);
-          skipped++;
-          continue;
-        }
-      }
-
-      // ── Substitute variables ────────────────────────────
-      let body = substituteVariables(msg.body, lead);
-      const subject = msg.subject ? substituteVariables(msg.subject, lead) : null;
-
-      let result: { success: boolean; error?: string };
-
-      if (msg.channel === "whatsapp") {
-        // Send with humanized delay (typing simulation + jitter)
-        result = await sendWhatsAppHumanized(lead.phone, body, settings);
+    for (const msg of (allPending || [])) {
+      const seqDelay = (msg as any).automation_sequences?.delay_minutes;
+      // Immediate = delay_minutes is 0 or sequence not found (direct notification)
+      if (seqDelay === 0 || seqDelay === undefined || seqDelay === null) {
+        immediateMsgs.push(msg);
       } else {
-        result = await sendEmail(
-          lead.email,
-          subject || "Método Mont'Alverne",
-          body,
-          supabaseUrl,
-          serviceKey
-        );
+        scheduledMsgs.push(msg);
       }
+    }
 
-      if (result.success) {
-        // Update queue status
-        await supabase
-          .from("message_queue")
-          .update({
-            status: "sent",
-            sent_at: new Date().toISOString(),
-            attempts: msg.attempts + 1,
-          })
-          .eq("id", msg.id);
+    // Process all immediate messages first
+    for (const msg of immediateMsgs) {
+      const r = await processOneMessage(msg, supabase, settings, sentToLeadInBatch, supabaseUrl, serviceKey);
+      if (r === "processed") processed++;
+      else if (r === "error") errors++;
+      else skipped++;
 
-        // Log to history
-        await supabase.from("message_history").insert({
-          lead_id: lead.id,
-          funnel: msg.funnel,
-          step_key: msg.step_key,
-          channel: msg.channel,
-          subject,
-          body_preview: body.substring(0, 150),
-          status: "sent",
-        });
+      if (immediateMsgs.indexOf(msg) < immediateMsgs.length - 1) {
+        await sleep(1000 + Math.random() * 2000);
+      }
+    }
 
-        // ── WA anti-ban post-send updates ──────────────────
-        if (msg.channel === "whatsapp") {
-          sentToLeadInBatch.add(lead.id);
+    // If immediate-only trigger, return early
+    if (triggerMode === "immediate") {
+      return new Response(
+        JSON.stringify({ processed, errors, skipped, mode: "immediate" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-          const today = new Date().toISOString().split("T")[0];
-          const newDailyCount =
-            lead.daily_wa_date === today ? (lead.daily_wa_count || 0) + 1 : 1;
+    // ── STEP 2: SCHEDULED messages — respect hourly limit ──
+    const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
+    const { count: waLastHour } = await supabase
+      .from("message_history")
+      .select("*", { count: "exact", head: true })
+      .eq("channel", "whatsapp")
+      .eq("status", "sent")
+      .gte("created_at", oneHourAgo);
 
-          await supabase
-            .from("leads")
-            .update({
-              last_wa_sent_at: new Date().toISOString(),
-              wa_sem_resposta_count: (lead.wa_sem_resposta_count || 0) + 1,
-              daily_wa_count: newDailyCount,
-              daily_wa_date: today,
-            })
-            .eq("id", lead.id);
-        }
+    const waRemaining = HOURLY_WA_LIMIT - (waLastHour || 0);
+    if (waRemaining <= 0 && scheduledMsgs.length > 0) {
+      console.log("Hourly WA limit reached. Skipping scheduled messages.");
+      return new Response(
+        JSON.stringify({ processed, errors, skipped, reason: "hourly_limit_scheduled" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
-        processed++;
+    const toProcess = scheduledMsgs.slice(0, Math.min(waRemaining, 10));
+    for (const msg of toProcess) {
+      const r = await processOneMessage(msg, supabase, settings, sentToLeadInBatch, supabaseUrl, serviceKey);
+      if (r === "processed") processed++;
+      else if (r === "error") errors++;
+      else skipped++;
 
-        // ── Inter-message delay: 1–3s between different leads ─
-        if (processed < pendingMessages.length) {
-          const interDelay = 1000 + Math.random() * 2000;
-          await sleep(interDelay);
-        }
-      } else {
-        const newAttempts = msg.attempts + 1;
-        await supabase
-          .from("message_queue")
-          .update({
-            status: newAttempts >= 3 ? "failed" : "pending",
-            last_error: result.error,
-            attempts: newAttempts,
-            ...(newAttempts < 3
-              ? { scheduled_for: new Date(Date.now() + 5 * 60 * 1000).toISOString() }
-              : {}),
-          })
-          .eq("id", msg.id);
-        errors++;
+      if (toProcess.indexOf(msg) < toProcess.length - 1) {
+        await sleep(1000 + Math.random() * 2000);
       }
     }
 
     return new Response(
-      JSON.stringify({ processed, errors, skipped, total: pendingMessages.length }),
+      JSON.stringify({ processed, errors, skipped, total: immediateMsgs.length + toProcess.length }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
