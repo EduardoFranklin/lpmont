@@ -10,12 +10,13 @@ import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
   Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap,
-  Video, CreditCard, Copy, ExternalLink
+  Video, CreditCard, Copy, ExternalLink, RefreshCw
 } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import LeadTags from "@/components/dashboard/LeadTags";
 import LeadTimeline from "@/components/dashboard/LeadTimeline";
+import { toast } from "sonner";
 
 const formatElapsed = (dateStr: string) => {
   const mins = differenceInMinutes(new Date(), new Date(dateStr));
