@@ -3,6 +3,13 @@ import { X, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { QuizPageData } from "@/pages/QuizPage";
 
+const maskPhone = (v: string) => {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length <= 2) return d.length ? `(${d}` : "";
+  if (d.length <= 7) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+};
+
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -101,9 +108,9 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
                   E-mail profissional
                 </label>
                 <input
-                  type="email"
+                 type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value.toLowerCase())}
                   placeholder="joao@clinica.com.br"
                   className="w-full bg-foreground/[0.04] border border-foreground/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/40 focus:bg-primary/[0.04] transition-colors"
                 />
@@ -113,9 +120,9 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
                   WhatsApp
                 </label>
                 <input
-                  type="tel"
+                 type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(maskPhone(e.target.value))}
                   placeholder="(98) 99999-9999"
                   className="w-full bg-foreground/[0.04] border border-foreground/10 rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/40 focus:bg-primary/[0.04] transition-colors"
                 />
