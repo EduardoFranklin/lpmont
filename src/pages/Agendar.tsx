@@ -196,6 +196,41 @@ const Agendar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Fetch booked slots from DB
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      const dates = TIME_SLOTS.map((d) => d.date);
+      const year = new Date().getFullYear();
+      const isoStarts = dates.map((dt) => {
+        const [dd, mm] = dt.split("/").map(Number);
+        return `${year}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}T00:00:00`;
+      });
+      const minDate = isoStarts[0];
+      const maxDateParts = dates[dates.length - 1].split("/").map(Number);
+      const maxDate = `${year}-${String(maxDateParts[1]).padStart(2, "0")}-${String(maxDateParts[0]).padStart(2, "0")}T23:59:59`;
+
+      const { data } = await supabase
+        .from("leads")
+        .select("reuniao_data_hora_iso, scheduled_time")
+        .not("reuniao_data_hora_iso", "is", null)
+        .gte("reuniao_data_hora_iso", minDate)
+        .lte("reuniao_data_hora_iso", maxDate)
+        .not("status", "eq", "perdido");
+
+      if (data) {
+        const booked = new Set<string>();
+        data.forEach((lead: any) => {
+          if (lead.reuniao_data_hora_iso && lead.scheduled_time) {
+            const dateKey = slotFromIso(lead.reuniao_data_hora_iso);
+            booked.add(buildSlotKey(dateKey, lead.scheduled_time));
+          }
+        });
+        setBookedSlots(booked);
+      }
+    };
+    fetchBookedSlots();
+  }, []);
+
   const normalize = (s: string) =>
     s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -221,19 +256,6 @@ const Agendar = () => {
   const goToStep2 = () => {
     if (isStep1Valid) {
       setStep(2);
-      setDynamicUnavailable(null);
-      // After 3s, mark a random available slot as unavailable
-      setTimeout(() => {
-        const available: { day: string; time: string }[] = [];
-        TIME_SLOTS.forEach((d) => {
-          d.slots.forEach((t) => {
-            if (!d.unavailable?.includes(t) && !isSlotTooSoon(d.date, t)) available.push({ day: d.day, time: t });
-          });
-        });
-        if (available.length > 0) {
-          setDynamicUnavailable(available[Math.floor(Math.random() * available.length)]);
-        }
-      }, 3000);
     }
   };
 
@@ -561,7 +583,7 @@ const Agendar = () => {
                     </p>
                     <div className="grid grid-cols-2 gap-2">
                       {day.slots.map((time) => {
-                        const isUnavailable = day.unavailable?.includes(time) || (dynamicUnavailable?.day === day.day && dynamicUnavailable?.time === time) || isSlotTooSoon(day.date, time);
+                        const isUnavailable = bookedSlots.has(buildSlotKey(day.date, time)) || isSlotTooSoon(day.date, time);
                         const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                         return (
                           <button
