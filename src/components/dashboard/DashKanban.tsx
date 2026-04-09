@@ -54,6 +54,7 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
     agendado: "F1",
     compareceu: "F3",
     convertido: "F4",
+    perdido: "F3", // retargeting
   };
 
   const handleDrop = async (e: React.DragEvent, newStatus: LeadStatus) => {
@@ -71,6 +72,19 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
       updatePayload.temperature = "quente";
     }
     await supabase.from("leads").update(updatePayload).eq("id", leadId);
+
+    // 1b. Add critical tags for funnel eligibility
+    if (newStatus === "convertido") {
+      // Tag "pagou" is required by F4 sequences
+      await supabase.from("lead_tags").upsert(
+        { lead_id: leadId, tag: "pagou", source: "kanban" },
+        { onConflict: "lead_id,tag", ignoreDuplicates: true }
+      ).select();
+      await supabase.from("lead_tags").upsert(
+        { lead_id: leadId, tag: "comprador", source: "kanban" },
+        { onConflict: "lead_id,tag", ignoreDuplicates: true }
+      ).select();
+    }
 
     // 2. Add Kanban movement tag
     const tagName = `movido_${newStatus}`;
