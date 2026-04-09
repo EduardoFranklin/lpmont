@@ -13,6 +13,7 @@ import DashSettings from "@/components/dashboard/DashSettings";
 import DashContent from "@/components/dashboard/DashContent";
 import DashUsers from "@/components/dashboard/DashUsers";
 import DashAgenda from "@/components/dashboard/DashAgenda";
+import DashChatMont from "@/components/dashboard/DashChatMont";
 import DashDateFilter, { type DatePreset, getDateRange } from "@/components/dashboard/DashDateFilter";
 import type { Session } from "@supabase/supabase-js";
 import { startOfDay, endOfDay } from "date-fns";
