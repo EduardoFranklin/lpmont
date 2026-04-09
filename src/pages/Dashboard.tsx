@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, BarChart3, List, Columns3, MessageSquare, Settings, FileText, Users, CalendarCheck } from "lucide-react";
+import { LogOut, BarChart3, List, Columns3, MessageSquare, Settings, FileText, Users, CalendarCheck, MessageCircle } from "lucide-react";
 import DashReports from "@/components/dashboard/DashReports";
 import DashLeadsList from "@/components/dashboard/DashLeadsList";
 import DashKanban from "@/components/dashboard/DashKanban";
@@ -13,6 +13,7 @@ import DashSettings from "@/components/dashboard/DashSettings";
 import DashContent from "@/components/dashboard/DashContent";
 import DashUsers from "@/components/dashboard/DashUsers";
 import DashAgenda from "@/components/dashboard/DashAgenda";
+import DashChatMont from "@/components/dashboard/DashChatMont";
 import DashDateFilter, { type DatePreset, getDateRange } from "@/components/dashboard/DashDateFilter";
 import type { Session } from "@supabase/supabase-js";
 import { startOfDay, endOfDay } from "date-fns";
@@ -132,6 +133,9 @@ const Dashboard = () => {
                 <TabsTrigger value="agenda" className="gap-1.5">
                   <CalendarCheck className="w-4 h-4" /> Agenda
                 </TabsTrigger>
+                <TabsTrigger value="chat" className="gap-1.5">
+                  <MessageCircle className="w-4 h-4" /> <span className="hidden sm:inline">ChatMont</span><span className="sm:hidden">Chat</span>
+                </TabsTrigger>
                 <TabsTrigger value="messaging" className="gap-1.5">
                   <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Mensageria</span><span className="sm:hidden">Msg</span>
                 </TabsTrigger>
@@ -153,6 +157,9 @@ const Dashboard = () => {
               </TabsContent>
               <TabsContent value="agenda">
                 <DashAgenda leads={leads} onRefresh={fetchLeads} />
+              </TabsContent>
+              <TabsContent value="chat">
+                <DashChatMont />
               </TabsContent>
               <TabsContent value="messaging">
                 <DashMessaging />
