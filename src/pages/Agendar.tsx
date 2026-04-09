@@ -649,7 +649,7 @@ const Agendar = () => {
                   </div>
 
                   <a
-                    href={`https://wa.me/5598991426777?text=${encodeURIComponent("Acabei de agendar uma reunião, tenho interesse em saber mais sobre o Método Mont.")}`}
+                    href={`https://wa.me/5598984636510?text=${encodeURIComponent("Acabei de agendar uma reunião, tenho interesse em saber mais sobre o Método Mont.")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-summit w-full justify-center text-sm py-3.5 gap-2 mb-3"
