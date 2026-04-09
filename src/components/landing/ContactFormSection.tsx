@@ -22,7 +22,7 @@ const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "
 const ALL_SLOTS = ["9h às 9h30", "10h às 10h30", "11h às 11h30", "14h às 14h30", "15h às 15h30", "16h às 16h30"];
 
 const generateTimeSlots = () => {
-  const result: { day: string; date: string; slots: string[]; unavailable: string[] }[] = [];
+  const result: { day: string; date: string; slots: string[] }[] = [];
   const now = new Date();
   let d = new Date(now);
   while (result.length < 4) {
@@ -30,9 +30,7 @@ const generateTimeSlots = () => {
     if (dow !== 0 && dow !== 6) {
       const dd = String(d.getDate()).padStart(2, "0");
       const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const seed = d.getDate() * 7 + d.getMonth() * 13;
-      const unavailable = ALL_SLOTS.filter((_, i) => (seed + i * 3) % 5 === 0);
-      result.push({ day: WEEKDAYS[dow], date: `${dd}/${mm}`, slots: [...ALL_SLOTS], unavailable });
+      result.push({ day: WEEKDAYS[dow], date: `${dd}/${mm}`, slots: [...ALL_SLOTS] });
     }
     d = new Date(d.getTime() + 86400000);
   }
@@ -40,6 +38,15 @@ const generateTimeSlots = () => {
 };
 
 const TIME_SLOTS = generateTimeSlots();
+
+const buildSlotKey = (date: string, time: string) => `${date}|${time}`;
+
+const slotFromIso = (iso: string): string => {
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}`;
+};
 
 const parseSlotHour = (slot: string): number => {
   const match = slot.match(/^(\d+)h/);
@@ -84,7 +91,7 @@ const ContactFormSection = () => {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ treatment: "Dr.", name: "", phone: "", email: "", uf: "", city: "", career: "" });
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; date: string; time: string } | null>(null);
-  const [dynamicUnavailable, setDynamicUnavailable] = useState<{ day: string; time: string } | null>(null);
+  const [bookedSlots, setBookedSlots] = useState<Set<string>>(new Set());
   const [cities, setCities] = useState<string[]>([]);
   const [loadingCities, setLoadingCities] = useState(false);
   const [citySearch, setCitySearch] = useState("");
@@ -127,6 +134,41 @@ const ContactFormSection = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Fetch booked slots from DB
+  useEffect(() => {
+    const fetchBookedSlots = async () => {
+      const dates = TIME_SLOTS.map((d) => d.date);
+      const year = new Date().getFullYear();
+      const isoStarts = dates.map((dt) => {
+        const [dd, mm] = dt.split("/").map(Number);
+        return `${year}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}T00:00:00`;
+      });
+      const minDate = isoStarts[0];
+      const maxDateParts = dates[dates.length - 1].split("/").map(Number);
+      const maxDate = `${year}-${String(maxDateParts[1]).padStart(2, "0")}-${String(maxDateParts[0]).padStart(2, "0")}T23:59:59`;
+
+      const { data } = await supabase
+        .from("leads")
+        .select("reuniao_data_hora_iso, scheduled_time")
+        .not("reuniao_data_hora_iso", "is", null)
+        .gte("reuniao_data_hora_iso", minDate)
+        .lte("reuniao_data_hora_iso", maxDate)
+        .not("status", "eq", "perdido");
+
+      if (data) {
+        const booked = new Set<string>();
+        data.forEach((lead: any) => {
+          if (lead.reuniao_data_hora_iso && lead.scheduled_time) {
+            const dateKey = slotFromIso(lead.reuniao_data_hora_iso);
+            booked.add(buildSlotKey(dateKey, lead.scheduled_time));
+          }
+        });
+        setBookedSlots(booked);
+      }
+    };
+    fetchBookedSlots();
+  }, []);
+
   const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const filteredCities = citySearch ? cities.filter((c) => normalize(c).includes(normalize(citySearch))) : cities;
   const progress = step === 1 ? 50 : step === 2 ? 90 : 100;
@@ -144,16 +186,6 @@ const ContactFormSection = () => {
   const goToStep2 = () => {
     if (isStep1Valid) {
       setStep(2);
-      setDynamicUnavailable(null);
-      setTimeout(() => {
-        const available: { day: string; time: string }[] = [];
-        TIME_SLOTS.forEach((d) => {
-          d.slots.forEach((t) => {
-            if (!d.unavailable?.includes(t) && !isSlotTooSoon(d.date, t)) available.push({ day: d.day, time: t });
-          });
-        });
-        if (available.length > 0) setDynamicUnavailable(available[Math.floor(Math.random() * available.length)]);
-      }, 3000);
     }
   };
 
@@ -362,7 +394,7 @@ const ContactFormSection = () => {
                             <p className="text-[12px] font-semibold text-foreground/30 mb-2">{day.day} · <span className="text-foreground/20">{day.date}</span></p>
                             <div className="grid grid-cols-2 gap-2">
                               {day.slots.map((time) => {
-                                const isUnavailable = day.unavailable?.includes(time) || (dynamicUnavailable?.day === day.day && dynamicUnavailable?.time === time) || isSlotTooSoon(day.date, time);
+                                const isUnavailable = bookedSlots.has(buildSlotKey(day.date, time)) || isSlotTooSoon(day.date, time);
                                 const isSelected = !isUnavailable && selectedSlot?.day === day.day && selectedSlot?.time === time;
                                 return (
                                   <button key={`${day.day}-${time}`} onClick={() => !isUnavailable && setSelectedSlot((prev) => prev?.day === day.day && prev?.time === time ? null : { day: day.day, date: day.date, time })} disabled={isUnavailable}
