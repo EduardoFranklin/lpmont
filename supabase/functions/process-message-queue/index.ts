@@ -208,6 +208,10 @@ async function sendEmail(
     return { success: false, error: e.message };
   }
 }
+// ── GLOBAL RATE LIMITS ────────────────────────────────────
+const HOURLY_WA_LIMIT = 30;
+const MAX_DAILY_WA = 200;
+const MIN_SAME_LEAD_INTERVAL_SEC = 60;
 
 // ── PROCESS ONE MESSAGE ───────────────────────────────────
 async function processOneMessage(
