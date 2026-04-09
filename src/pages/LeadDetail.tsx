@@ -121,15 +121,26 @@ const LeadDetail = () => {
         const pad = (n: number) => String(n).padStart(2, "0");
         setEditDate(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
         setEditTime(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
-      } else if (data.scheduled_day && data.scheduled_time) {
-        // Try to parse scheduled_day as dd/mm
-        const parts = data.scheduled_day.split("/");
-        if (parts.length === 2) {
+      } else if (data.scheduled_day || data.scheduled_time) {
+        const pad2 = (n: number) => String(n).padStart(2, "0");
+        // Try dd/mm format first
+        const parts = (data.scheduled_day || "").split("/");
+        if (parts.length === 2 && !isNaN(Number(parts[0]))) {
           const year = new Date().getFullYear();
           setEditDate(`${year}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`);
+        } else {
+          // Weekday name — find next occurrence
+          const dias: Record<string, number> = { domingo: 0, segunda: 1, terca: 2, terça: 2, quarta: 3, quinta: 4, sexta: 5, sabado: 6, sábado: 6 };
+          const dayIdx = dias[(data.scheduled_day || "").toLowerCase()];
+          if (dayIdx !== undefined) {
+            const now = new Date();
+            const diff = (dayIdx - now.getDay() + 7) % 7 || 7;
+            const target = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+            setEditDate(`${target.getFullYear()}-${pad2(target.getMonth() + 1)}-${pad2(target.getDate())}`);
+          }
         }
-        // Try to parse scheduled_time like "9h" or "14h"
-        const hourMatch = data.scheduled_time.match(/^(\d+)h/);
+        // Parse time like "9h" or "14h às 14h30"
+        const hourMatch = (data.scheduled_time || "").match(/^(\d+)h/);
         if (hourMatch) {
           setEditTime(`${hourMatch[1].padStart(2, "0")}:00`);
         }
