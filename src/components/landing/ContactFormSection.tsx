@@ -115,8 +115,13 @@ const ContactFormSection = () => {
     }
   };
 
+  const [calendarCreating, setCalendarCreating] = useState(false);
+
   const goToStep3 = async () => {
     if (!selectedSlot) return;
+    setCalendarCreating(true);
+    setStep(3); // Show loading animation immediately
+
     try {
       // Cancel pending F1 messages from previous appointments with same email
       const { data: existingLeads } = await supabase.from("leads")
@@ -192,7 +197,7 @@ const ContactFormSection = () => {
         },
       }).catch((err) => console.error("Welcome email error:", err));
     } catch (err) { console.error("Erro ao salvar lead:", err); }
-    setStep(3);
+    setCalendarCreating(false);
   };
 
   const stepVariants = { initial: { opacity: 0, x: 40 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -40 } };
