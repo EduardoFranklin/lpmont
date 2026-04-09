@@ -1,0 +1,1 @@
+ALTER TABLE public.leads ADD COLUMN google_calendar_event_id text;

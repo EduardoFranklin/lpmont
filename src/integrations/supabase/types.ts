@@ -177,6 +177,7 @@ export type Database = {
           email: string
           forma_pagamento: string | null
           funnel_origin: string | null
+          google_calendar_event_id: string | null
           hotmart_offer_code: string | null
           hotmart_status: string | null
           hotmart_transaction_id: string | null
@@ -227,6 +228,7 @@ export type Database = {
           email: string
           forma_pagamento?: string | null
           funnel_origin?: string | null
+          google_calendar_event_id?: string | null
           hotmart_offer_code?: string | null
           hotmart_status?: string | null
           hotmart_transaction_id?: string | null
@@ -277,6 +279,7 @@ export type Database = {
           email?: string
           forma_pagamento?: string | null
           funnel_origin?: string | null
+          google_calendar_event_id?: string | null
           hotmart_offer_code?: string | null
           hotmart_status?: string | null
           hotmart_transaction_id?: string | null
