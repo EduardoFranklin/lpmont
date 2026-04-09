@@ -76,9 +76,9 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
     }
     await supabase.from("leads").update(updatePayload).eq("id", leadId);
 
-    // 1b. Add critical tags for funnel eligibility
+    // 1b. Manage purchase tags based on stage
     if (newStatus === "convertido") {
-      // Tag "pagou" is required by F4 sequences
+      // Add "pagou"/"comprador" — required by F4 sequences
       await supabase.from("lead_tags").upsert(
         { lead_id: leadId, tag: "pagou", source: "kanban" },
         { onConflict: "lead_id,tag", ignoreDuplicates: true }
@@ -87,6 +87,10 @@ const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh
         { lead_id: leadId, tag: "comprador", source: "kanban" },
         { onConflict: "lead_id,tag", ignoreDuplicates: true }
       ).select();
+    } else if (oldStatus === "convertido") {
+      // Moving AWAY from convertido → remove purchase tags so F1-F3 can fire
+      await supabase.from("lead_tags").delete().eq("lead_id", leadId).eq("tag", "pagou");
+      await supabase.from("lead_tags").delete().eq("lead_id", leadId).eq("tag", "comprador");
     }
 
     // 2. CANCEL ALL pending messages from previous stage (Kanban is sovereign)
