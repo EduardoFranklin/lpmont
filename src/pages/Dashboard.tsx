@@ -133,6 +133,9 @@ const Dashboard = () => {
                 <TabsTrigger value="agenda" className="gap-1.5">
                   <CalendarCheck className="w-4 h-4" /> Agenda
                 </TabsTrigger>
+                <TabsTrigger value="chat" className="gap-1.5">
+                  <MessageCircle className="w-4 h-4" /> <span className="hidden sm:inline">ChatMont</span><span className="sm:hidden">Chat</span>
+                </TabsTrigger>
                 <TabsTrigger value="messaging" className="gap-1.5">
                   <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Mensageria</span><span className="sm:hidden">Msg</span>
                 </TabsTrigger>
