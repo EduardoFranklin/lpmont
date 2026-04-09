@@ -359,6 +359,11 @@ const LeadDetail = () => {
                 </select>
               </div>
             </div>
+            <div className="flex justify-end pt-1">
+              <Button onClick={() => handleSaveSection("dados")} disabled={savingSection === "dados" || !changedSections.has("dados")} size="sm">
+                <Save className="w-3.5 h-3.5 mr-1.5" /> {savingSection === "dados" ? "Salvando..." : changedSections.has("dados") ? "Salvar dados" : "Salvo"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
