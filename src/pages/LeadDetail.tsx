@@ -372,7 +372,7 @@ const LeadDetail = () => {
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Status</label>
               <select
                 value={editStatus}
-                onChange={(e) => { setEditStatus(e.target.value as LeadStatus); setHasChanges(true); }}
+                onChange={(e) => { setEditStatus(e.target.value as LeadStatus); markChanged("gerenciar"); }}
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
                 {STATUS_OPTIONS.map((s) => (
@@ -390,7 +390,7 @@ const LeadDetail = () => {
                     variant="outline"
                     size="sm"
                     className={`flex-1 gap-1.5 ${editTemp === t.value ? t.activeClass : "text-muted-foreground"}`}
-                    onClick={() => { setEditTemp(t.value); setHasChanges(true); }}
+                    onClick={() => { setEditTemp(t.value); markChanged("gerenciar"); }}
                   >
                     <t.icon className="w-3.5 h-3.5" />
                     {t.label}
@@ -402,7 +402,7 @@ const LeadDetail = () => {
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Observação</label>
               <textarea
                 value={editFields.notes}
-                onChange={(e) => { setEditFields(f => ({...f, notes: e.target.value})); setHasChanges(true); }}
+                onChange={(e) => { setEditFields(f => ({...f, notes: e.target.value})); markChanged("gerenciar"); }}
                 rows={2}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 placeholder="Observação geral do lead..."
@@ -430,7 +430,7 @@ const LeadDetail = () => {
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Consultor</label>
                 <select
                   value={editFields.reuniao_consultor}
-                  onChange={e => { setEditFields(f => ({...f, reuniao_consultor: e.target.value})); setHasChanges(true); }}
+                  onChange={e => { setEditFields(f => ({...f, reuniao_consultor: e.target.value})); markChanged("reuniao"); }}
                   className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
                 >
                   <option value="contato@metodomont.com.br">contato@metodomont.com.br</option>
@@ -455,7 +455,7 @@ const LeadDetail = () => {
                         variant="outline"
                         size="sm"
                         className={`flex-1 text-xs h-8 ${isActive ? opt.cls : "text-muted-foreground"}`}
-                        onClick={() => { setEditFields(f => ({...f, reuniao_status: opt.value})); setHasChanges(true); }}
+                        onClick={() => { setEditFields(f => ({...f, reuniao_status: opt.value})); markChanged("reuniao"); }}
                       >
                         {opt.label}
                       </Button>
@@ -490,7 +490,7 @@ const LeadDetail = () => {
                           } else {
                             setEditFields(f => ({...f, reuniao_status: opt.value}));
                           }
-                          setHasChanges(true);
+                          markChanged("reuniao");
                         }}
                       >
                         {opt.label}
