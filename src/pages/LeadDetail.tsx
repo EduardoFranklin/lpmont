@@ -125,9 +125,16 @@ const LeadDetail = () => {
       // Initialize date/time edit fields
       if (data.reuniao_data_hora_iso) {
         const d = new Date(data.reuniao_data_hora_iso);
-        const pad = (n: number) => String(n).padStart(2, "0");
-        setEditDate(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
-        setEditTime(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+        const spFmt = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "America/Sao_Paulo",
+          year: "numeric", month: "2-digit", day: "2-digit",
+          hour: "2-digit", minute: "2-digit", hour12: false,
+        });
+        const sp = Object.fromEntries(
+          spFmt.formatToParts(d).map((p) => [p.type, p.value])
+        );
+        setEditDate(`${sp.year}-${sp.month}-${sp.day}`);
+        setEditTime(`${sp.hour}:${sp.minute}`);
       } else if (data.scheduled_day || data.scheduled_time) {
         const pad2 = (n: number) => String(n).padStart(2, "0");
         // Try dd/mm format first

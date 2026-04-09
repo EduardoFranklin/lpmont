@@ -927,7 +927,7 @@ const QueueMonitor = () => {
                 {item.channel === "email" ? <Mail className="w-4 h-4 text-blue-400" /> : <MessageCircle className="w-4 h-4 text-green-400" />}
                 <div>
                   <p className="text-sm font-medium">{item.leads?.name || "Lead"}</p>
-                  <p className="text-xs text-muted-foreground">{item.funnel} · {item.step_key} · {new Date(item.scheduled_for).toLocaleString("pt-BR")}</p>
+                  <p className="text-xs text-muted-foreground">{item.funnel} · {item.step_key} · {new Date(item.scheduled_for).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
                 </div>
               </div>
               {item.status === "pending" && (
