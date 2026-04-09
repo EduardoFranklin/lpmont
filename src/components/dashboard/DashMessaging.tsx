@@ -27,6 +27,7 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
+import DashTeamMessaging from "./DashTeamMessaging";
 
 /* ─── constants ─── */
 
