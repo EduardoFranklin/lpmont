@@ -509,18 +509,18 @@ const LeadDetail = () => {
               {/* Dia / Horário — always editable */}
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Dia / Horário</label>
-                <div className="flex gap-2 items-center">
+                <div className="flex flex-wrap gap-2 items-center">
                   <Input
                     type="date"
                     value={editDate}
                     onChange={e => setEditDate(e.target.value)}
-                    className="flex-1 h-9"
+                    className="min-w-0 flex-1 basis-[120px] h-9"
                   />
                   <Input
                     type="time"
                     value={editTime}
                     onChange={e => setEditTime(e.target.value)}
-                    className="w-28 h-9"
+                    className="min-w-0 w-24 h-9"
                   />
                   <Button
                     size="sm"
@@ -530,7 +530,7 @@ const LeadDetail = () => {
                     onClick={handleReschedule}
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${rescheduling ? "animate-spin" : ""}`} />
-                    {rescheduling ? "Reagendando..." : "Reagendar"}
+                    {rescheduling ? "" : ""}
                   </Button>
                 </div>
                 {lead.reuniao_data_extenso && (
