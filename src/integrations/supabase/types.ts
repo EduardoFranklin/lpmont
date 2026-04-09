@@ -963,6 +963,103 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_conversations: {
+        Row: {
+          contact_name: string
+          created_at: string
+          id: string
+          is_favorite: boolean
+          last_message: string | null
+          last_message_at: string | null
+          lead_id: string | null
+          phone: string
+          unread_count: number
+          updated_at: string
+        }
+        Insert: {
+          contact_name?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          last_message?: string | null
+          last_message_at?: string | null
+          lead_id?: string | null
+          phone: string
+          unread_count?: number
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          last_message?: string | null
+          last_message_at?: string | null
+          lead_id?: string | null
+          phone?: string
+          unread_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_conversations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_messages: {
+        Row: {
+          audio_transcription: string | null
+          content: string | null
+          conversation_id: string
+          created_at: string
+          direction: string
+          external_id: string | null
+          id: string
+          is_automated: boolean
+          media_url: string | null
+          message_type: string
+          status: string
+        }
+        Insert: {
+          audio_transcription?: string | null
+          content?: string | null
+          conversation_id: string
+          created_at?: string
+          direction?: string
+          external_id?: string | null
+          id?: string
+          is_automated?: boolean
+          media_url?: string | null
+          message_type?: string
+          status?: string
+        }
+        Update: {
+          audio_transcription?: string | null
+          content?: string | null
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          external_id?: string | null
+          id?: string
+          is_automated?: boolean
+          media_url?: string | null
+          message_type?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
