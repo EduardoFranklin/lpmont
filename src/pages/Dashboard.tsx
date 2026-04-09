@@ -155,11 +155,11 @@ const Dashboard = () => {
               <TabsContent value="chat">
                 <DashChatMont />
               </TabsContent>
-              <TabsContent value="reports">
-                <DashReports leads={filteredLeads} />
-              </TabsContent>
               <TabsContent value="leads">
                 <DashLeadsList leads={filteredLeads} onRefresh={fetchLeads} />
+              </TabsContent>
+              <TabsContent value="reports">
+                <DashReports leads={filteredLeads} />
               </TabsContent>
               <TabsContent value="messaging">
                 <DashMessaging />
