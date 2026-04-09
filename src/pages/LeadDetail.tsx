@@ -115,8 +115,34 @@ const LeadDetail = () => {
         reuniao_status: data.reuniao_status || "pendente",
         reuniao_consultor: data.reuniao_consultor || "contato@metodomont.com.br",
       });
+      // Initialize date/time edit fields from reuniao_data_hora_iso
+      if (data.reuniao_data_hora_iso) {
+        const d = new Date(data.reuniao_data_hora_iso);
+        const pad = (n: number) => String(n).padStart(2, "0");
+        setEditDate(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
+        setEditTime(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+      }
     }
     setLoading(false);
+  };
+
+  const handleReschedule = async () => {
+    if (!lead || !editDate || !editTime) return;
+    setRescheduling(true);
+    try {
+      const newDateTimeISO = `${editDate}T${editTime}:00-03:00`;
+      const { data, error } = await supabase.functions.invoke("reschedule-calendar-event", {
+        body: { leadId: lead.id, newDateTimeISO },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success("Reunião reagendada com sucesso!");
+      await fetchLead();
+    } catch (err: any) {
+      toast.error(`Erro ao reagendar: ${err.message || "Tente novamente"}`);
+    } finally {
+      setRescheduling(false);
+    }
   };
 
   const fetchNotes = async () => {
