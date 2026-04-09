@@ -178,7 +178,95 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ enqueued: toEnqueue.length, funnel }), {
+    // ── TEAM NOTIFICATIONS ──────────────────────────────────
+    // Determine the lead status that triggered this automation
+    const triggerStatus = lead.status; // current status after the change
+    let teamSent = 0;
+
+    const { data: teamSeqs } = await supabase
+      .from("team_automation_sequences")
+      .select("*")
+      .eq("trigger_status", triggerStatus)
+      .eq("active", true)
+      .order("step_order");
+
+    if (teamSeqs && teamSeqs.length > 0) {
+      // Variable substitution for team messages
+      const teamVars: Record<string, string> = {
+        "{{nome}}": lead.name || "",
+        "{{email}}": lead.email || "",
+        "{{telefone}}": lead.phone || "",
+        "{{tratamento}}": lead.treatment || "Dr.",
+        "{{cidade}}": lead.city || "",
+        "{{uf}}": lead.uf || "",
+        "{{score}}": String(lead.quiz_score ?? ""),
+        "{{diagnostico}}": lead.quiz_diagnostico || "",
+        "{{data}}": lead.reuniao_data_extenso || lead.scheduled_day || "",
+        "{{hora}}": lead.reuniao_hora_extenso || lead.scheduled_time || "",
+        "{{reuniao_link_google_meet}}": lead.reuniao_link_google_meet || "",
+        "{{lead_number}}": String(lead.lead_number ?? ""),
+      };
+
+      const substituteTeam = (tpl: string) => {
+        let result = tpl;
+        for (const [key, value] of Object.entries(teamVars)) {
+          result = result.replaceAll(key, value);
+        }
+        return result;
+      };
+
+      // Fetch Z-API settings
+      const { data: settingsRows } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", ["zapi_instance_id", "zapi_token", "zapi_client_token"]);
+
+      const settings: Record<string, string> = {};
+      for (const row of settingsRows || []) {
+        settings[row.key] = row.value;
+      }
+
+      const instanceId = settings.zapi_instance_id;
+      const token = settings.zapi_token;
+      const clientToken = settings.zapi_client_token;
+
+      if (instanceId && token) {
+        for (const seq of teamSeqs) {
+          const recipients = (seq.recipient_phones as any[]) || [];
+          const messageBody = substituteTeam(seq.body);
+
+          for (const recipient of recipients) {
+            const phone = (recipient.phone || "").replace(/\D/g, "");
+            const formattedPhone = phone.startsWith("55") ? phone : `55${phone}`;
+
+            try {
+              const res = await fetch(
+                `https://api.z-api.io/instances/${instanceId}/token/${token}/send-text`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    ...(clientToken ? { "Client-Token": clientToken } : {}),
+                  },
+                  body: JSON.stringify({ phone: formattedPhone, message: messageBody }),
+                }
+              );
+              if (res.ok) {
+                teamSent++;
+                console.log(`Team notification sent to ${recipient.name || formattedPhone}`);
+              } else {
+                const errText = await res.text();
+                console.error(`Team notification failed for ${formattedPhone}: ${errText}`);
+              }
+            } catch (e: any) {
+              console.error(`Team notification error: ${e.message}`);
+            }
+          }
+        }
+      }
+    }
+
+    return new Response(JSON.stringify({ enqueued: toEnqueue.length, funnel, teamSent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error: any) {
