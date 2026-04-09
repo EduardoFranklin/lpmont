@@ -647,6 +647,7 @@ const Agendar = () => {
                       <p className="text-[12px] text-foreground/30 mt-1">30 minutos · Online</p>
                     </div>
 
+                    <p className="text-[13px] text-foreground/30 mb-1.5 mt-2">Estou com pressa:</p>
                     <a
                       href={`https://wa.me/5598984636510?text=${encodeURIComponent("Acabei de agendar uma reunião, tenho interesse em saber mais sobre o Método Mont.")}`}
                       target="_blank"
