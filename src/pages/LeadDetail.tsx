@@ -81,11 +81,18 @@ const LeadDetail = () => {
   const [newNote, setNewNote] = useState("");
   const [editStatus, setEditStatus] = useState<LeadStatus>("novo");
   const [editTemp, setEditTemp] = useState<LeadTemperature>("frio");
-  const [saving, setSaving] = useState(false);
+  const [_saving, _setSaving] = useState(false);
   const [rescheduling, setRescheduling] = useState(false);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
-  const [hasChanges, setHasChanges] = useState(false);
+  const [changedSections, setChangedSections] = useState<Set<string>>(new Set());
+
+  const markChanged = (section: string) => {
+    setChangedSections(prev => new Set(prev).add(section));
+  };
+  const clearChanged = (section: string) => {
+    setChangedSections(prev => { const n = new Set(prev); n.delete(section); return n; });
+  };
 
   // Editable fields — always editable
   const [editFields, setEditFields] = useState({
@@ -188,58 +195,66 @@ const LeadDetail = () => {
     });
   }, [id]);
 
-  const handleSave = async () => {
+  const [savingSection, setSavingSection] = useState<string | null>(null);
+
+  const handleSaveSection = async (section: string) => {
     if (!lead) return;
-    setSaving(true);
+    setSavingSection(section);
 
-    const newReuniaoStatus = editFields.reuniao_status || "pendente";
-    const oldReuniaoStatus = lead.reuniao_status || "pendente";
-    const oldStatus = lead.status;
-
-    await supabase.from("leads").update({
-      status: editStatus,
-      temperature: editTemp,
-      treatment: editFields.treatment,
-      name: editFields.name,
-      phone: editFields.phone,
-      email: editFields.email,
-      city: editFields.city,
-      uf: editFields.uf,
-      career: editFields.career,
-      scheduled_day: editFields.scheduled_day || null,
-      scheduled_time: editFields.scheduled_time || null,
-      notes: editFields.notes || null,
-      reuniao_status: newReuniaoStatus,
-      reuniao_consultor: editFields.reuniao_consultor || null,
-    }).eq("id", lead.id);
-
-    // Create tags for reuniao_status changes
-    if (newReuniaoStatus !== oldReuniaoStatus) {
-      const tagMap: Record<string, string> = {
-        confirmada: "reuniao_confirmada",
-        cancelada: "reuniao_cancelada",
-        compareceu: "reuniao_compareceu",
-        nao_compareceu: "reuniao_nao_compareceu",
-      };
-      const tag = tagMap[newReuniaoStatus];
-      if (tag) {
-        await supabase.from("lead_tags").insert({
-          lead_id: lead.id, tag, source: "lead_detail",
-        } as any);
+    try {
+      if (section === "dados") {
+        await supabase.from("leads").update({
+          treatment: editFields.treatment,
+          name: editFields.name,
+          phone: editFields.phone,
+          email: editFields.email,
+          city: editFields.city,
+          uf: editFields.uf,
+          career: editFields.career,
+        }).eq("id", lead.id);
+      } else if (section === "gerenciar") {
+        const oldStatus = lead.status;
+        await supabase.from("leads").update({
+          status: editStatus,
+          temperature: editTemp,
+          notes: editFields.notes || null,
+        }).eq("id", lead.id);
+        if (editStatus !== oldStatus) {
+          await supabase.from("lead_tags").insert({
+            lead_id: lead.id, tag: `movido_${editStatus}`, source: "lead_detail",
+          } as any);
+        }
+      } else if (section === "reuniao") {
+        const newReuniaoStatus = editFields.reuniao_status || "pendente";
+        const oldReuniaoStatus = lead.reuniao_status || "pendente";
+        await supabase.from("leads").update({
+          reuniao_status: newReuniaoStatus,
+          reuniao_consultor: editFields.reuniao_consultor || null,
+        }).eq("id", lead.id);
+        if (newReuniaoStatus !== oldReuniaoStatus) {
+          const tagMap: Record<string, string> = {
+            confirmada: "reuniao_confirmada",
+            cancelada: "reuniao_cancelada",
+            compareceu: "reuniao_compareceu",
+            nao_compareceu: "reuniao_nao_compareceu",
+          };
+          const tag = tagMap[newReuniaoStatus];
+          if (tag) {
+            await supabase.from("lead_tags").insert({
+              lead_id: lead.id, tag, source: "lead_detail",
+            } as any);
+          }
+        }
       }
-    }
 
-    // Create tag for lead status changes (same as kanban)
-    if (editStatus !== oldStatus) {
-      await supabase.from("lead_tags").insert({
-        lead_id: lead.id, tag: `movido_${editStatus}`, source: "lead_detail",
-      } as any);
+      await fetchLead();
+      clearChanged(section);
+      toast.success("Alterações salvas!");
+    } catch (err: any) {
+      toast.error("Erro ao salvar: " + err.message);
+    } finally {
+      setSavingSection(null);
     }
-
-    await fetchLead();
-    setHasChanges(false);
-    setSaving(false);
-    toast.success("Alterações salvas!");
   };
 
   const handleAddNote = async () => {
@@ -314,35 +329,40 @@ const LeadDetail = () => {
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Tratamento / Nome</label>
                 <div className="flex gap-2">
-                  <select value={editFields.treatment} onChange={e => { setEditFields(f => ({...f, treatment: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                  <select value={editFields.treatment} onChange={e => { setEditFields(f => ({...f, treatment: e.target.value})); markChanged("dados"); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
                     {TREATMENT_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  <Input value={editFields.name} onChange={e => { setEditFields(f => ({...f, name: e.target.value})); setHasChanges(true); }} placeholder="Nome completo" className="flex-1 h-9" />
+                  <Input value={editFields.name} onChange={e => { setEditFields(f => ({...f, name: e.target.value})); markChanged("dados"); }} placeholder="Nome completo" className="flex-1 h-9" />
                 </div>
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Telefone</label>
-                <Input value={editFields.phone} onChange={e => { setEditFields(f => ({...f, phone: e.target.value})); setHasChanges(true); }} placeholder="(00) 00000-0000" className="h-9" />
+                <Input value={editFields.phone} onChange={e => { setEditFields(f => ({...f, phone: e.target.value})); markChanged("dados"); }} placeholder="(00) 00000-0000" className="h-9" />
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Email</label>
-                <Input value={editFields.email} onChange={e => { setEditFields(f => ({...f, email: e.target.value.toLowerCase()})); setHasChanges(true); }} placeholder="seu@email.com" type="email" className="h-9" />
+                <Input value={editFields.email} onChange={e => { setEditFields(f => ({...f, email: e.target.value.toLowerCase()})); markChanged("dados"); }} placeholder="seu@email.com" type="email" className="h-9" />
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Cidade / UF</label>
                 <div className="flex gap-2">
-                  <Input value={editFields.city} onChange={e => { setEditFields(f => ({...f, city: e.target.value})); setHasChanges(true); }} placeholder="Cidade" className="flex-1 h-9" />
-                  <select value={editFields.uf} onChange={e => { setEditFields(f => ({...f, uf: e.target.value})); setHasChanges(true); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
+                  <Input value={editFields.city} onChange={e => { setEditFields(f => ({...f, city: e.target.value})); markChanged("dados"); }} placeholder="Cidade" className="flex-1 h-9" />
+                  <select value={editFields.uf} onChange={e => { setEditFields(f => ({...f, uf: e.target.value})); markChanged("dados"); }} className="h-9 rounded-md border border-input bg-background px-2 text-sm w-20">
                     {UF_OPTIONS.map(u => <option key={u} value={u}>{u}</option>)}
                   </select>
                 </div>
               </div>
               <div>
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Carreira</label>
-                <select value={editFields.career} onChange={e => { setEditFields(f => ({...f, career: e.target.value})); setHasChanges(true); }} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
+                <select value={editFields.career} onChange={e => { setEditFields(f => ({...f, career: e.target.value})); markChanged("dados"); }} className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm">
                   {CAREER_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
               </div>
+            </div>
+            <div className="flex justify-end pt-1">
+              <Button onClick={() => handleSaveSection("dados")} disabled={savingSection === "dados" || !changedSections.has("dados")} size="sm">
+                <Save className="w-3.5 h-3.5 mr-1.5" /> {savingSection === "dados" ? "Salvando..." : changedSections.has("dados") ? "Salvar dados" : "Salvo"}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -357,7 +377,7 @@ const LeadDetail = () => {
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Status</label>
               <select
                 value={editStatus}
-                onChange={(e) => { setEditStatus(e.target.value as LeadStatus); setHasChanges(true); }}
+                onChange={(e) => { setEditStatus(e.target.value as LeadStatus); markChanged("gerenciar"); }}
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
                 {STATUS_OPTIONS.map((s) => (
@@ -375,7 +395,7 @@ const LeadDetail = () => {
                     variant="outline"
                     size="sm"
                     className={`flex-1 gap-1.5 ${editTemp === t.value ? t.activeClass : "text-muted-foreground"}`}
-                    onClick={() => { setEditTemp(t.value); setHasChanges(true); }}
+                    onClick={() => { setEditTemp(t.value); markChanged("gerenciar"); }}
                   >
                     <t.icon className="w-3.5 h-3.5" />
                     {t.label}
@@ -387,15 +407,15 @@ const LeadDetail = () => {
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Observação</label>
               <textarea
                 value={editFields.notes}
-                onChange={(e) => { setEditFields(f => ({...f, notes: e.target.value})); setHasChanges(true); }}
+                onChange={(e) => { setEditFields(f => ({...f, notes: e.target.value})); markChanged("gerenciar"); }}
                 rows={2}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 placeholder="Observação geral do lead..."
               />
             </div>
             <div className="flex justify-end">
-              <Button onClick={handleSave} disabled={saving || !hasChanges} size="sm">
-                <Save className="w-3.5 h-3.5 mr-1.5" /> {saving ? "Salvando..." : hasChanges ? "Salvar alterações" : "Salvo"}
+              <Button onClick={() => handleSaveSection("gerenciar")} disabled={savingSection === "gerenciar" || !changedSections.has("gerenciar")} size="sm">
+                <Save className="w-3.5 h-3.5 mr-1.5" /> {savingSection === "gerenciar" ? "Salvando..." : changedSections.has("gerenciar") ? "Salvar alterações" : "Salvo"}
               </Button>
             </div>
           </CardContent>
@@ -415,7 +435,7 @@ const LeadDetail = () => {
                 <label className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1 block">Consultor</label>
                 <select
                   value={editFields.reuniao_consultor}
-                  onChange={e => { setEditFields(f => ({...f, reuniao_consultor: e.target.value})); setHasChanges(true); }}
+                  onChange={e => { setEditFields(f => ({...f, reuniao_consultor: e.target.value})); markChanged("reuniao"); }}
                   className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
                 >
                   <option value="contato@metodomont.com.br">contato@metodomont.com.br</option>
@@ -440,7 +460,7 @@ const LeadDetail = () => {
                         variant="outline"
                         size="sm"
                         className={`flex-1 text-xs h-8 ${isActive ? opt.cls : "text-muted-foreground"}`}
-                        onClick={() => { setEditFields(f => ({...f, reuniao_status: opt.value})); setHasChanges(true); }}
+                        onClick={() => { setEditFields(f => ({...f, reuniao_status: opt.value})); markChanged("reuniao"); }}
                       >
                         {opt.label}
                       </Button>
@@ -475,7 +495,7 @@ const LeadDetail = () => {
                           } else {
                             setEditFields(f => ({...f, reuniao_status: opt.value}));
                           }
-                          setHasChanges(true);
+                          markChanged("reuniao");
                         }}
                       >
                         {opt.label}
@@ -567,6 +587,11 @@ const LeadDetail = () => {
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Clock className="w-3.5 h-3.5" />
                 <span>Atualizado em {format(new Date(lead.updated_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}</span>
+              </div>
+              <div className="flex justify-end pt-2">
+                <Button onClick={() => handleSaveSection("reuniao")} disabled={savingSection === "reuniao" || !changedSections.has("reuniao")} size="sm">
+                  <Save className="w-3.5 h-3.5 mr-1.5" /> {savingSection === "reuniao" ? "Salvando..." : changedSections.has("reuniao") ? "Salvar reunião" : "Salvo"}
+                </Button>
               </div>
             </CardContent>
           </Card>
