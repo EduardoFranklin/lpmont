@@ -85,7 +85,14 @@ const LeadDetail = () => {
   const [rescheduling, setRescheduling] = useState(false);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
-  const [hasChanges, setHasChanges] = useState(false);
+  const [changedSections, setChangedSections] = useState<Set<string>>(new Set());
+
+  const markChanged = (section: string) => {
+    setChangedSections(prev => new Set(prev).add(section));
+  };
+  const clearChanged = (section: string) => {
+    setChangedSections(prev => { const n = new Set(prev); n.delete(section); return n; });
+  };
 
   // Editable fields — always editable
   const [editFields, setEditFields] = useState({
