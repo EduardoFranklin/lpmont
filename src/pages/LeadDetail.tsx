@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft, Phone, Mail, MapPin, Briefcase, Calendar, Clock, MessageCircle,
   Plus, Save, User, FileText, Globe, CalendarCheck, Timer, Snowflake, Flame, Zap,
-  Video, CreditCard
+  Video, CreditCard, Copy, ExternalLink
 } from "lucide-react";
 import { format, differenceInMinutes } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -335,18 +335,6 @@ const LeadDetail = () => {
                       <span className="text-foreground text-xs font-medium">{r.value}</span>
                     </div>
                   ))}
-                  {lead.reuniao_link_google_meet && (
-                    <a href={lead.reuniao_link_google_meet} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-primary underline">
-                      <Video className="w-3.5 h-3.5" /> Abrir Google Meet
-                    </a>
-                  )}
-                  {lead.reuniao_link_google_calendar && (
-                    <a href={lead.reuniao_link_google_calendar} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground underline ml-3">
-                      <Calendar className="w-3.5 h-3.5" /> Google Calendar
-                    </a>
-                  )}
                 </>
               ) : (
                 <div>
@@ -357,6 +345,45 @@ const LeadDetail = () => {
                   </div>
                 </div>
               )}
+
+              {/* Google Meet link */}
+              {lead.reuniao_link_google_meet && (
+                <div className="flex items-center gap-2 rounded-md border border-border p-2 bg-muted/20">
+                  <Video className="w-4 h-4 text-blue-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Google Meet</p>
+                    <p className="text-xs text-foreground truncate font-mono">{lead.reuniao_link_google_meet}</p>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" title="Copiar link" onClick={() => { navigator.clipboard.writeText(lead.reuniao_link_google_meet!); import("sonner").then(m => m.toast.success("Link copiado!")); }}>
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                  <a href={lead.reuniao_link_google_meet} target="_blank" rel="noopener noreferrer">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" title="Abrir Meet">
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Button>
+                  </a>
+                </div>
+              )}
+
+              {/* Google Calendar link */}
+              {lead.reuniao_link_google_calendar && (
+                <div className="flex items-center gap-2 rounded-md border border-border p-2 bg-muted/20">
+                  <Calendar className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Google Calendar</p>
+                    <p className="text-xs text-foreground truncate font-mono">{lead.reuniao_link_google_calendar}</p>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" title="Copiar link" onClick={() => { navigator.clipboard.writeText(lead.reuniao_link_google_calendar!); import("sonner").then(m => m.toast.success("Link copiado!")); }}>
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                  <a href={lead.reuniao_link_google_calendar} target="_blank" rel="noopener noreferrer">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" title="Abrir Calendar">
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </Button>
+                  </a>
+                </div>
+              )}
+
               <Separator />
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Clock className="w-3.5 h-3.5" />
