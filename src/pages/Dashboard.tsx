@@ -150,13 +150,13 @@ const Dashboard = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="kanban">
-                <DashKanban leads={filteredLeads} onRefresh={fetchLeads} onOpenChat={(phone) => { setChatPhone(phone); setActiveTab("chat"); }} />
+                <DashKanban leads={filteredLeads} onRefresh={fetchLeads} onOpenChat={(phone, name) => { setChatPhone(phone); setChatLeadName(name); setActiveTab("chat"); }} />
               </TabsContent>
               <TabsContent value="agenda">
                 <DashAgenda leads={leads} onRefresh={fetchLeads} />
               </TabsContent>
               <TabsContent value="chat">
-                <DashChatMont initialPhone={chatPhone} onPhoneConsumed={() => setChatPhone(null)} />
+                <DashChatMont initialPhone={chatPhone} initialLeadName={chatLeadName} onPhoneConsumed={() => { setChatPhone(null); setChatLeadName(null); }} />
               </TabsContent>
               <TabsContent value="leads">
                 <DashLeadsList leads={filteredLeads} onRefresh={fetchLeads} />
