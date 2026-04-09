@@ -87,6 +87,7 @@ const LeadDetail = () => {
   const [editFields, setEditFields] = useState({
     treatment: "", name: "", phone: "", email: "", city: "", uf: "", career: "",
     scheduled_day: "", scheduled_time: "", notes: "",
+    reuniao_status: "pendente", reuniao_consultor: "contato@metodomont.com.br",
   });
 
   const fetchLead = async () => {
