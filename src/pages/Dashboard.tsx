@@ -129,6 +129,10 @@ const Dashboard = () => {
                 <TabsTrigger value="kanban" className="gap-1.5">
                   <Columns3 className="w-4 h-4" /> Kanban
                 </TabsTrigger>
+                <TabsTrigger value="agenda" className="gap-1.5">
+                  <CalendarCheck className="w-4 h-4" /> Agenda
+                </TabsTrigger>
+                </TabsTrigger>
                 <TabsTrigger value="messaging" className="gap-1.5">
                   <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Mensageria</span><span className="sm:hidden">Msg</span>
                 </TabsTrigger>
