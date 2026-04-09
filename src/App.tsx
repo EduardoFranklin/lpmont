@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound.tsx";
 import QuizPage from "./pages/QuizPage.tsx";
 import Checkout from "./pages/Checkout.tsx";
 import FalarEquipe from "./pages/FalarEquipe.tsx";
+import Contato from "./pages/Contato.tsx";
 import Onboarding from "./pages/Onboarding.tsx";
 
 /* force-publish-v3 */
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/quiz/:slug" element={<QuizPage />} />
             <Route path="/pagar-agora" element={<Checkout />} />
             <Route path="/falar-equipe" element={<FalarEquipe />} />
+            <Route path="/contato" element={<Contato />} />
             <Route path="/onboarding" element={<Onboarding />} />
           </Route>
           {/* Dashboard routes — no tracking */}
