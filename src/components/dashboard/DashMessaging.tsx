@@ -36,6 +36,7 @@ const DEFAULT_FUNNELS = [
   { value: "F2", label: "F2 — Quiz de Diagnóstico", icon: Zap, color: "text-amber-500", description: "Diagnósticos A/B/C + recuperação de abandono" },
   { value: "F3", label: "F3 — Tráfego Direto", icon: ShoppingCart, color: "text-emerald-500", description: "Retargeting, abandono de checkout, objeções" },
   { value: "F4", label: "F4 — Pós-Compra (Onboarding)", icon: GraduationCap, color: "text-purple-500", description: "Boas-vindas, engajamento, reengajamento" },
+  { value: "F5", label: "F5 — Reagendamento", icon: RefreshCw, color: "text-rose-500", description: "Aviso automático com novos dados ao reagendar reunião" },
 ];
 
 const FUNNEL_ICONS = [
@@ -59,6 +60,7 @@ const VARIABLES = [
   { key: "{{data}}", desc: "Data da reunião" },
   { key: "{{hora}}", desc: "Horário da reunião" },
   { key: "{{reuniao_link_google_meet}}", desc: "Link do Google Meet" },
+  { key: "{{reuniao_link_google_calendar}}", desc: "Link do Google Calendar" },
   { key: "{{id_lead}}", desc: "ID do lead" },
 ];
 

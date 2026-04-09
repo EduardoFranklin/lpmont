@@ -221,6 +221,40 @@ Deno.serve(async (req) => {
       updated_at: new Date().toISOString(),
     }).eq("id", leadId);
 
+    // Cancel pending F1 messages for this lead (old schedule reminders)
+    await supabase
+      .from("message_queue")
+      .update({ status: "cancelled" })
+      .eq("lead_id", leadId)
+      .eq("funnel", "F1")
+      .eq("status", "pending");
+
+    // Also cancel any previous F5 (reagendamento) pending messages
+    await supabase
+      .from("message_queue")
+      .update({ status: "cancelled" })
+      .eq("lead_id", leadId)
+      .eq("funnel", "F5")
+      .eq("status", "pending");
+
+    // Trigger F5 — Reagendamento automation
+    try {
+      await fetch(`${supabaseUrl}/functions/v1/enqueue-automation`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${serviceKey}`,
+        },
+        body: JSON.stringify({
+          lead_id: leadId,
+          funnel: "F5",
+          event: "reagendamento",
+        }),
+      });
+    } catch (e) {
+      console.error("Failed to trigger F5 automation:", e);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
