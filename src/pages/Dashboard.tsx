@@ -29,6 +29,7 @@ const Dashboard = () => {
   const [topTab, setTopTab] = useState<"dashboard" | "content">("dashboard");
   const [activeTab, setActiveTab] = useState("kanban");
   const [chatPhone, setChatPhone] = useState<string | null>(null);
+  const [chatLeadName, setChatLeadName] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
