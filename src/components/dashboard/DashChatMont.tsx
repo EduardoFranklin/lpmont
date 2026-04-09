@@ -136,6 +136,27 @@ function formatMsgDate(dateStr: string): string {
   return format(d, "dd 'de' MMMM", { locale: ptBR });
 }
 
+/* ─── Phone helpers ─── */
+
+function normalizePhoneDigits(phone: string | null | undefined): string {
+  return (phone ?? "").replace(/\D/g, "").replace(/^55/, "");
+}
+
+function phonesMatch(a: string | null | undefined, b: string | null | undefined): boolean {
+  const phoneA = normalizePhoneDigits(a);
+  const phoneB = normalizePhoneDigits(b);
+
+  if (!phoneA || !phoneB) return false;
+  if (phoneA === phoneB) return true;
+
+  const aLast8 = phoneA.slice(-8);
+  const bLast8 = phoneB.slice(-8);
+  const aLast9 = phoneA.slice(-9);
+  const bLast9 = phoneB.slice(-9);
+
+  return aLast8 === bLast8 || aLast9 === bLast9;
+}
+
 /* ─── Status helpers ─── */
 
 const statusLabels: Record<string, string> = {
@@ -257,6 +278,8 @@ const DashChatMont = () => {
         .eq("id", conv.id);
     }
 
+    let linkedLead: Lead | null = null;
+
     // Fetch lead if linked
     if (conv.lead_id) {
       const { data: leadData } = await supabase
@@ -264,8 +287,36 @@ const DashChatMont = () => {
         .select("*")
         .eq("id", conv.lead_id)
         .single();
-      if (leadData) setLead(leadData as unknown as Lead);
+      if (leadData) linkedLead = leadData as unknown as Lead;
     }
+
+    // Fallback for older conversations not yet linked by phone
+    if (!linkedLead) {
+      const { data: leadsData } = await supabase
+        .from("leads")
+        .select("*")
+        .range(0, 999);
+
+      const matchedLead = (leadsData as unknown as Lead[] | null)?.find((candidate) =>
+        phonesMatch(candidate.phone, conv.phone)
+      ) || null;
+
+      if (matchedLead) {
+        linkedLead = matchedLead;
+        await supabase
+          .from("whatsapp_conversations")
+          .update({ lead_id: matchedLead.id })
+          .eq("id", conv.id);
+
+        setConversations((prev) =>
+          prev.map((item) =>
+            item.id === conv.id ? { ...item, lead_id: matchedLead.id } : item
+          )
+        );
+      }
+    }
+
+    if (linkedLead) setLead(linkedLead);
 
     inputRef.current?.focus();
   };
