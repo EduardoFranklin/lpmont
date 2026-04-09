@@ -132,7 +132,6 @@ const Dashboard = () => {
                 <TabsTrigger value="agenda" className="gap-1.5">
                   <CalendarCheck className="w-4 h-4" /> Agenda
                 </TabsTrigger>
-                </TabsTrigger>
                 <TabsTrigger value="messaging" className="gap-1.5">
                   <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Mensageria</span><span className="sm:hidden">Msg</span>
                 </TabsTrigger>
@@ -151,6 +150,10 @@ const Dashboard = () => {
               </TabsContent>
               <TabsContent value="kanban">
                 <DashKanban leads={filteredLeads} onRefresh={fetchLeads} />
+              </TabsContent>
+              <TabsContent value="agenda">
+                <DashAgenda leads={leads} onRefresh={fetchLeads} />
+              </TabsContent>
               </TabsContent>
               <TabsContent value="messaging">
                 <DashMessaging />
