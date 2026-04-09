@@ -80,13 +80,17 @@ Deno.serve(async (req) => {
 
     let conversationId: string;
     
-    // Try to find matching lead
-    const { data: matchedLead } = await supabase
+    // Try to find matching lead by last 8-10 digits
+    const phoneSuffix = normalizedPhone.slice(-9); // last 9 digits for matching
+    const { data: allLeads } = await supabase
       .from("leads")
-      .select("id, name")
-      .or(`phone.eq.${normalizedPhone},phone.eq.55${normalizedPhone},phone.eq.+55${normalizedPhone}`)
-      .limit(1)
-      .maybeSingle();
+      .select("id, name, phone")
+      .limit(500);
+    
+    const matchedLead = allLeads?.find((l) => {
+      const leadDigits = l.phone.replace(/\D/g, "").replace(/^55/, "");
+      return leadDigits === normalizedPhone || leadDigits.endsWith(phoneSuffix) || normalizedPhone.endsWith(leadDigits.slice(-9));
+    }) || null;
 
     if (existingConv) {
       conversationId = existingConv.id;
