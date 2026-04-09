@@ -35,6 +35,7 @@ const App = () => (
             <Route path="/quiz/:slug" element={<QuizPage />} />
             <Route path="/pagar-agora" element={<Checkout />} />
             <Route path="/falar-equipe" element={<FalarEquipe />} />
+            <Route path="/contato" element={<Contato />} />
             <Route path="/onboarding" element={<Onboarding />} />
           </Route>
           {/* Dashboard routes — no tracking */}
