@@ -26,7 +26,7 @@ const TEMP_COLORS: Record<string, string> = {
   quente: "bg-red-500",
 };
 
-const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh: () => void; onOpenChat?: (phone: string) => void }) => {
+const DashKanban = ({ leads, onRefresh, onOpenChat }: { leads: Lead[]; onRefresh: () => void; onOpenChat?: (phone: string, name: string) => void }) => {
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
