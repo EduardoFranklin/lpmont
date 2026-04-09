@@ -115,12 +115,24 @@ const LeadDetail = () => {
         reuniao_status: data.reuniao_status || "pendente",
         reuniao_consultor: data.reuniao_consultor || "contato@metodomont.com.br",
       });
-      // Initialize date/time edit fields from reuniao_data_hora_iso
+      // Initialize date/time edit fields
       if (data.reuniao_data_hora_iso) {
         const d = new Date(data.reuniao_data_hora_iso);
         const pad = (n: number) => String(n).padStart(2, "0");
         setEditDate(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`);
         setEditTime(`${pad(d.getHours())}:${pad(d.getMinutes())}`);
+      } else if (data.scheduled_day && data.scheduled_time) {
+        // Try to parse scheduled_day as dd/mm
+        const parts = data.scheduled_day.split("/");
+        if (parts.length === 2) {
+          const year = new Date().getFullYear();
+          setEditDate(`${year}-${parts[1].padStart(2, "0")}-${parts[0].padStart(2, "0")}`);
+        }
+        // Try to parse scheduled_time like "9h" or "14h"
+        const hourMatch = data.scheduled_time.match(/^(\d+)h/);
+        if (hourMatch) {
+          setEditTime(`${hourMatch[1].padStart(2, "0")}:00`);
+        }
       }
     }
     setLoading(false);
