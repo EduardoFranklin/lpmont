@@ -224,7 +224,6 @@ const DashScheduleSettings = () => {
 
           {consultants.map(consultant => {
             const activeDays = getSlots(consultant.id);
-            const slots = getSlotsForConsultant(consultant.id);
 
             return (
               <div key={consultant.id} className="rounded-lg border p-4 space-y-3">
@@ -257,38 +256,42 @@ const DashScheduleSettings = () => {
                   ))}
                 </div>
 
-                {/* Time slots */}
-                <div className="space-y-1.5">
-                  {slots.map(slot => (
-                    <div key={slot.id} className="flex items-center gap-2">
-                      <select
-                        value={slot.day_of_week}
-                        onChange={e => updateSlot(slot.id, "day_of_week", parseInt(e.target.value))}
-                        className="rounded-md border border-input bg-background px-2 py-1 text-xs"
-                      >
-                        {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
-                      </select>
-                      <Input
-                        type="time"
-                        value={formatTimeForDisplay(slot.start_time)}
-                        onChange={e => updateSlot(slot.id, "start_time", e.target.value)}
-                        className="w-28 text-xs h-8"
-                      />
-                      <span className="text-xs text-muted-foreground">-</span>
-                      <Input
-                        type="time"
-                        value={formatTimeForDisplay(slot.end_time)}
-                        onChange={e => updateSlot(slot.id, "end_time", e.target.value)}
-                        className="w-28 text-xs h-8"
-                      />
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => removeSlot(slot.id)}>
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                  <Button variant="outline" size="sm" className="text-xs gap-1 h-7" onClick={() => addSlot(consultant.id)}>
-                    <Plus className="w-3 h-3" /> Horário
-                  </Button>
+                {/* Time slots grouped by day */}
+                <div className="space-y-2">
+                  {DAYS.map((dayLabel, dayIdx) => {
+                    if (!activeDays.has(dayIdx)) return null;
+                    const daySlots = getSlotsByDay(consultant.id, dayIdx);
+                    return (
+                      <div key={dayIdx} className="flex items-start gap-2">
+                        <span className="text-xs font-medium text-muted-foreground w-8 pt-2 shrink-0">{dayLabel}</span>
+                        <div className="flex flex-col gap-1 flex-1">
+                          {daySlots.map(slot => (
+                            <div key={slot.id} className="flex items-center gap-1.5">
+                              <Input
+                                type="time"
+                                value={formatTimeForDisplay(slot.start_time)}
+                                onChange={e => updateSlot(slot.id, "start_time", e.target.value)}
+                                className="w-24 text-xs h-7"
+                              />
+                              <span className="text-xs text-muted-foreground">às</span>
+                              <Input
+                                type="time"
+                                value={formatTimeForDisplay(slot.end_time)}
+                                onChange={e => updateSlot(slot.id, "end_time", e.target.value)}
+                                className="w-24 text-xs h-7"
+                              />
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeSlot(slot.id)}>
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                          <Button variant="ghost" size="sm" className="text-[10px] gap-1 h-5 w-fit px-1.5 text-muted-foreground" onClick={() => addSlotToDay(consultant.id, dayIdx)}>
+                            <Plus className="w-2.5 h-2.5" /> período
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Config row */}
