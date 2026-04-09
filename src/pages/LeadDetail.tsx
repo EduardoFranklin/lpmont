@@ -195,58 +195,66 @@ const LeadDetail = () => {
     });
   }, [id]);
 
-  const handleSave = async () => {
+  const [savingSection, setSavingSection] = useState<string | null>(null);
+
+  const handleSaveSection = async (section: string) => {
     if (!lead) return;
-    setSaving(true);
+    setSavingSection(section);
 
-    const newReuniaoStatus = editFields.reuniao_status || "pendente";
-    const oldReuniaoStatus = lead.reuniao_status || "pendente";
-    const oldStatus = lead.status;
-
-    await supabase.from("leads").update({
-      status: editStatus,
-      temperature: editTemp,
-      treatment: editFields.treatment,
-      name: editFields.name,
-      phone: editFields.phone,
-      email: editFields.email,
-      city: editFields.city,
-      uf: editFields.uf,
-      career: editFields.career,
-      scheduled_day: editFields.scheduled_day || null,
-      scheduled_time: editFields.scheduled_time || null,
-      notes: editFields.notes || null,
-      reuniao_status: newReuniaoStatus,
-      reuniao_consultor: editFields.reuniao_consultor || null,
-    }).eq("id", lead.id);
-
-    // Create tags for reuniao_status changes
-    if (newReuniaoStatus !== oldReuniaoStatus) {
-      const tagMap: Record<string, string> = {
-        confirmada: "reuniao_confirmada",
-        cancelada: "reuniao_cancelada",
-        compareceu: "reuniao_compareceu",
-        nao_compareceu: "reuniao_nao_compareceu",
-      };
-      const tag = tagMap[newReuniaoStatus];
-      if (tag) {
-        await supabase.from("lead_tags").insert({
-          lead_id: lead.id, tag, source: "lead_detail",
-        } as any);
+    try {
+      if (section === "dados") {
+        await supabase.from("leads").update({
+          treatment: editFields.treatment,
+          name: editFields.name,
+          phone: editFields.phone,
+          email: editFields.email,
+          city: editFields.city,
+          uf: editFields.uf,
+          career: editFields.career,
+        }).eq("id", lead.id);
+      } else if (section === "gerenciar") {
+        const oldStatus = lead.status;
+        await supabase.from("leads").update({
+          status: editStatus,
+          temperature: editTemp,
+          notes: editFields.notes || null,
+        }).eq("id", lead.id);
+        if (editStatus !== oldStatus) {
+          await supabase.from("lead_tags").insert({
+            lead_id: lead.id, tag: `movido_${editStatus}`, source: "lead_detail",
+          } as any);
+        }
+      } else if (section === "reuniao") {
+        const newReuniaoStatus = editFields.reuniao_status || "pendente";
+        const oldReuniaoStatus = lead.reuniao_status || "pendente";
+        await supabase.from("leads").update({
+          reuniao_status: newReuniaoStatus,
+          reuniao_consultor: editFields.reuniao_consultor || null,
+        }).eq("id", lead.id);
+        if (newReuniaoStatus !== oldReuniaoStatus) {
+          const tagMap: Record<string, string> = {
+            confirmada: "reuniao_confirmada",
+            cancelada: "reuniao_cancelada",
+            compareceu: "reuniao_compareceu",
+            nao_compareceu: "reuniao_nao_compareceu",
+          };
+          const tag = tagMap[newReuniaoStatus];
+          if (tag) {
+            await supabase.from("lead_tags").insert({
+              lead_id: lead.id, tag, source: "lead_detail",
+            } as any);
+          }
+        }
       }
-    }
 
-    // Create tag for lead status changes (same as kanban)
-    if (editStatus !== oldStatus) {
-      await supabase.from("lead_tags").insert({
-        lead_id: lead.id, tag: `movido_${editStatus}`, source: "lead_detail",
-      } as any);
+      await fetchLead();
+      clearChanged(section);
+      toast.success("Alterações salvas!");
+    } catch (err: any) {
+      toast.error("Erro ao salvar: " + err.message);
+    } finally {
+      setSavingSection(null);
     }
-
-    await fetchLead();
-    setHasChanges(false);
-    setSaving(false);
-    toast.success("Alterações salvas!");
   };
 
   const handleAddNote = async () => {
