@@ -119,14 +119,8 @@ const Dashboard = () => {
               />
             </div>
 
-            <Tabs defaultValue="reports" className="space-y-6">
+            <Tabs defaultValue="kanban" className="space-y-6">
               <TabsList className="flex flex-wrap h-auto gap-1">
-                <TabsTrigger value="reports" className="gap-1.5">
-                  <BarChart3 className="w-4 h-4" /> Relatórios
-                </TabsTrigger>
-                <TabsTrigger value="leads" className="gap-1.5">
-                  <List className="w-4 h-4" /> Leads
-                </TabsTrigger>
                 <TabsTrigger value="kanban" className="gap-1.5">
                   <Columns3 className="w-4 h-4" /> Kanban
                 </TabsTrigger>
@@ -135,6 +129,12 @@ const Dashboard = () => {
                 </TabsTrigger>
                 <TabsTrigger value="chat" className="gap-1.5">
                   <MessageCircle className="w-4 h-4" /> <span className="hidden sm:inline">ChatMont</span><span className="sm:hidden">Chat</span>
+                </TabsTrigger>
+                <TabsTrigger value="reports" className="gap-1.5">
+                  <BarChart3 className="w-4 h-4" /> Relatórios
+                </TabsTrigger>
+                <TabsTrigger value="leads" className="gap-1.5">
+                  <List className="w-4 h-4" /> Leads
                 </TabsTrigger>
                 <TabsTrigger value="messaging" className="gap-1.5">
                   <MessageSquare className="w-4 h-4" /> <span className="hidden sm:inline">Mensageria</span><span className="sm:hidden">Msg</span>
@@ -146,12 +146,6 @@ const Dashboard = () => {
                   <Users className="w-4 h-4" /> <span className="hidden sm:inline">Usuários</span><span className="sm:hidden">Users</span>
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="reports">
-                <DashReports leads={filteredLeads} />
-              </TabsContent>
-              <TabsContent value="leads">
-                <DashLeadsList leads={filteredLeads} onRefresh={fetchLeads} />
-              </TabsContent>
               <TabsContent value="kanban">
                 <DashKanban leads={filteredLeads} onRefresh={fetchLeads} />
               </TabsContent>
@@ -160,6 +154,12 @@ const Dashboard = () => {
               </TabsContent>
               <TabsContent value="chat">
                 <DashChatMont />
+              </TabsContent>
+              <TabsContent value="reports">
+                <DashReports leads={filteredLeads} />
+              </TabsContent>
+              <TabsContent value="leads">
+                <DashLeadsList leads={filteredLeads} onRefresh={fetchLeads} />
               </TabsContent>
               <TabsContent value="messaging">
                 <DashMessaging />
