@@ -27,6 +27,8 @@ const Dashboard = () => {
   const [datePreset, setDatePreset] = useState<DatePreset>("tudo");
   const [customRange, setCustomRange] = useState<{ from?: Date; to?: Date }>({});
   const [topTab, setTopTab] = useState<"dashboard" | "content">("dashboard");
+  const [activeTab, setActiveTab] = useState("kanban");
+  const [chatPhone, setChatPhone] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
