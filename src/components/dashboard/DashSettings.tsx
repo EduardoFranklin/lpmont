@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Save, Code2, AlertTriangle, CalendarCheck, CheckCircle2, ExternalLink, MessageCircle, Eye, EyeOff, Loader2, Clock } from "lucide-react";
+import { Save, Code2, AlertTriangle, CalendarCheck, CheckCircle2, ExternalLink, MessageCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface SettingField {
@@ -240,7 +240,7 @@ const DashSettings = () => {
 
   const handleSaveAll = async () => {
     setSaving(true);
-    const allKeys = [...SETTINGS.map(s => s.key), ...ZAPI_FIELDS.map(f => f.key), "sending_window_start", "sending_window_end"];
+    const allKeys = [...SETTINGS.map(s => s.key), ...ZAPI_FIELDS.map(f => f.key)];
     for (const key of allKeys) {
       const value = values[key] || "";
       await supabase
@@ -296,53 +296,6 @@ const DashSettings = () => {
       {/* Z-API WhatsApp integration */}
       <ZApiCard values={values} setValues={setValues} />
 
-      {/* Sending Window */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Clock className="w-4 h-4 text-primary" /> Janela de Envio (WhatsApp / E-mail)
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Mensagens automáticas só serão enviadas dentro deste horário (fuso de São Paulo). Fora da janela, ficam na fila até o próximo horário permitido.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-3">
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-foreground/70">Início</label>
-              <div className="flex items-center gap-1.5">
-                <Input
-                  type="number"
-                  min={0}
-                  max={23}
-                  value={values["sending_window_start"] || "8"}
-                  onChange={e => setValues(prev => ({ ...prev, sending_window_start: e.target.value }))}
-                  className="w-20 text-center text-sm font-mono"
-                />
-                <span className="text-xs text-muted-foreground">h</span>
-              </div>
-            </div>
-            <span className="text-muted-foreground mt-5">—</span>
-            <div className="space-y-1">
-              <label className="text-xs font-medium text-foreground/70">Fim</label>
-              <div className="flex items-center gap-1.5">
-                <Input
-                  type="number"
-                  min={0}
-                  max={23}
-                  value={values["sending_window_end"] || "21"}
-                  onChange={e => setValues(prev => ({ ...prev, sending_window_end: e.target.value }))}
-                  className="w-20 text-center text-sm font-mono"
-                />
-                <span className="text-xs text-muted-foreground">h</span>
-              </div>
-            </div>
-            <div className="ml-4 text-xs text-muted-foreground/70 mt-5">
-              Fuso: São Paulo (BRT)
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
         <AlertTriangle className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />

@@ -37,13 +37,6 @@ function formatPhoneE164(phone: string): string {
   return `55${digits}`;
 }
 
-// ── SENDING WINDOW CHECK (dynamic from site_settings) ──────────────
-function isWithinSendingWindow(startHour: number, endHour: number): boolean {
-  const now = new Date();
-  const spTime = new Date(now.toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }));
-  const hour = spTime.getHours();
-  return hour >= startHour && hour < endHour;
-}
 
 // ── DETERMINISTIC HASH FOR VARIATION ──────────────────────
 function hashToIndex(str: string, len: number): number {
@@ -234,25 +227,7 @@ Deno.serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // ── Fetch sending window from site_settings ─────────────
-    let windowStart = 8;
-    let windowEnd = 21;
-    try {
-      const { data: windowSettings } = await supabase
-        .from("site_settings")
-        .select("key, value")
-        .in("key", ["sending_window_start", "sending_window_end"]);
-      for (const s of windowSettings || []) {
-        if (s.key === "sending_window_start" && s.value) windowStart = parseInt(s.value, 10);
-        if (s.key === "sending_window_end" && s.value) windowEnd = parseInt(s.value, 10);
-      }
-    } catch {}
-
-    // ── Check sending window (skip messages with skip_sending_window) ─
-    const withinWindow = isWithinSendingWindow(windowStart, windowEnd);
-    if (!withinWindow) {
-      console.log(`Outside sending window (${windowStart}h–${windowEnd}h SP). Will only process skip_sending_window messages.`);
-    }
+    // Sending window removed — messages are sent at any time
 
     // ── Check hourly WA rate (via message_history last 1h) ─
     const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
@@ -308,11 +283,6 @@ Deno.serve(async (req) => {
 
     // CONCURRENCY = 1: process one message at a time (anti-ban)
     for (const msg of pendingMessages) {
-      // ── Skip messages that must respect sending window ──
-      if (!withinWindow && !msg.skip_sending_window) {
-        skipped++;
-        continue;
-      }
 
       // ── Re-fetch lead data fresh for EVERY message ──────
       const { data: lead, error: leadErr } = await supabase
