@@ -158,6 +158,24 @@ Deno.serve(async (req) => {
         .insert(toEnqueue);
 
       if (insertError) throw insertError;
+
+      // Immediately trigger processing for instant messages (delay_minutes = 0)
+      const hasImmediate = toEnqueue.some((m: any) => {
+        const seq = sequences.find((s: any) => s.step_key === m.step_key && s.channel === m.channel);
+        return seq && seq.delay_minutes === 0;
+      });
+
+      if (hasImmediate) {
+        // Fire-and-forget: invoke process-message-queue immediately
+        fetch(`${supabaseUrl}/functions/v1/process-message-queue`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${serviceKey}`,
+          },
+          body: JSON.stringify({ trigger: "immediate" }),
+        }).catch((err) => console.error("Immediate process trigger error:", err));
+      }
     }
 
     return new Response(JSON.stringify({ enqueued: toEnqueue.length, funnel }), {
