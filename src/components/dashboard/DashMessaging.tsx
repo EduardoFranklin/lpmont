@@ -855,6 +855,26 @@ const QueueMonitor = () => {
     fetchQueue();
   };
 
+  const handlePauseAll = async () => {
+    if (!confirm(`Pausar todas as ${queue.length} mensagens pendentes? Elas serão marcadas como canceladas.`)) return;
+    const ids = queue.map((q: any) => q.id);
+    for (const id of ids) {
+      await supabase.from("message_queue" as any).update({ status: "cancelled" } as any).eq("id", id);
+    }
+    toast.success(`${ids.length} mensagens pausadas (canceladas)`);
+    fetchQueue();
+  };
+
+  const handleDeleteAll = async () => {
+    if (!confirm(`Excluir permanentemente todas as ${queue.length} mensagens ${filter === "pending" ? "pendentes" : filter === "sent" ? "enviadas" : filter === "failed" ? "com falha" : "canceladas"}? Esta ação não pode ser desfeita.`)) return;
+    const ids = queue.map((q: any) => q.id);
+    for (const id of ids) {
+      await supabase.from("message_queue" as any).delete().eq("id", id);
+    }
+    toast.success(`${ids.length} mensagens excluídas`);
+    fetchQueue();
+  };
+
   const statusIcon = (status: string) => {
     switch (status) {
       case "pending": return <Clock className="w-3.5 h-3.5 text-amber-500" />;
@@ -867,17 +887,29 @@ const QueueMonitor = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex gap-1">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex gap-1 flex-wrap">
           {["pending", "sent", "failed", "cancelled"].map((s) => (
             <Button key={s} variant={filter === s ? "default" : "outline"} size="sm" className="h-7 text-xs capitalize" onClick={() => setFilter(s)}>
               {s === "pending" ? "Pendentes" : s === "sent" ? "Enviadas" : s === "failed" ? "Falhas" : "Canceladas"}
             </Button>
           ))}
         </div>
-        <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={fetchQueue}>
-          <RefreshCw className="w-3 h-3" /> Atualizar
-        </Button>
+        <div className="flex items-center gap-1">
+          {queue.length > 0 && filter === "pending" && (
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1 text-amber-600 border-amber-500/30 hover:bg-amber-500/10" onClick={handlePauseAll}>
+              <XCircle className="w-3 h-3" /> Pausar todas ({queue.length})
+            </Button>
+          )}
+          {queue.length > 0 && (
+            <Button variant="outline" size="sm" className="h-7 text-xs gap-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={handleDeleteAll}>
+              <Trash2 className="w-3 h-3" /> Excluir todas ({queue.length})
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1" onClick={fetchQueue}>
+            <RefreshCw className="w-3 h-3" /> Atualizar
+          </Button>
+        </div>
       </div>
 
       {loading ? (
