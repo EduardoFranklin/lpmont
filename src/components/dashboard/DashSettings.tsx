@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Save, Code2, AlertTriangle, CalendarCheck, CheckCircle2, ExternalLink, MessageCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import DashScheduleSettings from "./DashScheduleSettings";
 
 interface SettingField {
   key: string;
@@ -295,6 +296,9 @@ const DashSettings = () => {
 
       {/* Z-API WhatsApp integration */}
       <ZApiCard values={values} setValues={setValues} />
+
+      {/* Schedule Settings */}
+      <DashScheduleSettings />
 
 
       <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
