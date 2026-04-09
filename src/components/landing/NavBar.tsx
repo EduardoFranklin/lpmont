@@ -195,7 +195,7 @@ const MobileMenu = ({
             Comprar Agora <ArrowRight className="w-3.5 h-3.5" />
           </a>
           <a
-            href="https://metodomont.com.br/#falar-equipe"
+            href="/contato"
             onClick={onClose}
             className="btn-gradient w-full"
           >
