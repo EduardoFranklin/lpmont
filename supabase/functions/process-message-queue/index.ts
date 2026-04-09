@@ -20,6 +20,7 @@ function substituteVariables(template: string, lead: any): string {
     "{{data}}": lead.reuniao_data_extenso || lead.scheduled_day || "",
     "{{hora}}": lead.reuniao_hora_extenso || lead.scheduled_time || "",
     "{{reuniao_link_google_meet}}": lead.reuniao_link_google_meet || "",
+    "{{reuniao_link_google_calendar}}": lead.reuniao_link_google_calendar || "",
     "{{id_lead}}": lead.id || "",
   };
   let result = template;

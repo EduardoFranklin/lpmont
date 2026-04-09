@@ -204,6 +204,7 @@ Deno.serve(async (req) => {
         "{{data}}": lead.reuniao_data_extenso || lead.scheduled_day || "",
         "{{hora}}": lead.reuniao_hora_extenso || lead.scheduled_time || "",
         "{{reuniao_link_google_meet}}": lead.reuniao_link_google_meet || "",
+        "{{reuniao_link_google_calendar}}": lead.reuniao_link_google_calendar || "",
         "{{lead_number}}": String(lead.lead_number ?? ""),
       };
 
