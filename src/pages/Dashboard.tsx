@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { LogOut, BarChart3, List, Columns3, MessageSquare, Settings, FileText, Users, CalendarCheck } from "lucide-react";
+import { LogOut, BarChart3, List, Columns3, MessageSquare, Settings, FileText, Users, CalendarCheck, MessageCircle } from "lucide-react";
 import DashReports from "@/components/dashboard/DashReports";
 import DashLeadsList from "@/components/dashboard/DashLeadsList";
 import DashKanban from "@/components/dashboard/DashKanban";
