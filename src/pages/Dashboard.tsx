@@ -24,7 +24,7 @@ const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [datePreset, setDatePreset] = useState<DatePreset>("mes");
+  const [datePreset, setDatePreset] = useState<DatePreset>("tudo");
   const [customRange, setCustomRange] = useState<{ from?: Date; to?: Date }>({});
   const [topTab, setTopTab] = useState<"dashboard" | "content">("dashboard");
   const navigate = useNavigate();
