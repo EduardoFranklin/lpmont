@@ -47,6 +47,8 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
           notes: `Quiz page: ${page.slug}`,
           quiz_slug: page.slug,
           funnel_origin: "quiz",
+          status: "novo",
+          temperature: "morno",
         } as any,
         { onConflict: "email", ignoreDuplicates: false }
       ).select("id");
