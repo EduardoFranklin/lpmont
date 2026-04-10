@@ -58,11 +58,16 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
       }
 
       if (upsertData?.[0]?.id) {
+        const leadId = upsertData[0].id;
         // Add quiz tag
         await supabase.from("lead_tags").upsert(
-          { lead_id: upsertData[0].id, tag: "quiz", source: "quiz" } as any,
+          { lead_id: leadId, tag: "quiz", source: "quiz" } as any,
           { onConflict: "lead_id,tag" }
         );
+        // Trigger F2 automation for new lead
+        supabase.functions.invoke("enqueue-automation", {
+          body: { lead_id: leadId, funnel: "F2", event: "quiz_lead_capturado" },
+        }).catch((err) => console.error("Enqueue automation error:", err));
       }
 
       localStorage.setItem("lead_email", cleanEmail);
