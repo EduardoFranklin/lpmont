@@ -31,22 +31,43 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
       return;
     }
 
-    // Save lead
+    // Save lead (upsert to handle duplicate emails)
     try {
-      await supabase.from("leads").insert({
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        treatment: "Dr.",
-        uf: "N/A",
-        city: "N/A",
-        career: "N/A",
-        notes: `Quiz page: ${page.slug}`,
-        quiz_slug: page.slug,
-      } as any);
-      localStorage.setItem("lead_email", email.trim().toLowerCase());
-      localStorage.setItem("lead_phone", phone.trim());
-    } catch {}
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanPhone = phone.trim();
+      const { data: upsertData, error } = await supabase.from("leads").upsert(
+        {
+          name: name.trim(),
+          email: cleanEmail,
+          phone: cleanPhone,
+          treatment: "Dr.",
+          uf: "N/A",
+          city: "N/A",
+          career: "N/A",
+          notes: `Quiz page: ${page.slug}`,
+          quiz_slug: page.slug,
+          funnel_origin: "quiz",
+        } as any,
+        { onConflict: "email", ignoreDuplicates: false }
+      ).select("id");
+
+      if (error) {
+        console.error("Lead upsert error:", error.message);
+      }
+
+      if (upsertData?.[0]?.id) {
+        // Add quiz tag
+        await supabase.from("lead_tags").upsert(
+          { lead_id: upsertData[0].id, tag: "quiz", source: "quiz" } as any,
+          { onConflict: "lead_id,tag" }
+        );
+      }
+
+      localStorage.setItem("lead_email", cleanEmail);
+      localStorage.setItem("lead_phone", cleanPhone);
+    } catch (err) {
+      console.error("Lead save failed:", err);
+    }
 
     setSuccess(true);
   };
