@@ -57,8 +57,18 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
         console.error("Lead upsert error:", error.message);
       }
 
-      if (upsertData?.[0]?.id) {
-        const leadId = upsertData[0].id;
+      // Get lead ID - from upsert result or by querying
+      let leadId = upsertData?.[0]?.id;
+      if (!leadId) {
+        const { data: found } = await supabase
+          .from("leads")
+          .select("id")
+          .eq("email", cleanEmail)
+          .maybeSingle();
+        leadId = found?.id;
+      }
+
+      if (leadId) {
         // Add quiz tag
         await supabase.from("lead_tags").upsert(
           { lead_id: leadId, tag: "quiz", source: "quiz" } as any,
@@ -67,7 +77,11 @@ const UnlockModal = ({ open, onClose, onUnlock, page }: Props) => {
         // Trigger F2 automation for new lead
         supabase.functions.invoke("enqueue-automation", {
           body: { lead_id: leadId, funnel: "F2", event: "quiz_lead_capturado" },
+        }).then((res) => {
+          console.log("Enqueue automation result:", res);
         }).catch((err) => console.error("Enqueue automation error:", err));
+      } else {
+        console.error("Could not resolve lead ID for automation trigger");
       }
 
       localStorage.setItem("lead_email", cleanEmail);
