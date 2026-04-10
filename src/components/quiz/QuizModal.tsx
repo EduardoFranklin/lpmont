@@ -75,7 +75,7 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
         const email = leadEmail.trim().toLowerCase();
         const phone = leadPhone.trim();
         // Upsert lead by email — avoid duplicates
-        const { data: upsertData } = await supabase.from("leads").upsert({
+        const { data: upsertData, error } = await supabase.from("leads").upsert({
           name: leadName.trim(),
           email,
           phone,
@@ -86,7 +86,12 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
           notes: `Quiz: ${page.slug}`,
           quiz_slug: page.slug,
           quiz_started_at: new Date().toISOString(),
-        } as any, { onConflict: "email" }).select("id");
+          funnel_origin: "quiz",
+        } as any, { onConflict: "email", ignoreDuplicates: false }).select("id");
+
+        if (error) {
+          console.error("Quiz lead upsert error:", error.message);
+        }
 
         if (upsertData && upsertData[0]?.id) {
           const leadId = upsertData[0].id;
@@ -98,7 +103,9 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
         }
         localStorage.setItem("lead_email", email);
         localStorage.setItem("lead_phone", phone);
-      } catch {}
+      } catch (err) {
+        console.error("Quiz lead save failed:", err);
+      }
       setPhase("quiz");
       return;
     }
