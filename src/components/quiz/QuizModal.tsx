@@ -87,6 +87,8 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
           quiz_slug: page.slug,
           quiz_started_at: new Date().toISOString(),
           funnel_origin: "quiz",
+          status: "novo",
+          temperature: "morno",
         } as any, { onConflict: "email", ignoreDuplicates: false }).select("id");
 
         if (error) {
