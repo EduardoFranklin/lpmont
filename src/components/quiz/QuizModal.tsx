@@ -95,17 +95,30 @@ const QuizModal = ({ open, onClose, page, questions, onShowCoupon }: Props) => {
           console.error("Quiz lead upsert error:", error.message);
         }
 
-        if (upsertData && upsertData[0]?.id) {
-          const leadId = upsertData[0].id;
-          setLeadId(leadId);
+        let resolvedLeadId = upsertData?.[0]?.id;
+        if (!resolvedLeadId) {
+          const { data: found } = await supabase
+            .from("leads")
+            .select("id")
+            .eq("email", email)
+            .maybeSingle();
+          resolvedLeadId = found?.id;
+        }
+
+        if (resolvedLeadId) {
+          setLeadId(resolvedLeadId);
           await supabase.from("lead_tags").upsert(
-            { lead_id: leadId, tag: "quiz", source: "quiz" } as any,
+            { lead_id: resolvedLeadId, tag: "quiz", source: "quiz" } as any,
             { onConflict: "lead_id,tag" }
           );
           // Trigger F2 automation for new quiz lead
           supabase.functions.invoke("enqueue-automation", {
-            body: { lead_id: leadId, funnel: "F2", event: "quiz_lead_capturado" },
+            body: { lead_id: resolvedLeadId, funnel: "F2", event: "quiz_lead_capturado" },
+          }).then((res) => {
+            console.log("Enqueue automation result:", res);
           }).catch((err) => console.error("Enqueue automation error:", err));
+        } else {
+          console.error("Could not resolve lead ID for quiz automation");
         }
         localStorage.setItem("lead_email", email);
         localStorage.setItem("lead_phone", phone);
